@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" class="lightmode">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="
+default-src 'none';
+script-src 'self' 'unsafe-inline';
+style-src 'self' 'unsafe-inline';
+connect-src *;
+img-src * blob: data:"
+    />
+    <style>
+      html {
+        height: 100%;
+        padding: 0;
+        margin: 0 auto;
+        font-size: 62.5%;
+      }
+      body {
+        margin: 0;
+        height: 100%;
+        position: relative;
+      }
+      a {
+        color: var(--link);
+      }
+      a:hover {
+        color: var(--link-hover);
+      }
+      svelte-app {
+        display: contents;
+      }
+    </style>
+    %sveltekit.head%
+  </head>
+  <body>
+    <svelte-app>%sveltekit.body%</svelte-app>
+  </body>
+</html>

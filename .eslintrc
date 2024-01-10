@@ -1,0 +1,15 @@
+{
+  "extends": "triple/svelte",
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": "./tsconfig.eslint.json",
+    "extraFileExtensions": [".cjs", ".svelte"]
+  },
+  "env": {
+    "browser": true
+  },
+  "rules": {
+    "class-methods-use-this": "off",
+    "import/no-extraneous-dependencies": "off"
+  }
+}

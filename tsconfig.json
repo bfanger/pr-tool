@@ -1,0 +1,6 @@
+{
+  "extends": "./web/.svelte-kit/tsconfig.json",
+  "compilerOptions": {
+    "ignoreDeprecations": "5.0"
+  }
+}

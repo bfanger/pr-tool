@@ -1,0 +1,9 @@
+$font: -apple-system, 'BlinkMacSystemFont', 'Helvetica Neue', 'Helvetica',
+    sans-serif;
+
+@mixin hairline($color, $position: '') {
+    border#{$position}: 1px solid $color;
+    @media (min-device-pixel-ratio: 2) {
+        border#{$position}-width: 0.5px;
+    }
+}

@@ -1,0 +1,6 @@
+node_modules
+/web/.svelte-kit
+/web/.env
+/web/build
+/electron/build
+/electron/out

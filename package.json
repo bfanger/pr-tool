@@ -1,0 +1,64 @@
+{
+  "name": "pr-notifications",
+  "description": "Show PRs in systemtray",
+  "author": "Bob Fanger <bfanger@gmail.com>",
+  "license": "MIT",
+  "workspaces": [
+    "web"
+  ],
+  "scripts": {
+    "dev": "concurrently --kill-others \"yarn:dev:*\"",
+    "dev:web": "yarn --cwd web dev",
+    "dev:electron": "yarn --cwd electron dev",
+    "build:web": "yarn --cwd web build",
+    "build:electron": "yarn --cwd electron build",
+    "start": "yarn --cwd web preview --host --port ${PORT}",
+    "lint": "concurrently --kill-others-on-fail \"npm:lint:*\"",
+    "lint:prettier": "prettier --check --loglevel=warn electron \"web/src/**/*.{svelte,ts}\"",
+    "lint:svelte-check": "svelte-check --fail-on-warnings --fail-on-hints",
+    "lint:eslint": "eslint --ext=js,ts,svelte --max-warnings=0 web/src electron/src",
+    "format": "prettier --write \"electron/src\" \"web/src/**/*.{svelte,ts}\" && eslint electron web/src --ext '.ts' --fix",
+    "precommit": "lint-staged",
+    "prepare": "husky install",
+    "preinstall": "npx only-allow yarn"
+  },
+  "prettier": "eslint-config-triple/.prettierrc",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.57.0",
+    "@typescript-eslint/parser": "^5.57.0",
+    "concurrently": "^8.0.1",
+    "eslint": "^8.37.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-airbnb-typescript": "^17.0.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-config-triple": "^0.5.8",
+    "eslint-import-resolver-typescript": "^3.5.4",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-only-warn": "^1.1.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-svelte3": "^4.0.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.2.0",
+    "only-allow": "^1.1.1",
+    "prettier": "^2.8.7",
+    "prettier-plugin-svelte": "^2.10.0",
+    "svelte": "^3.58.0",
+    "svelte-check": "^3.1.4",
+    "typescript": "^5.0.3"
+  },
+  "lint-staged": {
+    "*.{ts,svelte}": [
+      "eslint --max-warnings 0 --no-ignore",
+      "svelte-check --fail-on-warnings --fail-on-hints"
+    ],
+    "*.(c)?js": [
+      "eslint --max-warnings 0 --no-ignore"
+    ],
+    "*.{css,scss,json,html}": [
+      "prettier --check"
+    ]
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
