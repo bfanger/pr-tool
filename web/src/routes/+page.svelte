@@ -9,22 +9,7 @@
   }
 </script>
 
-<!-- <Spinner /> -->
 <div class="centered">
-  <div>
-    <Button
-      href="https://smarttvteststorage.blob.core.windows.net/mauna3d/pr-notifications/PR%20notifications-darwin-x64.zip"
-    >
-      Download for macOS
-    </Button>
-
-    <Button
-      href="https://smarttvteststorage.blob.core.windows.net/mauna3d/pr-notifications/PR%20notifications-win32-x64.zip"
-    >
-      Download for Windows
-    </Button>
-  </div>
-  <br /><br />
   <Button href="/app">Continue with web</Button>
 </div>
 <slot />
