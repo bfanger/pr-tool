@@ -1,7 +1,7 @@
 {
-  "name": "pr-notifications",
   "description": "Show PRs in systemtray",
   "author": "Bob Fanger <bfanger@gmail.com>",
+  "private": true,
   "license": "MIT",
   "workspaces": [
     "web"
