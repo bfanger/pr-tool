@@ -1,8 +1,8 @@
 import { interval, Observable, of } from "rxjs";
 import { catchError, map, shareReplay, switchMap } from "rxjs/operators";
-import bitbucketApi, { USERNAME } from "../../services/bitbucket-api";
+import bitbucketApi, { USERNAME } from "../../services/bitbucketApi";
 import type { PullRequestsResponse } from "../../services/bitbucket-api-types/pull-requests-response";
-import timeBetween, { MIN, SEC } from "../../services/time-between";
+import timeBetween, { MIN, SEC } from "../../services/timeBetween";
 import type { Profile } from "../Profile";
 import type { Project } from "../Project";
 import type { Provider } from "../Provider";
@@ -43,7 +43,7 @@ export default class BitbucketProvider implements Provider {
         catchError((err) => {
           console.warn(err);
           return of(new Error("Authentication failed"));
-        })
+        }),
       );
   }
 
@@ -54,11 +54,7 @@ export default class BitbucketProvider implements Provider {
         proxy: this.auth.proxy,
         params: { domain: this.auth.domain },
       })
-      .pipe(
-        switchMap((response) => {
-          return this.profile((response as any)[USERNAME]);
-        })
-      );
+      .pipe(switchMap((response) => this.profile((response as any)[USERNAME])));
   }
 
   profile(username: string): Observable<BitbucketProfile> {
@@ -76,7 +72,7 @@ export default class BitbucketProvider implements Provider {
             email: response.emailAddress,
           };
           return profile;
-        })
+        }),
       );
   }
 
@@ -91,7 +87,7 @@ export default class BitbucketProvider implements Provider {
     // )
     // return from([`${src}&d=${fallback}`])
     return of(
-      `https://${this.auth.domain}/users/${profile.id}/avatar.png?s=${px}`
+      `https://${this.auth.domain}/users/${profile.id}/avatar.png?s=${px}`,
     );
   }
 
@@ -110,7 +106,7 @@ export default class BitbucketProvider implements Provider {
             name: project.name,
           }));
           return projects;
-        })
+        }),
       );
   }
 
@@ -129,7 +125,7 @@ export default class BitbucketProvider implements Provider {
         })
         .pipe(
           map((response) => response.values),
-          shareReplay(1)
+          shareReplay(1),
         );
       clearTimeout(this.cacheTimer);
       this.cacheTimer = setTimeout(() => {
@@ -169,7 +165,7 @@ export default class BitbucketProvider implements Provider {
       catchError((err) => {
         this.cached = undefined;
         throw err;
-      })
+      }),
     );
   }
 
@@ -189,7 +185,7 @@ export default class BitbucketProvider implements Provider {
       relevant = true;
     }
     const approved = pullRequest.reviewers.filter(
-      (review) => review.icon === "APPROVED"
+      (review) => review.icon === "APPROVED",
     );
     if (
       created &&

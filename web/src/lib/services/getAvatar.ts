@@ -16,7 +16,7 @@ export default function getAvatar(
   organization: string,
   token: string,
   descriptor: string,
-  size?: string
+  size?: string,
 ) {
   const key = `${descriptor}_${size}`;
   if (!cache[key]) {
@@ -26,7 +26,7 @@ export default function getAvatar(
         const url = URL.createObjectURL(blob);
         return url;
       }),
-      shareReplay(1)
+      shareReplay(1),
     );
   }
   return cache[key];

@@ -25,7 +25,7 @@
       return config.provider
         .avatar(config.profile, config.size)
         .pipe(startWith(placeholder));
-    })
+    }),
   );
 </script>
 

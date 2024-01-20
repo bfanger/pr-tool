@@ -4,9 +4,9 @@ import type { Project } from "../Project";
 import type { Provider } from "../Provider";
 import type { PullRequest, PullRequestStatus } from "../PullRequest";
 import type { GithubProfile } from "./GithubProfile";
-import githubApi from "$lib/services/github-api";
+import githubApi from "$lib/services/githubApi";
 import drip from "$lib/services/drip";
-import timeBetween, { MIN } from "$lib/services/time-between";
+import timeBetween, { MIN } from "$lib/services/timeBetween";
 
 export type GithubProviderAuth = {
   login: string;
@@ -32,7 +32,7 @@ export default class GithubProvider implements Provider {
   valid(): Observable<boolean | Error> {
     return this.account().pipe(
       map(() => true),
-      catchError((err) => of(err))
+      catchError((err) => of(err)),
     );
   }
 
@@ -42,7 +42,7 @@ export default class GithubProvider implements Provider {
         id: user.login,
         name: user.name,
         avatar: user.avatar_url,
-      }))
+      })),
     );
   }
 
@@ -67,13 +67,13 @@ export default class GithubProvider implements Provider {
         map((repos) =>
           repos
             .filter(
-              (repo) => repo.open_issues > 0 && !repo.archived && !repo.fork
+              (repo) => repo.open_issues > 0 && !repo.archived && !repo.fork,
             )
             .map((repo) => ({
               id: repo.full_name,
               name: repo.name,
-            }))
-        )
+            })),
+        ),
       );
   }
 
@@ -118,7 +118,7 @@ export default class GithubProvider implements Provider {
                 map((reviews) => {
                   for (const review of reviews) {
                     data.reviewers = data.reviewers.filter(
-                      (r) => r.profile.id !== review.user.login
+                      (r) => r.profile.id !== review.user.login,
                     );
                     data.reviewers.push({
                       profile: {
@@ -132,11 +132,11 @@ export default class GithubProvider implements Provider {
                     });
                   }
                   return data;
-                })
+                }),
               );
           }
           return of(data);
-        })
+        }),
       );
   }
 
@@ -147,7 +147,7 @@ export default class GithubProvider implements Provider {
 
   pullRequestStatus(
     pullRequest: PullRequest,
-    me: GithubProfile
+    me: GithubProfile,
   ): PullRequestStatus {
     const created = pullRequest.creator.id === me.id;
     const owner = new URL(pullRequest.url).pathname.split("/")[1] === me.id;
@@ -158,7 +158,7 @@ export default class GithubProvider implements Provider {
     const active = created || owner || !!assigned;
     let relevant = owner;
     const approved = pullRequest.reviewers.filter(
-      (review) => review.icon === "APPROVED"
+      (review) => review.icon === "APPROVED",
     );
     if (assigned && assigned.icon !== "APPROVED") {
       relevant = assigned.required || approved.length < 2;

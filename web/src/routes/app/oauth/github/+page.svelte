@@ -4,7 +4,7 @@
   import { goto } from "$app/navigation";
   import Spinner from "$lib/components/Spinner.svelte";
   import Warning from "$lib/components/Warning.svelte";
-  import githubApi from "$lib/services/github-api";
+  import githubApi from "$lib/services/githubApi.js";
   import configs from "$lib/store/configs";
 
   export let data;
@@ -12,7 +12,7 @@
   onMount(async () => {
     if (data.accessToken) {
       const me = await firstValueFrom(
-        githubApi.get("user", { accessToken: data.accessToken })
+        githubApi.get("user", { accessToken: data.accessToken }),
       );
       configs.add({
         type: "github",

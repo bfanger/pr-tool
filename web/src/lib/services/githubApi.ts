@@ -32,7 +32,7 @@ type ResponseMapGet = {
 function applyParams(path: string, config: Config): AjaxRequest {
   const url = `https://api.github.com/${buildUrl(
     path,
-    (config.params ?? {}) as Record<string, string>
+    (config.params ?? {}) as Record<string, string>,
   )}`;
   const request = omit(config, ["token", "params"]) as AjaxRequest;
   request.url = url;
@@ -47,10 +47,10 @@ function applyParams(path: string, config: Config): AjaxRequest {
 function fetch<Response>(
   method: "GET",
   path: string,
-  config: Config
+  config: Config,
 ): Observable<Response> {
   return ajax<any>(applyParams(path, { ...config, method })).pipe(
-    map(({ response }) => response)
+    map(({ response }) => response),
   );
 }
 const githubApi = {

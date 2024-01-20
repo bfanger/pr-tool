@@ -7,12 +7,8 @@ import drip from "./drip";
  */
 export default function dripFlat<T, R>(
   transform: (i: T) => Observable<R[]>,
-  progress?: Observer<number>
+  progress?: Observer<number>,
 ) {
-  return (input: Observable<T[]>) => {
-    return drip(
-      transform,
-      progress
-    )(input).pipe(map((output) => output.flat(1)));
-  };
+  return (input: Observable<T[]>) =>
+    drip(transform, progress)(input).pipe(map((output) => output.flat(1)));
 }

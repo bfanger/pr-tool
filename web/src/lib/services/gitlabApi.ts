@@ -42,11 +42,11 @@ function applyParams(path: string, config: Config): AjaxRequest {
 function fetch<Response>(
   method: "GET",
   path: string,
-  config: Config
+  config: Config,
 ): Observable<Response> {
   return ajax<Response>(applyParams(path, { ...config, method })).pipe(
     // page
-    map(({ response }) => response)
+    map(({ response }) => response),
   );
 }
 const gitlabApi = {
@@ -56,7 +56,7 @@ const gitlabApi = {
   paged<P extends keyof ResponseMapGet>(
     path: P,
     options: Config,
-    perPage = 100
+    perPage = 100,
   ): Observable<ResponseMapGet[P]> {
     const params = options.params ? { ...options.params } : {};
     params.per_page = perPage;
@@ -82,12 +82,8 @@ const gitlabApi = {
           params.page = i;
           requests.push(gitlabApi.get(path, { ...config, params }));
         }
-        return combineLatest(requests).pipe(
-          map((results) => {
-            return results.flat(1);
-          })
-        );
-      })
+        return combineLatest(requests).pipe(map((results) => results.flat(1)));
+      }),
     );
   },
 };

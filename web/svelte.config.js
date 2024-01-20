@@ -8,9 +8,7 @@ const config = {
     adapter: adapter(),
   },
   vitePlugin: {
-    experimental: {
-      inspector: { holdMode: true },
-    },
+    inspector: { holdMode: true },
   },
 };
 

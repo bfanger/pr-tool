@@ -15,10 +15,10 @@ const emptyRef: Empty = {};
  */
 export default function drip<I, O>(
   transform: (i: I) => Observable<O>,
-  progress?: Observer<number>
+  progress?: Observer<number>,
 ) {
-  return (input: Observable<I[]>) => {
-    return input.pipe(
+  return (input: Observable<I[]>) =>
+    input.pipe(
       switchMap((items) => {
         if (items.length === 0) {
           if (progress) {
@@ -27,7 +27,7 @@ export default function drip<I, O>(
           return of([]);
         }
         return combineLatest(
-          items.map((item) => transform(item).pipe(startWith(emptyRef)))
+          items.map((item) => transform(item).pipe(startWith(emptyRef))),
         ).pipe(
           map((combined) => {
             const output = combined.filter((p) => p !== emptyRef);
@@ -39,9 +39,8 @@ export default function drip<I, O>(
               }
             }
             return output as O[];
-          })
+          }),
         );
-      })
+      }),
     );
-  };
 }

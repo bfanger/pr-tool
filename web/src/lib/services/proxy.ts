@@ -31,7 +31,7 @@ export default function proxy(request: AjaxRequest): Observable<ProxyResponse> {
           } as XMLHttpRequest,
         };
         return response;
-      })
-    )
+      }),
+    ),
   );
 }

@@ -35,7 +35,7 @@
         error = err;
       },
     }),
-    retry({ delay: () => merge(retry$, documentVisible$) })
+    retry({ delay: () => merge(retry$, documentVisible$) }),
   );
 
   function filter(prs: ResultWithStatus[], type: string) {

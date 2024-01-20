@@ -1,4 +1,6 @@
 import path from "path";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
 import Axios from "axios";
 import open from "open";
 import {
@@ -7,9 +9,11 @@ import {
   ipcMain,
   Tray,
   nativeTheme,
-  IpcMainEvent,
+  type IpcMainEvent,
   screen,
 } from "electron";
+
+const currentDir = dirname(fileURLToPath(import.meta.url));
 
 let tray: Tray;
 let window: BrowserWindow;
@@ -23,7 +27,7 @@ function getWindowPosition() {
 
   // Center window horizontally below the tray icon
   let x = Math.round(
-    trayBounds.x + trayBounds.width / 2 - windowBounds.width / 2
+    trayBounds.x + trayBounds.width / 2 - windowBounds.width / 2,
   );
   const { width } = screen.getPrimaryDisplay().workAreaSize;
   if (trayBounds.x > 0 && trayBounds.x < width) {
@@ -62,7 +66,7 @@ app.on("window-all-closed", () => {
 });
 const icons = ["default", "error", "busy"];
 function iconFilename(icon: string) {
-  return path.join(__dirname, `../assets/tray-${icon}Template.png`);
+  return path.join(currentDir, `../assets/tray-${icon}Template.png`);
 }
 function createTray() {
   tray = new Tray(iconFilename(currentIcon));
@@ -76,7 +80,7 @@ function createTray() {
     }
   });
 }
-nativeTheme.on("updated", function theThemeHasChanged() {
+nativeTheme.on("updated", () => {
   tray.setImage(iconFilename(currentIcon));
 });
 function createWindow() {
@@ -92,13 +96,13 @@ function createWindow() {
       nodeIntegration: false,
       contextIsolation: true,
       backgroundThrottling: false,
-      preload: path.join(__dirname, "preload.cjs"),
+      preload: path.join(currentDir, "preload.cjs"),
     },
   });
   window.loadURL(
     process.env.NODE_ENV === "development"
       ? "http://localhost:5173/app"
-      : "https://pr.bfanger.nl/app"
+      : "https://pr.bfanger.nl/app",
   );
 
   window.webContents.setWindowOpenHandler(({ url }) => {

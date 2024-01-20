@@ -15,9 +15,9 @@ export default providers$.pipe(
       provider
         .projects()
         .pipe(
-          map((projects) => projects.map((project) => ({ project, provider })))
+          map((projects) => projects.map((project) => ({ project, provider }))),
         ),
-    progress$
+    progress$,
   ),
-  shareReplay(1)
+  shareReplay(1),
 );

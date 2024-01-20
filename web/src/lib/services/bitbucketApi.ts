@@ -43,7 +43,7 @@ function applyParams(path: string, config: Config): AjaxRequest {
 function fetch<Response>(
   method: "GET",
   path: string,
-  config: Config
+  config: Config,
 ): Observable<Response> {
   let client: typeof proxy = ajax;
   if (config.proxy) {
@@ -57,7 +57,7 @@ function fetch<Response>(
       }
       response[USERNAME] = username;
       return response;
-    })
+    }),
   );
 }
 const bitbucketApi = {

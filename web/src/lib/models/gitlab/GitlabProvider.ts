@@ -1,7 +1,7 @@
 import { Observable, of, interval, NEVER } from "rxjs";
 import { catchError, map } from "rxjs/operators";
-import GitlabApi from "../../services/gitlab-api";
-import timeBetween, { MIN } from "../../services/time-between";
+import GitlabApi from "../../services/gitlabApi";
+import timeBetween, { MIN } from "../../services/timeBetween";
 import type { Provider } from "../Provider";
 import type { Project } from "../Project";
 import type { PullRequest, PullRequestStatus } from "../PullRequest";
@@ -30,7 +30,7 @@ export default class GitlabProvider implements Provider {
         id: user.id,
         name: user.name,
         avatar: user.avatar_url,
-      }))
+      })),
     );
   }
 
@@ -52,8 +52,8 @@ export default class GitlabProvider implements Provider {
           .map<Project>((project) => ({
             id: project.id,
             name: project.name,
-          }))
-      )
+          })),
+      ),
     );
   }
 
@@ -69,7 +69,7 @@ export default class GitlabProvider implements Provider {
           projectId,
         },
         token: this.auth.privateToken,
-      }
+      },
     ).pipe(
       map((prs) =>
         prs.map(
@@ -85,9 +85,9 @@ export default class GitlabProvider implements Provider {
                 status: "",
                 icon: "",
               })),
-            } as PullRequest)
-        )
-      )
+            }) as PullRequest,
+        ),
+      ),
     );
   }
 
@@ -105,17 +105,17 @@ export default class GitlabProvider implements Provider {
     }
     return this.account().pipe(
       map(() => true),
-      catchError(() => of(new Error("Invalid credentials, missing scope api")))
+      catchError(() => of(new Error("Invalid credentials, missing scope api"))),
     );
   }
 
   pullRequestStatus(
     pullRequest: PullRequest,
-    me: GitlabProfile
+    me: GitlabProfile,
   ): PullRequestStatus {
     const created = pullRequest.creator.id === me.id;
     const assigned = !!pullRequest.reviewers.find(
-      (reviewer) => reviewer.profile.id === me.id
+      (reviewer) => reviewer.profile.id === me.id,
     );
     const active = created || assigned;
 

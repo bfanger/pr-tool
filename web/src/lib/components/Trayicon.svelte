@@ -1,5 +1,4 @@
 <script lang="ts">
-  import rpc from "$lib/services/rpc";
   import {
     map,
     distinctUntilChanged,
@@ -17,7 +16,8 @@
     Subject,
     fromEvent,
   } from "rxjs";
-  import { MIN, HOUR } from "$lib/services/time-between";
+  import rpc from "$lib/services/rpc";
+  import { MIN, HOUR } from "$lib/services/timeBetween";
   import { progress$ as accountsProgress$ } from "$lib/streams/accounts";
   import {
     pullRequestsWithStatus$,
@@ -35,7 +35,7 @@
         pullRequestsWithStatus$,
         accountsProgress$,
         pullRequestsProgress$,
-      ])
+      ]),
     ),
     map(([prs, accountsProgress, pullRequestsProgress]) => ({
       count: prs.filter((pr) => pr.status.relevant).length,
@@ -65,9 +65,9 @@
         merge(
           timer(15 * MIN),
           fromEvent(window, "online"),
-          documentVisible$
+          documentVisible$,
         ).pipe(delay(1000)),
-    })
+    }),
   );
 
   count$.subscribe((count) => {

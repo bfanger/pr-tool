@@ -1,5 +1,5 @@
 import { pluck } from "rxjs/operators";
-import api from "./azure-api";
+import api from "./azureApi";
 
 interface WithUrl {
   url: string;
@@ -12,14 +12,14 @@ export default {
       {
         params: { organization, id, "api-version": "5.1" },
         token,
-      }
+      },
     );
   },
   avatar(
     organization: string,
     token: string,
     descriptor: string,
-    size?: string // 'medium' | 'small' | 'large',
+    size?: string, // 'medium' | 'small' | 'large',
   ) {
     return api.get(
       "https://vssps.dev.azure.com/[organization]/_apis/graph/subjects/[descriptor]/avatars",
@@ -31,7 +31,7 @@ export default {
           "api-version": "6.0-preview.1",
         },
         token,
-      }
+      },
     );
   },
   users(organization: string, token: string) {
@@ -42,13 +42,13 @@ export default {
           organization,
         },
         token,
-      }
+      },
     );
   },
   projects(
     organization: string,
     token: string,
-    params: { getDefaultTeamImageUrl?: boolean } = {}
+    params: { getDefaultTeamImageUrl?: boolean } = {},
   ) {
     return api
       .get("https://dev.azure.com/[organization]/_apis/projects", {
@@ -64,7 +64,7 @@ export default {
       {
         params: { organization, projectId, "api-version": "5.1" },
         token,
-      }
+      },
     );
   },
 
@@ -75,7 +75,7 @@ export default {
         {
           params: { organization, projectId, "api-version": "5.1" },
           token,
-        }
+        },
       )
       .pipe(pluck("value"));
   },

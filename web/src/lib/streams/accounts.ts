@@ -1,3 +1,4 @@
+/* eslint-disable filenames/match-exported */
 import { shareReplay, map } from "rxjs/operators";
 import { BehaviorSubject } from "rxjs";
 import drip from "../services/drip";
@@ -11,8 +12,8 @@ const accounts$ = providersWithConfig$.pipe(
       provider
         .account()
         .pipe(map((account) => ({ account, provider, config }))),
-    progress$
+    progress$,
   ),
-  shareReplay(1)
+  shareReplay(1),
 );
 export default accounts$;

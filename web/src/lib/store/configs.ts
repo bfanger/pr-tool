@@ -4,7 +4,7 @@ import storage from "$lib/services/storage";
 import type { ProviderConfig } from "$lib/streams/providers";
 
 const { subscribe, update } = writable<ProviderConfig[]>(
-  storage.get("configs", [])
+  storage.get("configs", []),
 );
 export default {
   subscribe,
@@ -29,10 +29,10 @@ export default {
    *  Store as RxJS observable
    */
   rx(): Observable<ProviderConfig[]> {
-    return new Observable((observer) => {
-      return subscribe((configs) => {
+    return new Observable((observer) =>
+      subscribe((configs) => {
         observer.next(configs);
-      });
-    });
+      }),
+    );
   },
 };

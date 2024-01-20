@@ -1,3 +1,4 @@
+/* eslint-disable filenames/match-exported */
 import { map, publishReplay } from "rxjs/operators";
 import type { ConnectableObservable } from "rxjs";
 import configsStore from "../store/configs";
@@ -50,13 +51,13 @@ export function providerFromConfig(config: ProviderConfig): Provider {
 
 const configs$ = configsStore.rx();
 export const providersWithConfig$ = configs$.pipe(
-  map((configs) => {
-    return configs.map((config) => ({
+  map((configs) =>
+    configs.map((config) => ({
       config,
       provider: providerFromConfig(config),
-    }));
-  }),
-  publishReplay(1)
+    })),
+  ),
+  publishReplay(1),
 );
 const connectable: ConnectableObservable<
   Array<{
@@ -66,6 +67,6 @@ const connectable: ConnectableObservable<
 > = providersWithConfig$ as any;
 connectable.connect();
 const providers$ = providersWithConfig$.pipe(
-  map((items) => items.map<Provider>(({ provider }) => provider))
+  map((items) => items.map<Provider>(({ provider }) => provider)),
 );
 export default providers$;

@@ -3,9 +3,6 @@
   "author": "Bob Fanger <bfanger@gmail.com>",
   "private": true,
   "license": "MIT",
-  "workspaces": [
-    "web"
-  ],
   "scripts": {
     "dev": "concurrently --kill-others \"yarn:dev:*\"",
     "dev:web": "yarn --cwd web dev",
@@ -14,42 +11,41 @@
     "build:electron": "yarn --cwd electron build",
     "start": "yarn --cwd web preview --host --port ${PORT}",
     "lint": "concurrently --kill-others-on-fail \"npm:lint:*\"",
-    "lint:prettier": "prettier --check --loglevel=warn electron \"web/src/**/*.{svelte,ts}\"",
-    "lint:svelte-check": "svelte-check --fail-on-warnings --fail-on-hints",
+    "lint:prettier": "prettier --check electron \"web/src/**/*.{svelte,ts}\"",
+    "lint:svelte-check": "svelte-check --fail-on-warnings",
     "lint:eslint": "eslint --ext=js,ts,svelte --max-warnings=0 web/src electron/src",
-    "format": "prettier --write \"electron/src\" \"web/src/**/*.{svelte,ts}\" && eslint electron web/src --ext '.ts' --fix",
+    "format": "eslint electron web/src --ext '.ts' --fix && prettier --write \"electron/src\" \"web/src/**/*.{svelte,ts}\"",
     "precommit": "lint-staged",
     "prepare": "husky install",
-    "preinstall": "npx only-allow yarn"
+    "preinstall": "npx only-allow pnpm"
   },
-  "prettier": "eslint-config-triple/.prettierrc",
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^5.57.0",
-    "@typescript-eslint/parser": "^5.57.0",
-    "concurrently": "^8.0.1",
-    "eslint": "^8.37.0",
+    "@typescript-eslint/eslint-plugin": "^6.19.0",
+    "@typescript-eslint/parser": "^6.19.0",
+    "concurrently": "^8.2.2",
+    "eslint": "^8.56.0",
     "eslint-config-airbnb-base": "^15.0.0",
-    "eslint-config-airbnb-typescript": "^17.0.0",
-    "eslint-config-prettier": "^8.8.0",
-    "eslint-config-triple": "^0.5.8",
-    "eslint-import-resolver-typescript": "^3.5.4",
-    "eslint-plugin-import": "^2.27.5",
+    "eslint-config-airbnb-typescript": "^17.1.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-config-triple": "^1.1.5",
+    "eslint-import-resolver-typescript": "^3.6.1",
+    "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-only-warn": "^1.1.0",
-    "eslint-plugin-prettier": "^4.2.1",
-    "eslint-plugin-svelte3": "^4.0.0",
+    "eslint-plugin-prettier": "^5.1.3",
+    "eslint-plugin-svelte": "^2.35.1",
     "husky": "^8.0.3",
-    "lint-staged": "^13.2.0",
-    "only-allow": "^1.1.1",
-    "prettier": "^2.8.7",
-    "prettier-plugin-svelte": "^2.10.0",
-    "svelte": "^3.58.0",
-    "svelte-check": "^3.1.4",
-    "typescript": "^5.0.3"
+    "lint-staged": "^15.2.0",
+    "only-allow": "^1.2.1",
+    "prettier": "^3.2.4",
+    "prettier-plugin-svelte": "^3.1.2",
+    "svelte": "^4.2.9",
+    "svelte-check": "^3.6.3",
+    "typescript": "^5.3.3"
   },
   "lint-staged": {
     "*.{ts,svelte}": [
       "eslint --max-warnings 0 --no-ignore",
-      "svelte-check --fail-on-warnings --fail-on-hints"
+      "svelte-check --fail-on-warnings"
     ],
     "*.(c)?js": [
       "eslint --max-warnings 0 --no-ignore"

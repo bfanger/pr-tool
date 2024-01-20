@@ -1,8 +1,8 @@
 <script lang="ts">
+  import { map } from "rxjs/operators";
   import accounts$, { progress$ } from "$lib/streams/accounts";
   import AddConfig from "$lib/components/AddConfig.svelte";
   import Trayicon from "$lib/components/Trayicon.svelte";
-  import { map } from "rxjs/operators";
   import Spinner from "$lib/components/Spinner.svelte";
   import { page } from "$app/stores";
 

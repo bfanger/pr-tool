@@ -43,7 +43,7 @@ function applyParams(path: string, config: Config): AjaxRequest {
   if (config.token) {
     const headers = request.headers as any;
     headers.Authorization = `Basic ${window.btoa(
-      `pr-notifications:${config.token}`
+      `pr-notifications:${config.token}`,
     )}`;
   }
   return request;
@@ -51,7 +51,7 @@ function applyParams(path: string, config: Config): AjaxRequest {
 function fetch<Response>(
   method: "GET",
   path: string,
-  config: Config
+  config: Config,
 ): Observable<Response> {
   return ajax<any>(applyParams(path, { ...config, method })).pipe(
     map(({ status, response }) => {
@@ -61,7 +61,7 @@ function fetch<Response>(
         }
       }
       return response;
-    })
+    }),
   );
 }
 const azureApi = {

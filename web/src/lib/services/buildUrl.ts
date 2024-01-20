@@ -7,7 +7,7 @@
 export default function buildUrl(
   path: string,
   params: Record<string, string>,
-  skipNulls = false
+  skipNulls = false,
 ) {
   const query = { ...params };
   let interpolatedPath = path;

@@ -1,8 +1,8 @@
 import { Observable, of, never, interval } from "rxjs";
 import { map, catchError, switchMap, shareReplay } from "rxjs/operators";
 import azure from "../../services/azure";
-import getAvatar from "../../services/get-avatar";
-import timeBetween, { MIN } from "../../services/time-between";
+import getAvatar from "../../services/getAvatar";
+import timeBetween, { MIN } from "../../services/timeBetween";
 import type { Provider } from "../Provider";
 import type { Project } from "../Project";
 import type { PullRequest, PullRequestStatus } from "../PullRequest";
@@ -19,7 +19,7 @@ const statusMap: Record<number, string> = {
 };
 function transformPullRequest(pr: ApiPullRequest): PullRequest {
   const match = pr.repository.url.match(
-    /^(https:\/\/dev\.azure\.com\/[^/]+\/)/
+    /^(https:\/\/dev\.azure\.com\/[^/]+\/)/,
   );
   const encodedProject = encodeURIComponent(pr.repository.project.name);
   const encodedRepo = encodeURIComponent(pr.repository.name);
@@ -76,13 +76,11 @@ export default class AzureDevopsProvider implements Provider {
       this.account$ = azure
         .profile(this.auth.organization, this.auth.personalAccessToken)
         .pipe(
-          map((profile) => {
-            return {
-              id: profile.emailAddress.toLowerCase(),
-              name: profile.displayName,
-            };
-          }),
-          shareReplay(1)
+          map((profile) => ({
+            id: profile.emailAddress.toLowerCase(),
+            name: profile.displayName,
+          })),
+          shareReplay(1),
         );
       this.account$.subscribe(null, () => {
         this.account$ = undefined;
@@ -99,8 +97,8 @@ export default class AzureDevopsProvider implements Provider {
     return this.account().pipe(
       map(() => true),
       catchError(() =>
-        of(new Error("Invalid credentials, missing scope Graph.Read"))
-      )
+        of(new Error("Invalid credentials, missing scope Graph.Read")),
+      ),
     );
   }
 
@@ -110,7 +108,7 @@ export default class AzureDevopsProvider implements Provider {
         this.auth.organization,
         this.auth.personalAccessToken,
         profile.descriptor,
-        size
+        size,
       );
     }
     return this.users().pipe(
@@ -123,9 +121,9 @@ export default class AzureDevopsProvider implements Provider {
           this.auth.organization,
           this.auth.personalAccessToken,
           user.descriptor,
-          size
+          size,
         );
-      })
+      }),
     );
   }
 
@@ -134,14 +132,12 @@ export default class AzureDevopsProvider implements Provider {
       .projects(this.auth.organization, this.auth.personalAccessToken)
       .pipe(
         map((projects) =>
-          projects.map((project) => {
-            return {
-              id: project.id,
-              name: project.name,
-              provider: this,
-            };
-          })
-        )
+          projects.map((project) => ({
+            id: project.id,
+            name: project.name,
+            provider: this,
+          })),
+        ),
       );
   }
 
@@ -150,7 +146,7 @@ export default class AzureDevopsProvider implements Provider {
       .pullRequests(
         `${projectId}`,
         this.auth.organization,
-        this.auth.personalAccessToken
+        this.auth.personalAccessToken,
       )
       .pipe(map((prs) => prs.map(transformPullRequest)));
   }
@@ -179,7 +175,7 @@ export default class AzureDevopsProvider implements Provider {
               };
             });
             return users;
-          })
+          }),
         );
     }
     return this.users$;
@@ -187,7 +183,7 @@ export default class AzureDevopsProvider implements Provider {
 
   pullRequestStatus(
     pullRequest: PullRequest,
-    me: AzureDevopsProfile
+    me: AzureDevopsProfile,
   ): PullRequestStatus {
     const created = pullRequest.creator.id === me.id;
     const assigned = created
@@ -196,7 +192,7 @@ export default class AzureDevopsProvider implements Provider {
     const active = created || !!assigned;
     let relevant = false;
     const approved = pullRequest.reviewers.filter(
-      (review) => review.icon === "APPROVED"
+      (review) => review.icon === "APPROVED",
     );
     if (assigned && assigned.icon !== "APPROVED") {
       relevant = assigned.required || approved.length < 2;

@@ -1,17 +1,17 @@
 <script lang="ts">
-  import configs from "$lib/store/configs";
-  import { providerFromConfig } from "$lib/streams/providers";
   import { Subject } from "rxjs";
   import { switchMap, debounceTime, map, tap, startWith } from "rxjs/operators";
-  import ConfigAzureDevops from "./ConfigAzureDevops.svelte";
   import azurePng from "../../assets/img/azure-devops.png";
+  import gitlabPng from "../../assets/img/gitlab.png";
+  import bitbucketPng from "../../assets/img/bitbucket.png";
+  import githubSvg from "../../assets/img/github.svg";
+  import ConfigAzureDevops from "./ConfigAzureDevops.svelte";
   import ConfigGitlab from "./ConfigGitlab.svelte";
   import Button from "./Button.svelte";
-  import gitlabPng from "../../assets/img/gitlab.png";
   import ConfigBitbucket from "./ConfigBitbucket.svelte";
-  import bitbucketPng from "../../assets/img/bitbucket.png";
   import ConfigGithub from "./ConfigGithub.svelte";
-  import githubSvg from "../../assets/img/github.svg";
+  import { providerFromConfig } from "$lib/streams/providers";
+  import configs from "$lib/store/configs";
   import type { ProviderConfig } from "$lib/streams/providers";
 
   let type: ProviderConfig["type"] = "azure-devops";
@@ -44,8 +44,8 @@
     },
   ];
 
-  $: provider = providers.find(
-    (p) => p.type === type
+  $: activeProvider = providers.find(
+    (p) => p.type === type,
   ) as (typeof providers)[number];
 
   const config$ = new Subject<ProviderConfig>();
@@ -65,7 +65,7 @@
     }),
     tap(() => {
       loading = false;
-    })
+    }),
   );
 
   $: status = $valid$;
@@ -98,11 +98,11 @@
       {/each}
     </div>
     <svelte:component
-      this={provider.Component}
+      this={activeProvider.Component}
       on:config={({ detail }) => config$.next(detail)}
     />
   </div>
-  {#if provider.type !== "github"}
+  {#if activeProvider.type !== "github"}
     <div class="buttons">
       <Button disabled={status.disabled}>Add account</Button>
     </div>

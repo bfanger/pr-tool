@@ -1,3 +1,4 @@
+/* eslint-disable filenames/match-exported */
 /**
  * All projects of all providers
  */
@@ -18,23 +19,25 @@ type Result = {
 };
 export const progress$ = new BehaviorSubject(0);
 const pullRequests$ = projects$.pipe(
-  dripFlat(({ project, provider }) => {
-    return provider.pollFor(project.id).pipe(
-      startWith(null),
-      switchMap(() =>
-        provider.pullRequestsFor(project.id).pipe(
-          map((prs: any) =>
-            prs.map((pr) => ({
-              pullRequest: pr,
-              project,
-              provider,
-            }))
-          )
-        )
-      )
-    );
-  }, progress$),
-  shareReplay(1)
+  dripFlat(
+    ({ project, provider }) =>
+      provider.pollFor(project.id).pipe(
+        startWith(null),
+        switchMap(() =>
+          provider.pullRequestsFor(project.id).pipe(
+            map((prs: any) =>
+              prs.map((pr) => ({
+                pullRequest: pr,
+                project,
+                provider,
+              })),
+            ),
+          ),
+        ),
+      ),
+    progress$,
+  ),
+  shareReplay(1),
 );
 export default pullRequests$;
 export type ResultWithStatus = Result & {
@@ -61,7 +64,7 @@ export const pullRequestsWithStatus$ = combineLatest([
     });
     return withStatus;
   }),
-  shareReplay(1)
+  shareReplay(1),
 );
 
 type Grouped = {
