@@ -69,9 +69,11 @@
   {#each projects as { project, provider, pullRequests } (project.id)}
     <div class="pull-requests">
       <h2 class="title">{project.name}</h2>
-      {#each pullRequests as pullRequest (pullRequest.id)}
-        <PullRequest {pullRequest} {provider} />
-      {/each}
+      <div>
+        {#each pullRequests as pullRequest (pullRequest.id)}
+          <PullRequest {pullRequest} {provider} />
+        {/each}
+      </div>
     </div>
   {/each}
 </TabbedPanel>
