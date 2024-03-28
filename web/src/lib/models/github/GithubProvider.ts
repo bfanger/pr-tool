@@ -97,7 +97,7 @@ export default class GithubProvider implements Provider {
               avatar: pr.user.avatar_url,
             } as GithubProfile,
             reviewers:
-              pr.requested_reviewers?.map((reviewer) => ({
+              pr.requested_reviewers.map((reviewer) => ({
                 profile: {
                   id: reviewer.login,
                   name: reviewer.login,
