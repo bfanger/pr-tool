@@ -6,5 +6,5 @@ export type UserResponse = {
   active: boolean;
   slug: string;
   type: string;
-  links: { self: Array<{ href: string }> };
+  links: { self: { href: string }[] };
 };

@@ -1,6 +1,7 @@
 node_modules
 /web/.svelte-kit
 /web/.env
+/web/.vercel
 /web/build
 /electron/build
 /electron/out

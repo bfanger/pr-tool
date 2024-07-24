@@ -10,21 +10,21 @@
   <button class="button" class:small {disabled} on:click><slot /></button>
 {/if}
 
-<style lang="scss">
-  @import "../../styling/helpers.scss";
+<style>
   .button {
-    font: 1.3rem $font;
+    font: 1.3rem var(--font);
     background: var(--button-background);
     color: var(--button-text);
     border-radius: 0.4rem;
     padding: 0.2rem 1rem;
     min-width: 9rem;
 
-    @include hairline(var(--border));
+    border: var(--hairline) solid var(--border);
     position: relative;
     cursor: pointer;
     text-decoration: none;
     display: inline-block;
+
     &:hover {
       color: var(--text);
     }

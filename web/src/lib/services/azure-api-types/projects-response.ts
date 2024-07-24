@@ -1,6 +1,6 @@
 export type ProjectsResponse = {
   count: number;
-  value: Array<{
+  value: {
     id: string;
     name: string;
     description?: string;
@@ -10,5 +10,5 @@ export type ProjectsResponse = {
     visibility: string;
     lastUpdateTime: string;
     defaultTeamImageUrl?: string; // Depends on the getDefaultTeamImageUrl parameter
-  }>;
+  }[];
 };

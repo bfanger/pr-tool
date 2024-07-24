@@ -13,5 +13,5 @@ type Project = {
   description?: string;
   public: boolean;
   type: string;
-  links: { self: Array<{ href: string }> };
+  links: { self: { href: string }[] };
 };

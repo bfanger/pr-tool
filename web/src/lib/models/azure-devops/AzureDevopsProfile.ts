@@ -1,8 +1,8 @@
-import type { Profile } from "../Profile";
 import type {
   CreatedBy,
   Reviewer,
 } from "../../services/azure-api-types/pull-requests-response";
+import type { Profile } from "../Profile";
 
 export interface AzureDevopsProfile extends Profile {
   id: string; // uniqueName / email

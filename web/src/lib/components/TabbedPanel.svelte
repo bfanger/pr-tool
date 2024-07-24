@@ -29,8 +29,7 @@
   </div>
 </div>
 
-<style lang="scss">
-  @import "../../styling/helpers.scss";
+<style>
   .tabbed-panel {
     height: calc(100vh);
     display: flex;
@@ -46,12 +45,12 @@
     top: 2rem;
   }
   .tab {
-    @include hairline(var(--border));
+    border: var(--hairline) solid var(--border);
     position: relative;
     cursor: pointer;
     text-decoration: none;
     display: inline-block;
-    font: 1.3rem $font;
+    font: 1.3rem var(--font);
     background: var(--button-background);
     color: var(--button-text);
     border-radius: 0.4rem;

@@ -1,9 +1,11 @@
 <slot />
 
-<style lang="scss">
-  @import "../styling/helpers.scss";
-
+<style>
   :root {
+    --font: -apple-system, "BlinkMacSystemFont", "Helvetica Neue", "Helvetica",
+      sans-serif;
+    --hairline: 1px;
+
     background: var(--background);
     color: var(--text);
 
@@ -61,6 +63,10 @@
       --error-background: #a02525;
       --progressbar-bar: #48484a;
       --progressbar-progress: #4792f8;
+    }
+
+    @media (min-device-pixel-ratio: 2) {
+      --hairline: 0.5px;
     }
   }
 </style>

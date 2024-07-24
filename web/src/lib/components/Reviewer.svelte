@@ -30,8 +30,7 @@
   </div>
 </div>
 
-<style lang="scss">
-  @import "../../styling/helpers.scss";
+<style>
   .reviewer {
     display: flex;
     white-space: nowrap;

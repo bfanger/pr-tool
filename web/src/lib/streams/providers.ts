@@ -1,16 +1,16 @@
 /* eslint-disable filenames/match-exported */
-import { map, publishReplay } from "rxjs/operators";
 import type { ConnectableObservable } from "rxjs";
-import configsStore from "../store/configs";
-import AzureDevopsProvider from "../models/azure-devops/AzureDevopsProvider";
-import type { AzureDevopsProviderAuth } from "../models/azure-devops/AzureDevopsProvider";
-import GitlabProvider from "../models/gitlab/GitlabProvider";
-import type { GitlabProviderAuth } from "../models/gitlab/GitlabProvider";
-import BitbucketProvider from "../models/bitbucket/BitbucketProvider";
-import type { BitbucketProviderAuth } from "../models/bitbucket/BitbucketProvider";
-import type { Provider } from "../models/Provider";
+import { map, publishReplay } from "rxjs/operators";
 import type { GithubProviderAuth } from "$lib/models/github/GithubProvider";
 import GithubProvider from "$lib/models/github/GithubProvider";
+import type { AzureDevopsProviderAuth } from "../models/azure-devops/AzureDevopsProvider";
+import type { BitbucketProviderAuth } from "../models/bitbucket/BitbucketProvider";
+import type { GitlabProviderAuth } from "../models/gitlab/GitlabProvider";
+import type { Provider } from "../models/Provider";
+import AzureDevopsProvider from "../models/azure-devops/AzureDevopsProvider";
+import BitbucketProvider from "../models/bitbucket/BitbucketProvider";
+import GitlabProvider from "../models/gitlab/GitlabProvider";
+import configsStore from "../store/configs";
 
 type AzureDevopsProviderConfig = {
   type: "azure-devops";
@@ -60,10 +60,10 @@ export const providersWithConfig$ = configs$.pipe(
   publishReplay(1),
 );
 const connectable: ConnectableObservable<
-  Array<{
+  {
     config: ProviderConfig;
     provider: Provider;
-  }>
+  }[]
 > = providersWithConfig$ as any;
 connectable.connect();
 const providers$ = providersWithConfig$.pipe(

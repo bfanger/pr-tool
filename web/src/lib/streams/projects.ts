@@ -2,8 +2,8 @@
  * All projects of all providers
  */
 
-import { shareReplay, map } from "rxjs/operators";
 import { BehaviorSubject } from "rxjs";
+import { map,shareReplay } from "rxjs/operators";
 import dripFlat from "../services/dripFlat";
 import providers$ from "./providers";
 

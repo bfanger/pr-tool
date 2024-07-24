@@ -1,11 +1,12 @@
-import { omit } from "lodash-es";
-import { Observable, of, combineLatest } from "rxjs";
-import { ajax } from "rxjs/ajax";
+import type {Observable} from "rxjs";
 import type { AjaxRequest } from "rxjs/ajax";
+import { omit } from "lodash-es";
+import { combineLatest, of } from "rxjs";
+import { ajax } from "rxjs/ajax";
 import { map, switchMap } from "rxjs/operators";
-import type { UserResponse } from "./gitlab-api-types/user-response";
-import type { ProjectsResponse } from "./gitlab-api-types/projects-response";
 import type { MergeRequestsResponse } from "./gitlab-api-types/merge-requests-response";
+import type { ProjectsResponse } from "./gitlab-api-types/projects-response";
+import type { UserResponse } from "./gitlab-api-types/user-response";
 import buildUrl from "./buildUrl";
 
 interface Config extends Partial<AjaxRequest> {

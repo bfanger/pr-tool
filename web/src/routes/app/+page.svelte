@@ -82,7 +82,7 @@
 </div>
 <slot />
 
-<style lang="scss">
+<style>
   .pull-requests {
     max-width: 100rem;
     margin-left: auto;

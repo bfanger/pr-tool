@@ -2,10 +2,11 @@
  * The proxy immitates the api of ajax from 'rxjs/ajax' but uses axios inside nodejs.
  * This allows the app to make requests that are not allowed with CORS
  */
-import { Observable, from, defer } from "rxjs";
-import { map } from "rxjs/operators";
-import type { AjaxRequest, AjaxResponse } from "rxjs/ajax";
 import type { AxiosRequestConfig } from "axios";
+import type { Observable} from "rxjs";
+import type { AjaxRequest, AjaxResponse } from "rxjs/ajax";
+import { defer,from } from "rxjs";
+import { map } from "rxjs/operators";
 import rpc from "./rpc";
 
 export type ProxyResponse = Pick<

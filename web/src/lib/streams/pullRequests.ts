@@ -3,14 +3,14 @@
  * All projects of all providers
  */
 
-import { combineLatest, BehaviorSubject } from "rxjs";
-import { map, switchMap, startWith, shareReplay } from "rxjs/operators";
-import dripFlat from "../services/dripFlat";
-import type { PullRequest, PullRequestStatus } from "../models/PullRequest";
+import { BehaviorSubject,combineLatest } from "rxjs";
+import { map, shareReplay,startWith, switchMap } from "rxjs/operators";
 import type { Project } from "../models/Project";
 import type { Provider } from "../models/Provider";
-import projects$ from "./projects";
+import type { PullRequest, PullRequestStatus } from "../models/PullRequest";
+import dripFlat from "../services/dripFlat";
 import accounts$ from "./accounts";
+import projects$ from "./projects";
 
 type Result = {
   pullRequest: PullRequest;

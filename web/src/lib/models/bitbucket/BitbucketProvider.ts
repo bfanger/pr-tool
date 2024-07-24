@@ -1,12 +1,13 @@
-import { interval, Observable, of } from "rxjs";
+import type { Observable} from "rxjs";
+import { interval, of } from "rxjs";
 import { catchError, map, shareReplay, switchMap } from "rxjs/operators";
-import bitbucketApi, { USERNAME } from "../../services/bitbucketApi";
 import type { PullRequestsResponse } from "../../services/bitbucket-api-types/pull-requests-response";
-import timeBetween, { MIN, SEC } from "../../services/timeBetween";
 import type { Profile } from "../Profile";
 import type { Project } from "../Project";
 import type { Provider } from "../Provider";
 import type { PullRequest, PullRequestStatus, Reviewer } from "../PullRequest";
+import bitbucketApi, { USERNAME } from "../../services/bitbucketApi";
+import timeBetween, { MIN, SEC } from "../../services/timeBetween";
 
 export type BitbucketProviderAuth = {
   domain: string;

@@ -9,7 +9,7 @@
   />
 </div>
 
-<style lang="scss">
+<style>
   .bar {
     margin-left: auto;
     margin-right: auto;

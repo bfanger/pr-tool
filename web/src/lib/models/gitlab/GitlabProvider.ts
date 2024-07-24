@@ -1,11 +1,12 @@
-import { Observable, of, interval, NEVER } from "rxjs";
+import type { Observable} from "rxjs";
+import { interval, NEVER,of } from "rxjs";
 import { catchError, map } from "rxjs/operators";
+import type { Project } from "../Project";
+import type { Provider } from "../Provider";
+import type { PullRequest, PullRequestStatus } from "../PullRequest";
 import GitlabApi from "../../services/gitlabApi";
 import timeBetween, { MIN } from "../../services/timeBetween";
-import type { Provider } from "../Provider";
-import type { Project } from "../Project";
-import type { PullRequest, PullRequestStatus } from "../PullRequest";
-import { userToProfile, type GitlabProfile } from "./GitlabProfile";
+import { type GitlabProfile,userToProfile } from "./GitlabProfile";
 
 export type GitlabProviderAuth = {
   domain: string;

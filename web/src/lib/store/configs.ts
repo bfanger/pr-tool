@@ -1,7 +1,7 @@
-import { writable } from "svelte/store";
 import { Observable } from "rxjs";
-import storage from "$lib/services/storage";
+import { writable } from "svelte/store";
 import type { ProviderConfig } from "$lib/streams/providers";
+import storage from "$lib/services/storage";
 
 const { subscribe, update } = writable<ProviderConfig[]>(
   storage.get("configs", []),

@@ -1,9 +1,8 @@
+import { GITHUB_CLIENT_SECRET } from "$env/static/private";
 import {
   PUBLIC_GITHUB_CLIENT_ID,
   PUBLIC_GITHUB_REDIRECT_URI,
 } from "$env/static/public";
-
-import { GITHUB_CLIENT_SECRET } from "$env/static/private";
 
 export const prerender = false;
 export const load = async ({ url }) => {

@@ -117,7 +117,7 @@
   {/if}
 </form>
 
-<style lang="scss">
+<style>
   .title {
     font-size: 1.7rem;
     font-weight: bold;

@@ -1,14 +1,14 @@
+import type { Observable } from "rxjs";
+import type { AjaxRequest } from "rxjs/ajax";
 import { omit } from "lodash-es";
 import { ajax } from "rxjs/ajax";
-import type { AjaxRequest } from "rxjs/ajax";
 import { map } from "rxjs/operators";
-import type { Observable } from "rxjs";
-import type { ProjectsResponse } from "./azure-api-types/projects-response";
-import type { ProjectResponse } from "./azure-api-types/project-response";
-import type { TeamResponse } from "./azure-api-types/team-response";
-import type { PullRequestsResponse } from "./azure-api-types/pull-requests-response";
-import type { ProfileResponse } from "./azure-api-types/profile-response";
 import type { AvatarsResponse } from "./azure-api-types/avatars-response";
+import type { ProfileResponse } from "./azure-api-types/profile-response";
+import type { ProjectResponse } from "./azure-api-types/project-response";
+import type { ProjectsResponse } from "./azure-api-types/projects-response";
+import type { PullRequestsResponse } from "./azure-api-types/pull-requests-response";
+import type { TeamResponse } from "./azure-api-types/team-response";
 import type { UsersResponse } from "./azure-api-types/users-response";
 import buildUrl from "./buildUrl";
 

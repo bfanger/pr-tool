@@ -1,7 +1,7 @@
 <script lang="ts">
   import azurePng from "../../assets/img/azure-devops.png";
-  import gitlabPng from "../../assets/img/gitlab.png";
   import bitbucketPng from "../../assets/img/bitbucket.png";
+  import gitlabPng from "../../assets/img/gitlab.png";
 </script>
 
 <div class="spinner">
@@ -10,13 +10,14 @@
   <img class="dot" src={bitbucketPng} alt="." />
 </div>
 
-<style lang="scss">
+<style>
   .spinner {
     position: absolute;
     top: 50%;
     left: 50%;
   }
   .dot {
+    --offset: 2rem;
     position: absolute;
     width: 2rem;
     height: 2rem;
@@ -30,22 +31,22 @@
       animation-delay: -1.2s;
     }
   }
-  $offset: 2rem;
+
   @keyframes spin {
     0% {
-      transform: translate(-$offset, -$offset);
+      transform: translate(calc(var(--offset) * -1), calc(var(--offset) * -1));
     }
     25% {
-      transform: translate($offset, -$offset);
+      transform: translate(var(--offset), calc(var(--offset) * -1));
     }
     50% {
-      transform: translate($offset, $offset);
+      transform: translate(var(--offset), var(--offset));
     }
     75% {
-      transform: translate(-$offset, $offset);
+      transform: translate(calc(var(--offset) * -1), var(--offset));
     }
     100% {
-      transform: translate(-$offset, -$offset);
+      transform: translate(calc(var(--offset) * -1), calc(var(--offset) * -1));
     }
   }
 </style>

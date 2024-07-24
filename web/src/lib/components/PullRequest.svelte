@@ -1,8 +1,8 @@
 <script lang="ts">
+  import type { Provider } from "$lib/models/Provider";
+  import type { PullRequest } from "$lib/models/PullRequest";
   import Avatar from "./Avatar.svelte";
   import Reviewer from "./Reviewer.svelte";
-  import type { PullRequest } from "$lib/models/PullRequest";
-  import type { Provider } from "$lib/models/Provider";
 
   export let provider: Provider;
   export let pullRequest: PullRequest;
@@ -24,20 +24,19 @@
   </div>
 </a>
 
-<style lang="scss">
-  @import "../../styling/helpers.scss";
+<style>
   .pull-request {
     display: block;
     color: var(--text);
     text-decoration: none;
     background: var(--inset);
     padding: 0.8rem 1.2rem;
-    @include hairline(var(--border), -bottom);
-    @include hairline(var(--border), -left);
-    @include hairline(var(--border), -right);
+    border-right: var(--hairline) solid var(--border);
+    border-bottom: var(--hairline) solid var(--border);
+    border-left: var(--hairline) solid var(--border);
   }
   .pull-request:first-child {
-    @include hairline(var(--border), -top);
+    border-top: var(--hairline) solid var(--border);
     border-top-left-radius: 0.6rem;
     border-top-right-radius: 0.6rem;
   }

@@ -1,13 +1,13 @@
+import type { Observable } from "rxjs";
+import type { AjaxRequest } from "rxjs/ajax";
 import { omit } from "lodash-es";
 import { ajax } from "rxjs/ajax";
-import type { AjaxRequest } from "rxjs/ajax";
 import { map } from "rxjs/operators";
-import type { Observable } from "rxjs";
-import buildUrl from "./buildUrl";
-import type { UserResponse } from "./github-api-types/user-response";
-import type { RepositoriesResponse } from "./github-api-types/repositories-response";
 import type { PullRequestsResponse } from "./github-api-types/pull-requests-response";
+import type { RepositoriesResponse } from "./github-api-types/repositories-response";
 import type { ReviewsResponse } from "./github-api-types/reviews-response";
+import type { UserResponse } from "./github-api-types/user-response";
+import buildUrl from "./buildUrl";
 
 interface Config extends Partial<AjaxRequest> {
   accessToken: string;

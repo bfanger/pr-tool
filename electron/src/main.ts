@@ -1,17 +1,17 @@
-import path from "path";
-import { fileURLToPath } from "url";
-import { dirname } from "path";
 import Axios from "axios";
-import open from "open";
 import {
   app,
   BrowserWindow,
   ipcMain,
-  Tray,
-  nativeTheme,
   type IpcMainEvent,
+  nativeTheme,
   screen,
+  Tray,
 } from "electron";
+import open from "open";
+import path from "path";
+import { dirname } from "path";
+import { fileURLToPath } from "url";
 
 const currentDir = dirname(fileURLToPath(import.meta.url));
 

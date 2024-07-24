@@ -1,5 +1,5 @@
-import type { Profile } from "../Profile";
 import type { ApiUser } from "../../services/gitlab-api-types/api-user";
+import type { Profile } from "../Profile";
 
 export interface GitlabProfile extends Profile {
   id: number;

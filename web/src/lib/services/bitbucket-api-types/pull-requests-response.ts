@@ -38,7 +38,7 @@ type PullRequest = {
     commentCount: number;
     openTaskCount: number;
   };
-  links: { self: Array<{ href: string }> };
+  links: { self: { href: string }[] };
 };
 
 type Author = {
@@ -50,7 +50,7 @@ type Author = {
     active: boolean;
     slug: string;
     type: string;
-    links: { self: Array<{ href: string }> };
+    links: { self: { href: string }[] };
   };
   role: string;
   approved: boolean;
@@ -72,11 +72,11 @@ type Repository = {
     name: string;
     public: boolean;
     type: string;
-    links: { self: Array<{ href: string }> };
+    links: { self: { href: string }[] };
   };
   public: boolean;
   links: {
-    clone: Array<{ name: string; href: string }>;
-    self: Array<{ href: string }>;
+    clone: { name: string; href: string }[];
+    self: { href: string }[];
   };
 };

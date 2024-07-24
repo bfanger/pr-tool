@@ -1,12 +1,13 @@
-import { NEVER, Observable, interval, of } from "rxjs";
+import type { Observable} from "rxjs";
+import { interval, NEVER, of } from "rxjs";
 import { catchError, map } from "rxjs/operators";
+import drip from "$lib/services/drip";
+import githubApi from "$lib/services/githubApi";
+import timeBetween, { MIN } from "$lib/services/timeBetween";
 import type { Project } from "../Project";
 import type { Provider } from "../Provider";
 import type { PullRequest, PullRequestStatus } from "../PullRequest";
 import type { GithubProfile } from "./GithubProfile";
-import githubApi from "$lib/services/githubApi";
-import drip from "$lib/services/drip";
-import timeBetween, { MIN } from "$lib/services/timeBetween";
 
 export type GithubProviderAuth = {
   login: string;

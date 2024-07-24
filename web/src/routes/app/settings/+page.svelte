@@ -43,7 +43,7 @@
 <BackButton />
 <slot />
 
-<style lang="scss">
+<style>
   .config {
     display: grid;
     grid-template-columns: 2fr 1fr min-content;

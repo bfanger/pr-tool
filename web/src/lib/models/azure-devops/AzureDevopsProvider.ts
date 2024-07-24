@@ -1,14 +1,15 @@
-import { Observable, of, never, interval } from "rxjs";
-import { map, catchError, switchMap, shareReplay } from "rxjs/operators";
+import type { Observable} from "rxjs";
+import { interval,never, of } from "rxjs";
+import { catchError, map, shareReplay,switchMap } from "rxjs/operators";
+import type { PullRequest as ApiPullRequest } from "../../services/azure-api-types/pull-requests-response";
+import type { Project } from "../Project";
+import type { Provider } from "../Provider";
+import type { PullRequest, PullRequestStatus } from "../PullRequest";
+import type { AzureDevopsProfile } from "./AzureDevopsProfile";
 import azure from "../../services/azure";
 import getAvatar from "../../services/getAvatar";
 import timeBetween, { MIN } from "../../services/timeBetween";
-import type { Provider } from "../Provider";
-import type { Project } from "../Project";
-import type { PullRequest, PullRequestStatus } from "../PullRequest";
-import type { PullRequest as ApiPullRequest } from "../../services/azure-api-types/pull-requests-response";
-import type { AzureDevopsProfile } from "./AzureDevopsProfile";
-import { fromReviewer, fromCreatedBy } from "./AzureDevopsProfile";
+import { fromCreatedBy,fromReviewer } from "./AzureDevopsProfile";
 
 const statusMap: Record<number, string> = {
   10: "Approved",

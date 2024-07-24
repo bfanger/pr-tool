@@ -1,13 +1,13 @@
 import type { Observable } from "rxjs";
-import { ajax } from "rxjs/ajax";
 import type { AjaxRequest } from "rxjs/ajax";
 import { omit } from "lodash-es";
+import { ajax } from "rxjs/ajax";
 import { map } from "rxjs/operators";
-import type { PullRequestsResponse } from "./bitbucket-api-types/pull-requests-response";
 import type { ProjectsResponse } from "./bitbucket-api-types/projects-response";
+import type { PullRequestsResponse } from "./bitbucket-api-types/pull-requests-response";
 import type { UserResponse } from "./bitbucket-api-types/user-response";
-import proxy from "./proxy";
 import buildUrl from "./buildUrl";
+import proxy from "./proxy";
 
 interface Config extends Partial<AjaxRequest> {
   token: string; // Personal Access Token

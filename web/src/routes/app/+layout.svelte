@@ -1,10 +1,10 @@
 <script lang="ts">
   import { map } from "rxjs/operators";
-  import accounts$, { progress$ } from "$lib/streams/accounts";
-  import AddConfig from "$lib/components/AddConfig.svelte";
-  import Trayicon from "$lib/components/Trayicon.svelte";
-  import Spinner from "$lib/components/Spinner.svelte";
   import { page } from "$app/stores";
+  import AddConfig from "$lib/components/AddConfig.svelte";
+  import Spinner from "$lib/components/Spinner.svelte";
+  import Trayicon from "$lib/components/Trayicon.svelte";
+  import accounts$, { progress$ } from "$lib/streams/accounts";
 
   const isServer = typeof window === "undefined";
 
@@ -28,13 +28,11 @@
   {/if}
 </div>
 
-<style lang="scss">
-  @import "../../styling/helpers.scss";
-
+<style>
   .layout {
     min-height: 100%;
     box-sizing: border-box;
-    font-family: $font;
+    font-family: var(--font);
     font-size: 1.4rem;
     letter-spacing: 0.1px;
     display: flex;
