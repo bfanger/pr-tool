@@ -1,5 +1,4 @@
-import type {
-  Channel} from "pr-tool-web/src/lib/services/rpc";
+import type { Channel } from "pr-tool-web/src/lib/services/rpc";
 import { contextBridge, ipcRenderer } from "electron";
 import {
   channels,

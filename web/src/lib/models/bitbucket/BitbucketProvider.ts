@@ -1,4 +1,4 @@
-import type { Observable} from "rxjs";
+import type { Observable } from "rxjs";
 import { interval, of } from "rxjs";
 import { catchError, map, shareReplay, switchMap } from "rxjs/operators";
 import type { PullRequestsResponse } from "../../services/bitbucket-api-types/pull-requests-response";

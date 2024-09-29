@@ -1,29 +1,29 @@
 <script lang="ts">
   import {
-    map,
-    distinctUntilChanged,
-    retry,
-    tap,
-    switchMap,
-    startWith,
-    delay,
-  } from "rxjs/operators";
-  import {
-    interval,
-    timer,
-    merge,
     combineLatest,
-    Subject,
     fromEvent,
+    interval,
+    merge,
+    Subject,
+    timer,
   } from "rxjs";
-  import rpc from "$lib/services/rpc";
-  import { MIN, HOUR } from "$lib/services/timeBetween";
-  import { progress$ as accountsProgress$ } from "$lib/streams/accounts";
   import {
-    pullRequestsWithStatus$,
-    progress$ as pullRequestsProgress$,
-  } from "$lib/streams/pullRequests";
+    delay,
+    distinctUntilChanged,
+    map,
+    retry,
+    startWith,
+    switchMap,
+    tap,
+  } from "rxjs/operators";
+  import rpc from "$lib/services/rpc";
+  import { HOUR, MIN } from "$lib/services/timeBetween";
+  import { progress$ as accountsProgress$ } from "$lib/streams/accounts";
   import documentVisible$ from "$lib/streams/documentVisible";
+  import {
+    progress$ as pullRequestsProgress$,
+    pullRequestsWithStatus$,
+  } from "$lib/streams/pullRequests";
 
   let title = "Loading...";
 

@@ -1,4 +1,4 @@
-import type {Observable} from "rxjs";
+import type { Observable } from "rxjs";
 import type { AjaxRequest } from "rxjs/ajax";
 import { omit } from "lodash-es";
 import { combineLatest, of } from "rxjs";

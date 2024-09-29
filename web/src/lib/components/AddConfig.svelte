@@ -1,18 +1,18 @@
 <script lang="ts">
   import { Subject } from "rxjs";
-  import { switchMap, debounceTime, map, tap, startWith } from "rxjs/operators";
+  import { debounceTime, map, startWith, switchMap, tap } from "rxjs/operators";
+  import type { ProviderConfig } from "$lib/streams/providers";
+  import configs from "$lib/store/configs";
+  import { providerFromConfig } from "$lib/streams/providers";
   import azurePng from "../../assets/img/azure-devops.png";
-  import gitlabPng from "../../assets/img/gitlab.png";
   import bitbucketPng from "../../assets/img/bitbucket.png";
   import githubSvg from "../../assets/img/github.svg";
-  import ConfigAzureDevops from "./ConfigAzureDevops.svelte";
-  import ConfigGitlab from "./ConfigGitlab.svelte";
+  import gitlabPng from "../../assets/img/gitlab.png";
   import Button from "./Button.svelte";
+  import ConfigAzureDevops from "./ConfigAzureDevops.svelte";
   import ConfigBitbucket from "./ConfigBitbucket.svelte";
   import ConfigGithub from "./ConfigGithub.svelte";
-  import { providerFromConfig } from "$lib/streams/providers";
-  import configs from "$lib/store/configs";
-  import type { ProviderConfig } from "$lib/streams/providers";
+  import ConfigGitlab from "./ConfigGitlab.svelte";
 
   let type: ProviderConfig["type"] = "azure-devops";
   let loading = false;

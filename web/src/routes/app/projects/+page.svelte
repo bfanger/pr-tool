@@ -1,6 +1,6 @@
 <script lang="ts">
-  import projects$, { progress$ } from "$lib/streams/projects";
   import BackButton from "$lib/components/BackButton.svelte";
+  import projects$, { progress$ } from "$lib/streams/projects";
 
   $: projects = $projects$;
   $: percentage = $progress$ * 100;

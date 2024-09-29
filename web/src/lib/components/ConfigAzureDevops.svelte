@@ -1,8 +1,8 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
-  import TextInput from "./TextInput.svelte";
-  import type { ProviderConfig } from "$lib/streams/providers";
   import type { AzureDevopsProviderAuth } from "$lib/models/azure-devops/AzureDevopsProvider";
+  import type { ProviderConfig } from "$lib/streams/providers";
+  import TextInput from "./TextInput.svelte";
 
   const dispatch = createEventDispatcher();
 

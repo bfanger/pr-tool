@@ -1,10 +1,10 @@
 <script lang="ts">
-  import Spinner from "./Spinner.svelte";
-  import Button from "$lib/components/Button.svelte";
   import {
     PUBLIC_GITHUB_CLIENT_ID,
     PUBLIC_GITHUB_REDIRECT_URI,
   } from "$env/static/public";
+  import Button from "$lib/components/Button.svelte";
+  import Spinner from "./Spinner.svelte";
 
   let authorizing = false;
 

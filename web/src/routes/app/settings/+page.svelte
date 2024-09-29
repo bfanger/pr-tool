@@ -1,11 +1,11 @@
 <script lang="ts">
   import { lastValueFrom } from "rxjs";
-  import configs from "$lib/store/configs";
-  import { providersWithConfig$ } from "$lib/streams/providers";
   import AddConfig from "$lib/components/AddConfig.svelte";
   import BackButton from "$lib/components/BackButton.svelte";
-  import rpc from "$lib/services/rpc";
   import Button from "$lib/components/Button.svelte";
+  import rpc from "$lib/services/rpc";
+  import configs from "$lib/store/configs";
+  import { providersWithConfig$ } from "$lib/streams/providers";
 </script>
 
 <br />

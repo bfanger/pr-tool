@@ -3,8 +3,8 @@
  * All projects of all providers
  */
 
-import { BehaviorSubject,combineLatest } from "rxjs";
-import { map, shareReplay,startWith, switchMap } from "rxjs/operators";
+import { BehaviorSubject, combineLatest } from "rxjs";
+import { map, shareReplay, startWith, switchMap } from "rxjs/operators";
 import type { Project } from "../models/Project";
 import type { Provider } from "../models/Provider";
 import type { PullRequest, PullRequestStatus } from "../models/PullRequest";

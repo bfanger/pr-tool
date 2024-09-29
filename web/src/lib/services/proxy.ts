@@ -3,9 +3,9 @@
  * This allows the app to make requests that are not allowed with CORS
  */
 import type { AxiosRequestConfig } from "axios";
-import type { Observable} from "rxjs";
+import type { Observable } from "rxjs";
 import type { AjaxRequest, AjaxResponse } from "rxjs/ajax";
-import { defer,from } from "rxjs";
+import { defer, from } from "rxjs";
 import { map } from "rxjs/operators";
 import rpc from "./rpc";
 

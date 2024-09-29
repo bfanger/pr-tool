@@ -3,7 +3,7 @@
  */
 
 import { BehaviorSubject } from "rxjs";
-import { map,shareReplay } from "rxjs/operators";
+import { map, shareReplay } from "rxjs/operators";
 import dripFlat from "../services/dripFlat";
 import providers$ from "./providers";
 

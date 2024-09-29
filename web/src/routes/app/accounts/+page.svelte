@@ -1,10 +1,10 @@
 <script lang="ts">
-  import configs from "$lib/store/configs";
-  import accounts$, { progress$ } from "$lib/streams/accounts";
-  import Avatar from "$lib/components/Avatar.svelte";
   import AddConfig from "$lib/components/AddConfig.svelte";
+  import Avatar from "$lib/components/Avatar.svelte";
   import BackButton from "$lib/components/BackButton.svelte";
   import Button from "$lib/components/Button.svelte";
+  import configs from "$lib/store/configs";
+  import accounts$, { progress$ } from "$lib/streams/accounts";
 
   $: accounts = $accounts$;
   $: percentage = $progress$ * 100;

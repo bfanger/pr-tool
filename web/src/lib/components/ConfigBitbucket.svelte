@@ -1,8 +1,8 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
-  import TextInput from "./TextInput.svelte";
-  import type { ProviderConfig } from "$lib/streams/providers";
   import type { BitbucketProviderAuth } from "$lib/models/bitbucket/BitbucketProvider";
+  import type { ProviderConfig } from "$lib/streams/providers";
+  import TextInput from "./TextInput.svelte";
 
   const dispatch = createEventDispatcher();
   const proxyAvailable = !!window.rpc;

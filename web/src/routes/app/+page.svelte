@@ -1,20 +1,20 @@
 <script lang="ts">
   // eslint-disable-next-line import/extensions
-  import { tap, retry } from "rxjs/operators";
   import { merge, Subject } from "rxjs";
-  import {
-    groupByProject,
-    pullRequestsWithStatus$,
-    progress$ as prProgress$,
-  } from "$lib/streams/pullRequests";
-  import { progress$ as accountsProgress$ } from "$lib/streams/accounts";
-  import TabbedPanel from "$lib/components/TabbedPanel.svelte";
-  import PullRequest from "$lib/components/PullRequest.svelte";
+  import { retry, tap } from "rxjs/operators";
   import type { ResultWithStatus } from "$lib/streams/pullRequests";
   import Button from "$lib/components/Button.svelte";
   import Progressbar from "$lib/components/Progressbar.svelte";
-  import documentVisible$ from "$lib/streams/documentVisible";
+  import PullRequest from "$lib/components/PullRequest.svelte";
+  import TabbedPanel from "$lib/components/TabbedPanel.svelte";
   import Warning from "$lib/components/Warning.svelte";
+  import { progress$ as accountsProgress$ } from "$lib/streams/accounts";
+  import documentVisible$ from "$lib/streams/documentVisible";
+  import {
+    groupByProject,
+    progress$ as prProgress$,
+    pullRequestsWithStatus$,
+  } from "$lib/streams/pullRequests";
 
   const filterOptions = [
     { key: "relevant", label: "Relevant" },

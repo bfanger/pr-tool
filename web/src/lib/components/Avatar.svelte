@@ -1,9 +1,9 @@
 <script lang="ts">
   import { of, ReplaySubject } from "rxjs";
   import { startWith, switchMap } from "rxjs/operators";
-  import placeholder from "../../assets/img/avatar-placeholder.svg";
-  import type { Provider } from "$lib/models/Provider";
   import type { Profile } from "$lib/models/Profile";
+  import type { Provider } from "$lib/models/Provider";
+  import placeholder from "../../assets/img/avatar-placeholder.svg";
 
   export let profile: Profile;
   export let provider: Provider;

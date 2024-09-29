@@ -1,4 +1,4 @@
-import type { Observable} from "rxjs";
+import type { Observable } from "rxjs";
 import { interval, NEVER, of } from "rxjs";
 import { catchError, map } from "rxjs/operators";
 import drip from "$lib/services/drip";

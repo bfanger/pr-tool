@@ -1,6 +1,6 @@
-import type { Observable,Observer } from "rxjs";
+import type { Observable, Observer } from "rxjs";
 import { combineLatest, of } from "rxjs";
-import { map,startWith, switchMap } from "rxjs/operators";
+import { map, startWith, switchMap } from "rxjs/operators";
 
 type Empty = unknown;
 const emptyRef: Empty = {};
