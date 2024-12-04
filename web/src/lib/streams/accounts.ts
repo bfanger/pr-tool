@@ -1,4 +1,3 @@
-/* eslint-disable filenames/match-exported */
 import { BehaviorSubject } from "rxjs";
 import { map, shareReplay } from "rxjs/operators";
 import drip from "../services/drip";

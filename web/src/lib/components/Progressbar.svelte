@@ -6,7 +6,7 @@
   <div
     class="progress"
     style="transform: scaleX({Math.max(1, percentage) / 100})"
-  />
+  ></div>
 </div>
 
 <style>

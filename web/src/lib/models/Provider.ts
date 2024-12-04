@@ -16,6 +16,5 @@ export interface Provider {
   projects(): Observable<Project[]>;
   pullRequestsFor(projectId: string | number): Observable<PullRequest[]>;
   pollFor(projectId: string | number): Observable<null>;
-  // pullRequests?(): Observable<PullRequestWithProject[]>
   pullRequestStatus(pullRequest: PullRequest, me: Profile): PullRequestStatus;
 }

@@ -1,4 +1,3 @@
-/* eslint-disable filenames/match-exported */
 import { defer, fromEvent, NEVER } from "rxjs";
 import { filter } from "rxjs/operators";
 

@@ -1,5 +1,4 @@
 <script lang="ts">
-  // eslint-disable-next-line import/extensions
   import { merge, Subject } from "rxjs";
   import { retry, tap } from "rxjs/operators";
   import type { ResultWithStatus } from "$lib/streams/pullRequests";

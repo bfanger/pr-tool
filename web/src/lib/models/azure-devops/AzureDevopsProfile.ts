@@ -18,7 +18,6 @@ export function fromCreatedBy(createdBy: CreatedBy): AzureDevopsProfile {
   };
 }
 export function fromReviewer(reviewer: Reviewer): AzureDevopsProfile {
-  // eslint-disable-next-line no-underscore-dangle
   const match = reviewer._links.avatar.href.match(/MemberAvatars\/([^/]+)/);
   return {
     id: reviewer.uniqueName.toLowerCase(),

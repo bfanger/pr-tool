@@ -1,4 +1,3 @@
-/* eslint-disable filenames/match-exported */
 /**
  * All projects of all providers
  */

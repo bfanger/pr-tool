@@ -11,7 +11,8 @@
   {#if type === "text"}
     <input {id} type="text" {placeholder} bind:value />
   {/if}
-  {#if type === "textarea"}<textarea {id} {placeholder} bind:value />{/if}
+  {#if type === "textarea"}<textarea {id} {placeholder} bind:value
+    ></textarea>{/if}
   {#if $$slots.default}
     <div class="tip">
       <slot />

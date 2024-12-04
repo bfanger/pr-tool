@@ -1,4 +1,3 @@
-/* eslint-disable import/no-unresolved */
 import { GITHUB_CLIENT_SECRET } from "$env/static/private";
 import {
   PUBLIC_GITHUB_CLIENT_ID,

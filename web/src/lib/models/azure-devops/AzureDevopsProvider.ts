@@ -152,7 +152,7 @@ export default class AzureDevopsProvider implements Provider {
       .pipe(map((prs) => prs.map(transformPullRequest)));
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   pollFor(projectId: string | number) {
     // @todo Advanced polling:
     // slow polling when: no commits for 1 week

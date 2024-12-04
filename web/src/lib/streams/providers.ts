@@ -1,4 +1,3 @@
-/* eslint-disable filenames/match-exported */
 import type { ConnectableObservable } from "rxjs";
 import { map, publishReplay } from "rxjs/operators";
 import type { GithubProviderAuth } from "$lib/models/github/GithubProvider";

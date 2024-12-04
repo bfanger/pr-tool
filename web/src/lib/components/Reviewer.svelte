@@ -21,7 +21,7 @@
       <Avatar {profile} size="medium" {provider} />
     </div>
     {#if icon}
-      <div class="icon" style="background-image:url('{icon}')" />
+      <div class="icon" style="background-image:url('{icon}')"></div>
     {/if}
   </div>
   <div>

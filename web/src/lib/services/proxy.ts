@@ -16,7 +16,7 @@ export type ProxyResponse = Pick<
 export default function proxy(request: AjaxRequest): Observable<ProxyResponse> {
   const options: AxiosRequestConfig = {
     url: request.url,
-    method: request.method as AxiosRequestConfig["method"],
+    method: request.method,
     headers: request.headers,
   };
   return defer(() =>

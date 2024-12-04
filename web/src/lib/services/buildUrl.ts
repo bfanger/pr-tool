@@ -16,7 +16,7 @@ export default function buildUrl(
       delete query[param];
     }
 
-    const replaced = interpolatedPath.replace(`[${param}]`, value as string);
+    const replaced = interpolatedPath.replace(`[${param}]`, value);
     if (replaced !== interpolatedPath) {
       interpolatedPath = replaced;
       delete query[param];

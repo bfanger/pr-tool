@@ -24,7 +24,6 @@ const rpc = {
     ...args: any[]
   ): Promise<R> {
     if (window.rpc && window.rpc.call) {
-      // eslint-disable-next-line @typescript-eslint/return-await
       return await window.rpc.call(channel, ...args);
     }
     // not available in web

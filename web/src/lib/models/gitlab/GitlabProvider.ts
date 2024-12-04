@@ -92,7 +92,7 @@ export default class GitlabProvider implements Provider {
     );
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   pollFor(projectId: string | number) {
     // @todo Advanced polling:
     // Use gitlab feed to detect changes
