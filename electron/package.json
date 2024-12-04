@@ -14,7 +14,7 @@
     "build:main": "esbuild src/main.ts --platform=node --outfile=build/main.js",
     "build:preload": "esbuild src/preload.ts --platform=node --bundle --external:electron --format=cjs --outfile=build/preload.cjs",
     "build:electron": "electron-forge package",
-    "preinstall": "npx only-allow pnpm"
+    "preinstall": "npx only-allow npm"
   },
   "config": {
     "forge": {
@@ -35,7 +35,7 @@
     "@types/json-schema": "^7.0.15",
     "@types/semver": "^7.5.8",
     "concurrently": "^9.0.1",
-    "electron": "^32.1.2",
+    "electron": "^33.2.1",
     "esbuild": "^0.24.0",
     "follow-redirects": "^1.15.9",
     "form-data": "^4.0.0",
