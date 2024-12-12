@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Subject } from "rxjs";
+  import { BehaviorSubject } from "rxjs";
   import { debounceTime, map, startWith, switchMap, tap } from "rxjs/operators";
   import type { ProviderConfig } from "$lib/streams/providers";
   import configs from "$lib/store/configs";
@@ -48,7 +48,7 @@
     (p) => p.type === type,
   ) as (typeof providers)[number];
 
-  const config$ = new Subject<ProviderConfig>();
+  const config$ = new BehaviorSubject<ProviderConfig | undefined>(undefined);
 
   const valid$ = config$.pipe(
     debounceTime(500),
