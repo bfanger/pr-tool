@@ -1,10 +1,11 @@
 import type { Observable } from "rxjs";
-import { interval, NEVER, of } from "rxjs";
-import { catchError, map } from "rxjs/operators";
+import { combineLatest, interval, NEVER, of } from "rxjs";
+import { catchError, map, share, switchMap } from "rxjs/operators";
 import type { Project } from "../Project";
 import type { Provider } from "../Provider";
 import type { PullRequest, PullRequestStatus } from "../PullRequest";
 import GitlabApi from "../../services/gitlabApi";
+import gitlabApi from "../../services/gitlabApi";
 import timeBetween, { MIN } from "../../services/timeBetween";
 import { type GitlabProfile, userToProfile } from "./GitlabProfile";
 
@@ -57,36 +58,79 @@ export default class GitlabProvider implements Provider {
       ),
     );
   }
-
+  #sharedAccount: Observable<GitlabProfile>;
   pullRequestsFor(projectId: number): Observable<PullRequest[]> {
+    if (!this.#sharedAccount) {
+      this.#sharedAccount = this.account().pipe(share());
+    }
     // @todo optimize, gitlab doesn't require a projectId (like azure) to retrieve pull requests.
     // This would allow for less api requests.
-    return GitlabApi.paged(
-      "https://[domain]/api/v4/projects/[projectId]/merge_requests",
-      {
-        params: {
-          domain: this.auth.domain,
-          state: "opened",
-          projectId,
+    return combineLatest([
+      this.#sharedAccount,
+      GitlabApi.paged(
+        "https://[domain]/api/v4/projects/[projectId]/merge_requests",
+        {
+          params: {
+            domain: this.auth.domain,
+            state: "opened",
+            projectId,
+          },
+          token: this.auth.privateToken,
         },
-        token: this.auth.privateToken,
-      },
-    ).pipe(
-      map((prs) =>
-        prs.map(
-          (pr) =>
-            ({
+      ),
+    ]).pipe(
+      switchMap(([me, prs]) =>
+        // GET /projects/:id/merge_requests/:merge_request_iid/approvals
+        // https://gitlab.tisgroup.nl/api/v4/projects/381/merge_requests/5/approvals
+        combineLatest(
+          prs.map((pr) => {
+            const pullRequest: PullRequest = {
               id: pr.id,
               title: pr.title,
               fase: "READY",
               url: pr.web_url,
               creator: userToProfile(pr.author),
-              reviewers: pr.assignees.map((assignee) => ({
+              reviewers: (pr.reviewers.length > 0
+                ? pr.reviewers
+                : pr.assignees
+              ).map((assignee) => ({
                 profile: userToProfile(assignee),
                 status: "",
                 icon: "",
+                required: false, // @todo Lookup policy
               })),
-            }) as PullRequest,
+            };
+            if (
+              pr.author.id === me.id ||
+              pr.reviewers.some((reviewer) => reviewer.id === me.id)
+            ) {
+              return gitlabApi
+                .get(
+                  "https://[domain]/api/v4/projects/[projectId]/merge_requests/[iid]/approvals",
+                  {
+                    params: {
+                      domain: this.auth.domain,
+                      projectId,
+                      iid: pr.iid,
+                    },
+                    token: this.auth.privateToken,
+                  },
+                )
+                .pipe(
+                  map((approvals) => {
+                    for (const reviewer of pullRequest.reviewers) {
+                      const approved = approvals.approved_by.find(
+                        (approval) => approval.user.id === reviewer.profile.id,
+                      );
+                      reviewer.status = approved ? "Approved" : reviewer.status;
+                      reviewer.icon = approved ? "APPROVED" : reviewer.icon;
+                    }
+                    return pullRequest;
+                  }),
+                );
+            }
+            return of(pullRequest);
+          }),
         ),
       ),
     );
@@ -96,7 +140,7 @@ export default class GitlabProvider implements Provider {
   pollFor(projectId: string | number) {
     // @todo Advanced polling:
     // Use gitlab feed to detect changes
-    return interval(timeBetween(1 * MIN, 10 * MIN)).pipe(map(() => null));
+    return interval(timeBetween(5 * MIN, 15 * MIN)).pipe(map(() => null));
   }
 
   valid(): Observable<Error | boolean> {

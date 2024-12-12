@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Provider } from "$lib/models/Provider";
   import type { Reviewer } from "$lib/models/PullRequest";
-  import approvedSvg from "../../assets/img/approved.svg";
+  import approvedSvg from "../../assets/img/approved.svg?no-inline";
   import Avatar from "./Avatar.svelte";
 
   export let reviewer: Reviewer;

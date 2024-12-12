@@ -21,6 +21,7 @@ type MergeRequest = {
   assignee: ApiUser;
   author: ApiUser;
   assignees: ApiUser[];
+  reviewers: ApiUser[];
   source_project_id: number;
   target_project_id: number;
   labels: [];
@@ -57,3 +58,10 @@ type MergeRequest = {
 };
 
 export type MergeRequestsResponse = MergeRequest[];
+
+export type ApprovalsResponse = {
+  user_has_approved: boolean;
+  user_can_approve: boolean;
+  approved: boolean;
+  approved_by: { user: ApiUser }[];
+};

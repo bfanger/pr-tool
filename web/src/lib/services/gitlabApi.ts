@@ -4,7 +4,10 @@ import { omit } from "lodash-es";
 import { combineLatest, of } from "rxjs";
 import { ajax } from "rxjs/ajax";
 import { map, switchMap } from "rxjs/operators";
-import type { MergeRequestsResponse } from "./gitlab-api-types/merge-requests-response";
+import type {
+  ApprovalsResponse,
+  MergeRequestsResponse,
+} from "./gitlab-api-types/merge-requests-response";
 import type { ProjectsResponse } from "./gitlab-api-types/projects-response";
 import type { UserResponse } from "./gitlab-api-types/user-response";
 import buildUrl from "./buildUrl";
@@ -18,6 +21,7 @@ type ResponseMapGet = {
   "https://[domain]/api/v4/projects": ProjectsResponse;
   "https://[domain]/api/v4/merge_requests": MergeRequestsResponse;
   "https://[domain]/api/v4/projects/[projectId]/merge_requests": MergeRequestsResponse;
+  "https://[domain]/api/v4/projects/[projectId]/merge_requests/[iid]/approvals": ApprovalsResponse;
 };
 
 /**
