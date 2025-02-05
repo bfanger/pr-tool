@@ -9,7 +9,7 @@ export const load = async ({ url }) => {
   if (url.searchParams.has("code")) {
     const body = new FormData();
     body.append("client_id", PUBLIC_GITHUB_CLIENT_ID);
-    body.append("code", url.searchParams.get("code"));
+    body.append("code", url.searchParams.get("code")!);
     body.append("redirect_uri", PUBLIC_GITHUB_REDIRECT_URI);
     body.append("client_secret", GITHUB_CLIENT_SECRET);
     const request = await fetch("https://github.com/login/oauth/access_token", {

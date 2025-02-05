@@ -1,0 +1,90 @@
+:root {
+  --font: -apple-system, "BlinkMacSystemFont", "Helvetica Neue", "Helvetica",
+    sans-serif;
+  --hairline: 1px;
+
+  /* .lightmode { */
+  --background: #f6f6f6;
+  --text: #222;
+  --muted: #ababab;
+  --border: #e4e4e4;
+  --inset: #fff;
+  --fieldset: #eee;
+  --button-background: #fff;
+  --button-text: #000;
+  --button-disabled-text: #acacac;
+  --button-disabled-background: #f5f5f5;
+  --button-active-text: #fff;
+  --button-active-background: linear-gradient(180deg, #77a5f4 0%, #286df6 100%);
+  --button-active-border: #5b93f3;
+  --button-active-bottom-border: #2165f6;
+  --link: #286df6;
+  --link-hover: #84a6e6;
+  --focus-ring: #84a6e6;
+  --error-text: #333;
+  --error-background: #ff9292;
+  --progressbar-bar: #e2e2e2;
+  --progressbar-progress: #1887fa;
+
+  color: var(--text);
+  background: var(--background);
+
+  @media (prefers-color-scheme: dark) {
+    /* .darkmode { */
+    --background: #333;
+    --text: #e1e1e1;
+    --muted: #7d7d7d;
+    --border: #515151;
+    --inset: #212121;
+    --fieldset: #393939;
+    --button-background: #6b6b6b;
+    --button-text: #fff;
+    --button-disabled-text: #7d7d7d;
+    --button-disabled-background: #525252;
+    --button-active-text: #fff;
+    --button-active-background: linear-gradient(
+      180deg,
+      #2e6bde 0%,
+      #295fc6 100%
+    );
+    --button-active-border: #5682cf;
+    --button-active-bottom-border: #2a5fc7;
+    --link: #5c92ff;
+    --link-hover: #84a6e6;
+    --focus-ring: #437199;
+    --error-text: #fff;
+    --error-background: #a02525;
+    --progressbar-bar: #48484a;
+    --progressbar-progress: #4792f8;
+  }
+
+  /* stylelint-disable-next-line media-feature-name-no-unknown */
+  @media (min-device-pixel-ratio: 2) {
+    --hairline: 0.5px;
+  }
+}
+
+html {
+  height: 100%;
+  margin: 0 auto;
+  padding: 0;
+  font-size: 62.5%;
+}
+
+body {
+  position: relative;
+  height: 100%;
+  margin: 0;
+}
+
+a {
+  color: var(--link);
+}
+
+a:hover {
+  color: var(--link-hover);
+}
+
+svelte-app {
+  display: contents;
+}

@@ -29,7 +29,7 @@
 <style>
   .centered {
     display: flex;
-    justify-content: flex-end;
     grid-column: 2/3;
+    justify-content: flex-end;
   }
 </style>

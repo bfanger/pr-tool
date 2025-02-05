@@ -11,20 +11,26 @@
 
 <style>
   .bar {
-    margin-left: auto;
-    margin-right: auto;
+    overflow: hidden;
+
     width: 20rem;
     max-width: 60%;
-    border-radius: 1rem;
-    overflow: hidden;
-    background: var(--progressbar-bar);
     height: 0.6rem;
+    margin-right: auto;
+    margin-left: auto;
+    border-radius: 1rem;
+
+    background: var(--progressbar-bar);
   }
+
   .progress {
-    height: 100%;
-    width: 100%;
     will-change: transform;
+
     transform-origin: left center;
+
+    width: 100%;
+    height: 100%;
+
     background-color: var(--progressbar-progress);
   }
 </style>

@@ -26,5 +26,5 @@
 {#if data.accessToken}
   <Spinner />
 {:else}
-  <Warning message={data.error} />
+  <Warning message={data.error!} />
 {/if}

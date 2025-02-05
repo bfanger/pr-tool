@@ -9,12 +9,14 @@
 
 <style>
   .warning {
-    text-align: center;
-    background: var(--error-background);
-    color: var(--error-text);
-    border-radius: 1rem;
     margin: 1rem;
     padding-top: 1px;
     padding-bottom: 1rem;
+    border-radius: 1rem;
+
+    color: var(--error-text);
+    text-align: center;
+
+    background: var(--error-background);
   }
 </style>

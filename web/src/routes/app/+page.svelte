@@ -84,28 +84,32 @@
 <style>
   .pull-requests {
     max-width: 100rem;
-    margin-left: auto;
     margin-right: auto;
+    margin-left: auto;
   }
+
   .title {
-    font-size: 1.4rem;
-    font-weight: normal;
-    letter-spacing: 0.2px;
     margin-top: 2.2rem;
     margin-bottom: 1rem;
+
+    font-size: 1.4rem;
+    font-weight: normal;
     text-transform: uppercase;
+    letter-spacing: 0.2px;
   }
 
   .message {
-    text-align: center;
     padding: 2rem;
     font-size: 1.6rem;
+    text-align: center;
   }
+
   .settings {
     position: absolute;
-    right: 1rem;
     top: 0.5rem;
+    right: 1rem;
   }
+
   .retry {
     text-align: center;
   }

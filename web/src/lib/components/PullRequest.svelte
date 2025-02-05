@@ -27,41 +27,49 @@
 <style>
   .pull-request {
     display: block;
-    color: var(--text);
-    text-decoration: none;
-    background: var(--inset);
+
     padding: 0.8rem 1.2rem;
     border-right: var(--hairline) solid var(--border);
     border-bottom: var(--hairline) solid var(--border);
     border-left: var(--hairline) solid var(--border);
+
+    color: var(--text);
+    text-decoration: none;
+
+    background: var(--inset);
   }
+
   .pull-request:first-child {
     border-top: var(--hairline) solid var(--border);
     border-top-left-radius: 0.6rem;
     border-top-right-radius: 0.6rem;
   }
+
   .pull-request:last-child {
-    border-bottom-left-radius: 0.6rem;
     border-bottom-right-radius: 0.6rem;
+    border-bottom-left-radius: 0.6rem;
   }
+
   .title-row {
     display: flex;
     align-items: flex-start;
     font-size: 1.4rem;
     letter-spacing: 0.1px;
   }
+
   .avatar {
     flex-shrink: 0;
     margin-right: 1rem;
   }
+
   .reviewers {
     display: flex;
     flex-wrap: wrap;
-    align-content: flex-start;
-    justify-content: flex-end;
+    place-content: flex-start flex-end;
   }
+
   .reviewer {
-    margin-left: 1.2rem;
     margin-top: 0.5rem;
+    margin-left: 1.2rem;
   }
 </style>

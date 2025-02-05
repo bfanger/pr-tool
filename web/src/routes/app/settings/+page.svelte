@@ -47,16 +47,19 @@
   .config {
     display: grid;
     grid-template-columns: 2fr 1fr min-content;
-    margin-left: 1rem;
     margin-right: 1rem;
+    margin-left: 1rem;
   }
+
   .buttons {
     display: flex;
     justify-content: center;
+
     width: 100%;
     margin-top: 2rem;
     margin-bottom: 2rem;
   }
+
   .buttons > :global(* + *) {
     margin-left: 1rem;
   }

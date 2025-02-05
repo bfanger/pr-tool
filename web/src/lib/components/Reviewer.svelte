@@ -35,30 +35,37 @@
     display: flex;
     white-space: nowrap;
   }
+
   .avatar-and-icon {
+    position: relative;
     flex-shrink: 0;
     padding-right: 0.4rem;
-    position: relative;
   }
+
   .avatar.has-icon {
     opacity: 0.7;
   }
+
   .icon {
     position: absolute;
-    bottom: 0.2rem;
     right: 0.2rem;
+    bottom: 0.2rem;
+
     width: 1.6rem;
     height: 1.6rem;
     border-radius: 50%;
+
     background: #808080;
-    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+    box-shadow: 1px 1px 3px rgb(0 0 0 / 40%);
   }
+
   .name {
     font-size: 1.2rem;
   }
+
   .status {
     font-size: 1rem;
-    letter-spacing: 0;
     color: var(--muted);
+    letter-spacing: 0;
   }
 </style>

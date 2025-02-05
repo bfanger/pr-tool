@@ -22,26 +22,32 @@
 
 <style>
   label {
-    white-space: nowrap;
+    min-width: 16rem;
+
     font-size: 1.3rem;
     line-height: 2.1rem;
     text-align: right;
-    min-width: 16rem;
+    white-space: nowrap;
   }
+
   input,
   textarea {
-    width: 100%;
     box-sizing: border-box;
-    font: 1.4rem/1.8rem var(--font);
-    background: var(--inset);
-    color: var(--text);
+    width: 100%;
     padding: 0.2rem 0.3rem;
     border: var(--hairline) solid var(--border);
+
+    font: 1.4rem/1.8rem var(--font);
+    color: var(--text);
+
+    background: var(--inset);
+
     &:focus {
-      box-shadow: 0 0 1px 3px var(--focus-ring);
       outline: none;
+      box-shadow: 0 0 1px 3px var(--focus-ring);
     }
   }
+
   .tip {
     margin-top: 0.4rem;
     font-size: 1.2rem;

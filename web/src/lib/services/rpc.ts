@@ -18,13 +18,15 @@ type Responses = {
   axios: AxiosResponse;
 };
 
+const win = globalThis as any;
+
 const rpc = {
   async send<T extends Channel, R = Responses[T]>(
     channel: T,
     ...args: any[]
   ): Promise<R> {
-    if (window.rpc && window.rpc.call) {
-      return await window.rpc.call(channel, ...args);
+    if (win.rpc && win.rpc.call) {
+      return await win.rpc.call(channel, ...args);
     }
     // not available in web
     console.info(`[rpc] ${channel}`, ...args);

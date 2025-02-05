@@ -41,7 +41,7 @@ export default class GithubProvider implements Provider {
     return githubApi.get("user", { accessToken: this.auth.accessToken }).pipe(
       map((user) => ({
         id: user.login,
-        name: user.name,
+        name: user.name!,
         avatar: user.avatar_url,
       })),
     );
@@ -93,12 +93,12 @@ export default class GithubProvider implements Provider {
             fase: "READY",
             url: pr.html_url,
             creator: {
-              id: pr.user.login,
-              name: pr.user.name,
-              avatar: pr.user.avatar_url,
+              id: pr.user!.login,
+              name: pr.user!.name,
+              avatar: pr.user!.avatar_url,
             } as GithubProfile,
             reviewers:
-              pr.requested_reviewers.map((reviewer) => ({
+              pr.requested_reviewers!.map((reviewer) => ({
                 profile: {
                   id: reviewer.login,
                   name: reviewer.login,
@@ -109,7 +109,7 @@ export default class GithubProvider implements Provider {
                 required: false,
               })) ?? [],
           };
-          if (pr.user.login === this.auth.login) {
+          if (pr.user!.login === this.auth.login) {
             return githubApi
               .get("repos/[owner]/[repo]/pulls/[number]/reviews", {
                 params: { owner, repo, number: pr.number },
@@ -119,15 +119,17 @@ export default class GithubProvider implements Provider {
                 map((reviews) => {
                   for (const review of reviews) {
                     data.reviewers = data.reviewers.filter(
-                      (r) => r.profile.id !== review.user.login,
+                      (r) => r.profile.id !== review.user!.login,
                     );
                     data.reviewers.push({
                       profile: {
-                        id: review.user.login,
-                        name: review.user.login,
-                        avatar: review.user.avatar_url,
+                        id: review.user!.login,
+                        name: review.user!.login,
+                        avatar: review.user!.avatar_url,
                       } as GithubProfile,
-                      status: statuses[review.state] ?? review.state,
+                      status:
+                        statuses[review.state as keyof typeof statuses] ??
+                        review.state,
                       icon: review.state === "APPROVED" ? "APPROVED" : "",
                       required: false,
                     });
@@ -180,5 +182,5 @@ export default class GithubProvider implements Provider {
 
 function splitProjectId(projectId: string): { owner: string; repo: string } {
   const [owner, repo] = projectId.split("/");
-  return { owner, repo };
+  return { owner: owner!, repo: repo! };
 }

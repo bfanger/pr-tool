@@ -172,7 +172,7 @@ type AsyncHandler = (err: Error | null, reponse?: any) => void;
 function createAsyncResponse(event: IpcMainEvent): AsyncHandler {
   const id = createRequestId();
   const eventName = `async-response-${id}`;
-  // eslint-disable-next-line no-param-reassign
+
   event.returnValue = eventName;
   let sent = false;
 

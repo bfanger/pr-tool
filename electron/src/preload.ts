@@ -1,9 +1,8 @@
-import type { Channel } from "pr-tool-web/src/lib/services/rpc";
 import { contextBridge, ipcRenderer } from "electron";
 import {
   channels,
   channelWithResponse,
-  // eslint-disable-next-line import/no-relative-packages
+  type Channel,
 } from "../../web/src/lib/services/rpc";
 
 contextBridge.exposeInMainWorld("rpc", {

@@ -6,6 +6,7 @@ import { BehaviorSubject, combineLatest } from "rxjs";
 import { map, shareReplay, startWith, switchMap } from "rxjs/operators";
 import type { Project } from "../models/Project";
 import type { Provider } from "../models/Provider";
+import type { Profile } from "../models/Profile";
 import type { PullRequest, PullRequestStatus } from "../models/PullRequest";
 import dripFlat from "../services/dripFlat";
 import accounts$ from "./accounts";
@@ -24,7 +25,7 @@ const pullRequests$ = projects$.pipe(
         startWith(null),
         switchMap(() =>
           provider.pullRequestsFor(project.id).pipe(
-            map((prs: any) =>
+            map((prs) =>
               prs.map((pr) => ({
                 pullRequest: pr,
                 project,
@@ -47,7 +48,7 @@ export const pullRequestsWithStatus$ = combineLatest([
   pullRequests$,
 ]).pipe(
   map(([accounts, pullRequests]) => {
-    const accountByProvider = new Map();
+    const accountByProvider = new Map<Provider, Profile>();
     accounts.forEach(({ account, provider }) => {
       accountByProvider.set(provider, account);
     });
@@ -57,7 +58,7 @@ export const pullRequestsWithStatus$ = combineLatest([
       if (account) {
         withStatus.push({
           ...pr,
-          status: pr.provider.pullRequestStatus(pr.pullRequest, account),
+          status: pr.provider.pullRequestStatus(pr.pullRequest!, account),
         });
       }
     });

@@ -55,7 +55,7 @@
     tap(() => {
       loading = true;
     }),
-    switchMap((config) => providerFromConfig(config).valid()),
+    switchMap((config) => providerFromConfig(config!).valid()),
     startWith(false),
     map((err) => {
       if (typeof err === "boolean") {
@@ -73,7 +73,7 @@
     if (status.disabled) {
       return;
     }
-    configs.add($config$);
+    configs.add($config$!);
   }
 </script>
 
@@ -119,54 +119,64 @@
 
 <style>
   .title {
+    margin-top: 0;
     font-size: 1.7rem;
     font-weight: bold;
-    margin-top: 0;
   }
+
   .icon {
     width: 1.6rem;
     height: 1.6rem;
-    margin-left: 0.2rem;
     margin-right: 0.4rem;
+    margin-left: 0.2rem;
   }
+
   .form {
-    padding: 1.2rem;
     max-width: 750px;
+    padding: 1.2rem;
   }
+
   .fields {
     display: grid;
-    grid-template-columns: 1fr 100fr;
     grid-gap: 1rem;
+    grid-template-columns: 1fr 100fr;
   }
+
   .providers {
     display: flex;
     flex-direction: column;
     gap: 0.4rem;
   }
+
   .radio-label {
+    cursor: pointer;
     display: inline-flex;
     align-items: center;
     margin-right: 0.8rem;
-    cursor: pointer;
   }
+
   .label {
-    white-space: nowrap;
+    min-width: 16rem;
+
     font-size: 1.3rem;
     line-height: 2.1rem;
     text-align: right;
-    min-width: 16rem;
+    white-space: nowrap;
   }
+
   .buttons {
     display: flex;
     justify-content: flex-end;
     margin-top: 1rem;
   }
+
   .error {
+    font-weight: bold;
     color: red;
-    font-weight: bold;
   }
+
   .valid {
-    color: green;
     font-weight: bold;
+    color: green;
   }
 </style>

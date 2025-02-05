@@ -58,7 +58,7 @@ export default class GitlabProvider implements Provider {
       ),
     );
   }
-  #sharedAccount: Observable<GitlabProfile>;
+  #sharedAccount!: Observable<GitlabProfile>;
   pullRequestsFor(projectId: number): Observable<PullRequest[]> {
     if (!this.#sharedAccount) {
       this.#sharedAccount = this.account().pipe(share());

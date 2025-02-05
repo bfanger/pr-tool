@@ -41,14 +41,16 @@
 
 <style>
   img {
-    display: inline-block;
     overflow: hidden;
+    display: inline-block;
     border-radius: 50%;
   }
+
   .large {
     width: 40px;
     height: 40px;
   }
+
   .medium {
     width: 2.4rem;
     height: 2.4rem;

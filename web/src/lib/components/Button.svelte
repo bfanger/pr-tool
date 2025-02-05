@@ -12,33 +12,40 @@
 
 <style>
   .button {
-    font: 1.3rem var(--font);
-    background: var(--button-background);
-    color: var(--button-text);
-    border-radius: 0.4rem;
-    padding: 0.2rem 1rem;
-    min-width: 9rem;
-
-    border: var(--hairline) solid var(--border);
-    position: relative;
     cursor: pointer;
-    text-decoration: none;
+
+    position: relative;
+
     display: inline-block;
+
+    min-width: 9rem;
+    padding: 0.2rem 1rem;
+    border: var(--hairline) solid var(--border);
+    border-radius: 0.4rem;
+
+    font: 1.3rem var(--font);
+    color: var(--button-text);
+    text-decoration: none;
+
+    background: var(--button-background);
 
     &:hover {
       color: var(--text);
     }
+
     &:active {
       outline: none;
     }
+
     &:disabled {
       border-color: transparent;
       color: var(--button-disabled-text);
       background: var(--button-disabled-background);
     }
   }
+
   .small {
-    font-size: 1rem;
     min-width: 0;
+    font-size: 1rem;
   }
 </style>

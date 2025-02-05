@@ -47,7 +47,7 @@ function transformPullRequest(pr: ApiPullRequest): PullRequest {
       })
       .map((reviewer) => ({
         profile: fromReviewer(reviewer),
-        status: statusMap[reviewer.vote],
+        status: statusMap[reviewer.vote]!,
         icon: reviewer.vote > 0 ? "APPROVED" : "",
         required: !!reviewer.isRequired,
       })),

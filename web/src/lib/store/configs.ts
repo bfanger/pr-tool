@@ -9,7 +9,7 @@ const { subscribe, update } = writable<ProviderConfig[]>(
 export default {
   subscribe,
 
-  async add(config: ProviderConfig) {
+  add(config: ProviderConfig) {
     update((state) => {
       const configs = [...state, config];
       storage.set("configs", configs);

@@ -9,7 +9,7 @@
   const isServer = typeof window === "undefined";
 
   const accountCount$ = accounts$.pipe(map((accounts) => accounts.length));
-  $: oauth = $page.route.id.startsWith("/app/oauth/");
+  $: oauth = $page.route.id!.startsWith("/app/oauth/");
   $: noAccounts = $progress$ === 1 && $accountCount$ === 0;
 </script>
 
@@ -30,12 +30,14 @@
 
 <style>
   .layout {
-    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+
     box-sizing: border-box;
+    min-height: 100%;
+
     font-family: var(--font);
     font-size: 1.4rem;
     letter-spacing: 0.1px;
-    display: flex;
-    flex-direction: column;
   }
 </style>

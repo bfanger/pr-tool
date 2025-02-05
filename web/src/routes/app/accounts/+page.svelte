@@ -32,6 +32,7 @@
     display: flex;
     margin-bottom: 1.6rem;
   }
+
   .button {
     margin-left: auto;
   }

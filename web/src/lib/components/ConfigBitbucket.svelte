@@ -57,8 +57,8 @@
 
 <style>
   .label {
+    user-select: none;
     font-size: 1.3rem;
     line-height: 1.2;
-    user-select: none;
   }
 </style>
