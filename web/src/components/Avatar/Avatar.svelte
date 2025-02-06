@@ -1,13 +1,15 @@
 <script lang="ts">
+  import placeholderSvg from "./placeholder.svg";
+
   type Props = {
     size: "medium" | "large";
-    src: string;
+    src?: string;
     title?: string;
   };
   let { size, src, title }: Props = $props();
 </script>
 
-<img {src} {title} alt={title} data-size={size} />
+<img src={src ?? placeholderSvg} {title} alt={title} data-size={size} />
 
 <style>
   img {

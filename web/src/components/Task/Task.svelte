@@ -1,29 +1,30 @@
 <script lang="ts">
-  import type { Snippet } from "svelte";
+  import type { Task } from "../../platforms/types";
+  import Avatar from "../Avatar/Avatar.svelte";
+  import TaskCollaborator from "./TaskCollaborator.svelte";
 
   type Props = {
-    href: string;
-    title: string;
-    avatar?: Snippet;
+    task: Task;
   };
-  let { href, title, avatar }: Props = $props();
+  let { task }: Props = $props();
+  let { url, title, author } = $derived(task);
 </script>
 
-<a class="todo" {href} target="_blank" rel="noreferrer">
+<a class="todo" href={url} target="_blank" rel="noreferrer">
   <div class="title-row">
     <span class="avatar">
-      {@render avatar?.()}
-      <!-- title={creator.name} -->
-      <!-- <Avatar profile={creator} size="large" {provider} /> -->
+      <Avatar
+        src={author?.getAvatar("large")}
+        title={author?.name}
+        size="large"
+      />
     </span>
     {title}
   </div>
   <div class="collaborators">
-    <!-- {#each collaborators as collaborator (collaborator.profile.id)}
-      <span class="collaborator">
-        <collaborator {collaborator} {provider} />
-      </span>
-    {/each} -->
+    {#each task.getCollaborators() as collaborator}
+      <TaskCollaborator {collaborator} />
+    {/each}
   </div>
 </a>
 
@@ -70,9 +71,4 @@
     flex-wrap: wrap;
     place-content: flex-start flex-end;
   }
-
-  /* .collaborator {
-    margin-top: 0.5rem;
-    margin-left: 1.2rem;
-  } */
 </style>

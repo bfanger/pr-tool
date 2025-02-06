@@ -1,6 +1,5 @@
 <script lang="ts">
-  import Avatar from "../..//components/Avatar.svelte";
-  import Todo from "../../components/Todo.svelte";
+  import Todo from "../../components/Task/Task.svelte";
   import gitlab from "../../platforms/gitlab.svelte";
   import { configsSchema } from "../../platforms/types";
   import storage from "../../services/storage.svelte";
@@ -22,24 +21,15 @@
 {/key}
 
 {#each platforms as platform}
-  {@const { status, items } = platform.getActiveTodos()}
-
-  <div>Platform status: {platform.status}</div>
-  <div>Active Todos status: {status}</div>
-  <div>Active: {platform.stats.active}</div>
+  <div>Platform status: {platform.progress}</div>
+  <div>attentionRequired: {platform.stats.attentionRequired}</div>
   <div>
-    {#each items as item}
-      {@const { author } = item.getAuthor()}
-      <Todo href={item.url} title={item.title}>
-        {#snippet avatar()}
-          {#if author}
-            {@const { url } = author.getAvatar("large")}
-            {#if url}
-              <Avatar src={url} title={author.name} size="large" />
-            {/if}
-          {/if}
-        {/snippet}
-      </Todo>
+    {#each platform.tasksWithAttentionRequired as task (task.id)}
+      <Todo {task} />
+    {/each}
+    <h2>Active</h2>
+    {#each platform.activeTasks as task (task.id)}
+      <Todo {task} />
     {/each}
   </div>
 {/each}

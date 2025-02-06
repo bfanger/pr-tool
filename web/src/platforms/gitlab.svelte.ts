@@ -1,22 +1,41 @@
 import buildUrl, { type PathParams } from "../services/buildUrl";
 import cache from "../services/cache";
-import type { GitlabGetRequests, GitlabMergeRequest } from "./gitlab-types";
-import type { GitlabConfig, Platform, Status, Todo } from "./types";
+import type {
+  GitLabApprovals,
+  GitLabGetRequests,
+  GitLabMergeRequest,
+  GitLabUser,
+} from "./gitlab-types";
+import type {
+  Collaborator,
+  GitLabConfig,
+  Platform,
+  Progress,
+  Task,
+} from "./types";
 
-export default function gitlab(config: GitlabConfig): Platform {
-  let status: Status = $state("init");
-  let mergeRequests = $state(new Map<number, GitlabMergeRequest>());
-
-  let activeTodos = $derived(
-    mergeRequests
+export default function gitlab(config: GitLabConfig): Platform {
+  let progress: Progress = $state("init");
+  let activeMergeRequests = $state(
+    new Map<number, GitLabMergeRequest & { approvals?: GitLabApprovals }>(),
+  );
+  let user: GitLabUser | undefined = $state();
+  let activeTasks = $derived(
+    activeMergeRequests
       .values()
-      .filter((mr) => isActive(mr))
-      .map(mergeRequestToTodo)
+      .map((mr) => mergeRequestToTask(mr))
+      .toArray(),
+  );
+  let tasksWithAttentionRequired = $derived(
+    activeMergeRequests
+      .values()
+      .filter((mr) => isAttentionNeeded(mr, user))
+      .map((mr) => mergeRequestToTask(mr))
       .toArray(),
   );
 
   let stats: Platform["stats"] = $derived({
-    active: activeTodos.length,
+    attentionRequired: tasksWithAttentionRequired.length,
   });
 
   const userKey = Symbol("user");
@@ -28,71 +47,83 @@ export default function gitlab(config: GitlabConfig): Platform {
       revalidate: 86400,
     });
   }
+
   const refresh: Platform["refresh"] = async () => {
     abortController.abort();
     abortController = new AbortController();
-    if (status !== "init") {
-      status = "updating";
+    if (progress !== "init") {
+      progress = "updating";
     }
     try {
-      const user = await getUser();
+      user = await getUser();
 
-      const [author, assigned, reviewer] = await Promise.all([
+      const [authoredMrs, assignedMrs, reviewMrs] = await Promise.all([
         apiGetAll(`/merge_requests`, {
-          searchParams: { author_id: user.id, state: "opened" },
+          searchParams: { scope: "all", author_id: user.id, state: "opened" },
           signal: abortController.signal,
           config,
         }),
         apiGetAll(`/merge_requests`, {
-          searchParams: { assignee_id: user.id, state: "opened" },
+          searchParams: { scope: "all", assignee_id: user.id, state: "opened" },
           signal: abortController.signal,
           config,
         }),
         apiGetAll(`/merge_requests`, {
-          searchParams: { reviewer_id: user.id, state: "opened" },
+          searchParams: { scope: "all", reviewer_id: user.id, state: "opened" },
           signal: abortController.signal,
           config,
         }),
       ]);
-      mergeRequests = new Map(
-        [author, assigned, reviewer].flat().map((mr) => [mr.id, mr]),
+      const mrsIncludingApprovals = [
+        ...assignedMrs,
+        ...(await Promise.all(
+          [authoredMrs, reviewMrs].flat().map(async (mr) => {
+            const approvals = await apiGet(
+              "/projects/{projectId}/merge_requests/{iid}/approvals",
+              {
+                params: { projectId: mr.project_id, iid: mr.iid },
+                config,
+              },
+            );
+            return { ...mr, approvals };
+          }),
+        )),
+      ];
+      activeMergeRequests = new Map(
+        mrsIncludingApprovals.map((mr) => [mr.id, mr]),
       );
-      status = "idle";
+      progress = "idle";
     } catch (error) {
-      status = "error";
+      progress = "error";
       throw error;
     }
   };
 
   return {
-    get status() {
-      return status;
+    get progress() {
+      return progress;
     },
     get stats() {
       return stats;
     },
-    getActiveTodos() {
-      return {
-        get status() {
-          return status;
-        },
-        get items() {
-          return activeTodos;
-        },
-      };
+    get activeTasks() {
+      return activeTasks;
+    },
+    get tasksWithAttentionRequired() {
+      return tasksWithAttentionRequired;
     },
     refresh,
   } satisfies Platform;
 }
 
-async function apiGet<T extends keyof GitlabGetRequests>(
+async function apiGet<T extends keyof GitLabGetRequests>(
   path: T,
   options: RequestInit & {
     params?: PathParams<T>;
     searchParams?: Record<string, number | string>;
-    config: GitlabConfig;
+    config: GitLabConfig;
   },
-): Promise<GitlabGetRequests[T]> {
+): Promise<GitLabGetRequests[T]> {
   const { params, searchParams, config, ...init } = options;
   const { auth } = options.config;
   const headers = new Headers(init.headers);
@@ -108,37 +139,85 @@ async function apiGet<T extends keyof GitlabGetRequests>(
   return response.json();
 }
 
-async function apiGetAll<T extends keyof GitlabGetRequests>(
+async function apiGetAll<T extends keyof GitLabGetRequests>(
   path: T,
   options: RequestInit & {
     params?: PathParams<T>;
     searchParams?: Record<string, number | string>;
-    config: GitlabConfig;
+    config: GitLabConfig;
   },
-): Promise<GitlabGetRequests[T]> {
+): Promise<GitLabGetRequests[T]> {
   // @todo Retrieve all pages based on the `X-` headers.
   return apiGet(path, options);
 }
 
-function isActive(mr: GitlabMergeRequest) {
-  return !mr.draft;
+function isAttentionNeeded(
+  mr: GitLabMergeRequest & { approvals?: GitLabApprovals },
+  user: GitLabUser | undefined,
+): boolean {
+  if (!user || mr.draft) {
+    return false;
+  }
+  if (mr.author.id === user.id) {
+    if (mr.reviewers.length === 0) {
+      return true; // No reviewers assigned
+    }
+    return mr.reviewers.length === mr.approvals?.approved_by.length; // Approved, ready to merge
+  }
+  if (mr.assignees.find((assignee) => assignee.id === user.id)) {
+    return true; // Assigned
+  }
+  if (mr.reviewers.find((reviewer) => reviewer.id === user.id)) {
+    if (
+      mr.approvals?.approved_by.find((approval) => approval.user.id === user.id)
+    ) {
+      return false; // Already approved
+    }
+    return true; // Review requested
+  }
+  return false;
 }
 
-function mergeRequestToTodo(mr: GitlabMergeRequest): Todo {
+function mergeRequestToTask(
+  mr: GitLabMergeRequest & { approvals?: GitLabApprovals },
+): Task {
   return {
     id: `${mr.id}`,
     title: mr.title,
     url: mr.web_url,
-    getAuthor() {
-      return {
-        status: "idle",
-        author: {
-          name: mr.author.name,
-          getAvatar() {
-            return { status: "idle", url: mr.author.avatar_url };
-          },
-        },
-      };
+    author: {
+      name: mr.author.name,
+      getAvatar() {
+        return mr.author.avatar_url;
+      },
     },
+    getCollaborators() {
+      // @todo Trigger update?
+      const collaborators: Collaborator[] = $state([
+        ...mr.reviewers.map((reviewer) =>
+          userToCollaborator(reviewer, mr.approvals),
+        ),
+        ...mr.assignees.map((user) => userToCollaborator(user)),
+      ]);
+
+      return collaborators;
+    },
+  };
+}
+
+function userToCollaborator(
+  user: GitLabUser,
+  approvals?: GitLabApprovals,
+): Collaborator {
+  const approved = approvals?.approved_by.find(
+    (reviewer) => reviewer.user.id === user.id,
+  );
+  return {
+    name: user.name,
+    getAvatar() {
+      return user.avatar_url;
+    },
+    icon: approved ? "completed" : undefined,
+    status: approved ? "Approved" : undefined,
   };
 }

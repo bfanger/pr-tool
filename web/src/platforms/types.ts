@@ -1,27 +1,32 @@
 import { z } from "zod";
 
-export type Status = "init" | "error" | "updating" | "idle";
+export type Progress = "init" | "error" | "updating" | "idle";
 
 export type Platform = {
-  status: Status;
-  stats: { active: number };
+  progress: Progress;
+  stats: { attentionRequired: number };
   refresh: () => Promise<void>;
 
-  getActiveTodos: () => { status: Status; items: Todo[] };
+  activeTasks: Task[];
+  tasksWithAttentionRequired: Task[];
 };
-export type Todo = {
+export type Task = {
   id: string;
   url: string;
   title: string;
-  getAuthor(): { status: Status; author?: Person };
-  // collaborator(): Person[];
+  author: Person;
+  getCollaborators: () => Collaborator[];
 };
-type Person = {
+export type Person = {
   name: string;
-  getAvatar: (size: "medium" | "large") => { status: Status; url?: string };
+  getAvatar: (size: "medium" | "large") => string | undefined;
+};
+export type Collaborator = Person & {
+  icon?: "completed";
+  status?: string;
 };
 
-export type GitlabConfig = z.infer<typeof gitlabConfigSchema>;
+export type GitLabConfig = z.infer<typeof gitlabConfigSchema>;
 const gitlabConfigSchema = z.object({
   type: z.literal("gitlab"),
   auth: z.object({
