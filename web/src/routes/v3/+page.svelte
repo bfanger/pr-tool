@@ -14,22 +14,52 @@
       throw new Error(`Unsupported platform: ${config?.type}`);
     }),
   );
+  let count = $derived(
+    platforms
+      .map((platform) => platform.stats.attentionRequired)
+      .reduce((a, b) => a + b, 0),
+  );
+
+  let tasksWithAttentionRequired = $derived(
+    platforms.map((platform) => platform.tasksWithAttentionRequired).flat(1),
+  );
+
+  let activeTasks = $derived(
+    platforms.map((platform) => platform.activeTasks).flat(1),
+  );
 </script>
 
+{#if platforms.length === 0}
+  <div>No platforms configured</div>
+{/if}
 {#key platforms}
   <Refresh {platforms} />
-{/key}
 
-{#each platforms as platform}
-  <div>Platform status: {platform.progress}</div>
-  <div>attentionRequired: {platform.stats.attentionRequired}</div>
+  {#each platforms as platform}
+    {#if platform.progress === "init"}
+      <div>Loading...</div>
+    {:else}
+      {#if platform.progress === "error"}
+        <div>
+          Failed <button onclick={() => platform.refresh()}>Retry</button>
+        </div>
+      {/if}
+      <div>
+        Platform: {platform.progress} / {platform.stats.attentionRequired}
+      </div>
+    {/if}
+  {/each}
+
+  <h1>Relevant ({count})</h1>
   <div>
-    {#each platform.tasksWithAttentionRequired as task (task.id)}
-      <Todo {task} />
-    {/each}
-    <h2>Active</h2>
-    {#each platform.activeTasks as task (task.id)}
+    {#each tasksWithAttentionRequired as task (task.id)}
       <Todo {task} />
     {/each}
   </div>
-{/each}
+  <h2>Active</h2>
+  <div>
+    {#each activeTasks as task (task.id)}
+      <Todo {task} />
+    {/each}
+  </div>
+{/key}
