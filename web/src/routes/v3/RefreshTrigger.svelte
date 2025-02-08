@@ -1,0 +1,70 @@
+<script lang="ts">
+  import { onMount } from "svelte";
+  import type { Platform } from "../../platforms/types";
+  import Button from "../../components/Button/Button.svelte";
+
+  type Props = {
+    platforms: Platform[];
+  };
+  let { platforms }: Props = $props();
+  let promise = $state<Promise<void>>();
+
+  function refreshAll() {
+    promise = Promise.allSettled(
+      platforms.map((platform) => platform.refresh()),
+    ).then((results) => {
+      for (const result of results) {
+        if (result.status === "rejected") {
+          console.warn(result.reason);
+        }
+      }
+      return undefined;
+    });
+    return promise;
+  }
+
+  function handleNetworkChange() {
+    console.info("Network change detected");
+    refreshAll();
+  }
+
+  onMount(() => {
+    refreshAll();
+    window.navigator.connection?.addEventListener(
+      "change",
+      handleNetworkChange,
+    );
+    return () => {
+      window.navigator.connection?.removeEventListener(
+        "change",
+        handleNetworkChange,
+      );
+    };
+  });
+
+  function handleVisibilityChange() {
+    if (!document.hidden) {
+      refreshAll();
+    }
+  }
+</script>
+
+<svelte:document onvisibilitychange={handleVisibilityChange} />
+
+<Button onclick={refreshAll}>
+  {#await promise}
+    Refreshing...
+  {:then _}
+    Refresh all
+  {:catch}
+    Refresh all
+  {/await}
+</Button>
+
+{#each platforms as platform}
+  {#if platform.progress === "error"}
+    <div>
+      Failed <Button onclick={() => platform.refresh()}>Retry</Button>
+    </div>
+  {/if}
+{/each}

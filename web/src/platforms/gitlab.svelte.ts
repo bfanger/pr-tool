@@ -1,19 +1,13 @@
-import buildUrl, { type PathParams } from "../services/buildUrl";
 import cache from "../services/cache";
-import stableFetch from "../services/stableFetch";
-import type {
-  GitLabApprovals,
-  GitLabGetRequests,
-  GitLabMergeRequest,
-  GitLabUser,
-} from "./gitlab-types";
-import type {
-  Collaborator,
-  GitLabConfig,
-  Platform,
-  Progress,
-  Task,
-} from "./types";
+import {
+  gitlabGetAll,
+  gitlabGet,
+  gitlabMergeRequestToTask,
+  type GitLabApprovals,
+  type GitLabMergeRequest,
+  type GitLabUser,
+} from "./gitlab-api";
+import type { GitLabConfig, Platform, Progress } from "./types";
 
 export default function gitlab({ auth }: GitLabConfig): Platform {
   let progress: Progress = $state("init");
@@ -24,14 +18,14 @@ export default function gitlab({ auth }: GitLabConfig): Platform {
   let activeTasks = $derived(
     activeMergeRequests
       .values()
-      .map((mr) => mergeRequestToTask(mr))
+      .map((mr) => gitlabMergeRequestToTask(mr))
       .toArray(),
   );
   let tasksWithAttentionRequired = $derived(
     activeMergeRequests
       .values()
       .filter((mr) => isAttentionNeeded(mr, user))
-      .map((mr) => mergeRequestToTask(mr))
+      .map((mr) => gitlabMergeRequestToTask(mr))
       .toArray(),
   );
 
@@ -41,13 +35,13 @@ export default function gitlab({ auth }: GitLabConfig): Platform {
 
   const userKey = Symbol("user");
   let refreshController = new AbortController();
-  const config: ApiConfig = {
+  const config = {
     auth,
     signal: refreshController.signal,
   };
 
   function getUser() {
-    return cache(userKey, () => apiGet(`/user`, {}, config), {
+    return cache(userKey, () => gitlabGet(`/user`, {}, config), {
       dedupe: 10,
       revalidate: 86400,
     });
@@ -64,26 +58,8 @@ export default function gitlab({ auth }: GitLabConfig): Platform {
     try {
       user = await getUser();
 
-      const [authoredMrs, assignedMrs, reviewMrs] = await Promise.all([
-        apiGetAll(
-          `/merge_requests`,
-          {
-            searchParams: { scope: "all", author_id: user.id, state: "opened" },
-          },
-          config,
-        ),
-        apiGetAll(
-          `/merge_requests`,
-          {
-            searchParams: {
-              scope: "all",
-              assignee_id: user.id,
-              state: "opened",
-            },
-          },
-          config,
-        ),
-        apiGetAll(
+      const [reviewMrs, authoredMrs, assignedMrs] = await Promise.all([
+        gitlabGetAll(
           `/merge_requests`,
           {
             searchParams: {
@@ -92,14 +68,36 @@ export default function gitlab({ auth }: GitLabConfig): Platform {
               state: "opened",
             },
           },
-          config,
+          { ...config, delay: 0 },
+        ),
+        gitlabGetAll(
+          `/merge_requests`,
+          {
+            searchParams: {
+              scope: "all",
+              author_id: user.id,
+              state: "opened",
+            },
+          },
+          { ...config, delay: 25 },
+        ),
+        gitlabGetAll(
+          `/merge_requests`,
+          {
+            searchParams: {
+              scope: "all",
+              assignee_id: user.id,
+              state: "opened",
+            },
+          },
+          { ...config, delay: 50, jitter: 2 },
         ),
       ]);
       const mrsIncludingApprovals = [
         ...assignedMrs,
         ...(await Promise.all(
           [authoredMrs, reviewMrs].flat().map(async (mr, i) => {
-            const approvals = await apiGet(
+            const approvals = await gitlabGet(
               "/projects/{projectId}/merge_requests/{iid}/approvals",
               {
                 params: { projectId: mr.project_id, iid: mr.iid },
@@ -136,49 +134,6 @@ export default function gitlab({ auth }: GitLabConfig): Platform {
     refresh,
   } satisfies Platform;
 }
-type ApiConfig = {
-  auth: { domain: string; privateToken: string };
-  signal: AbortSignal;
-  delay?: number;
-};
-async function apiGet<T extends keyof GitLabGetRequests>(
-  path: T,
-  request: RequestInit & {
-    params?: PathParams<T>;
-    searchParams?: Record<string, number | string>;
-  },
-  config: ApiConfig,
-): Promise<GitLabGetRequests[T]> {
-  const { params, searchParams, ...init } = request;
-  const { auth, delay } = config;
-  const headers = new Headers(init.headers);
-  headers.set("Private-Token", auth.privateToken);
-  const url = buildUrl(path, params ?? ({} as PathParams<T>), searchParams);
-  const response = await stableFetch(
-    `https://${auth.domain}/api/v4${url}`,
-    {
-      ...init,
-      headers,
-    },
-    { delay, retries: 3, timeout: 20_000, signal: config.signal },
-  );
-  if (!response.ok) {
-    throw new Error(response.statusText);
-  }
-  return response.json();
-}
-
-async function apiGetAll<T extends keyof GitLabGetRequests>(
-  path: T,
-  options: RequestInit & {
-    params?: PathParams<T>;
-    searchParams?: Record<string, number | string>;
-  },
-  config: ApiConfig,
-): Promise<GitLabGetRequests[T]> {
-  // @todo Retrieve all pages based on the `X-` headers.
-  return apiGet(path, options, config);
-}
 
 function isAttentionNeeded(
   mr: GitLabMergeRequest & { approvals?: GitLabApprovals },
@@ -205,48 +160,4 @@ function isAttentionNeeded(
     return true; // Review requested
   }
   return false;
-}
-
-function mergeRequestToTask(
-  mr: GitLabMergeRequest & { approvals?: GitLabApprovals },
-): Task {
-  return {
-    id: `${mr.id}`,
-    title: mr.title,
-    url: mr.web_url,
-    author: {
-      name: mr.author.name,
-      getAvatar() {
-        return mr.author.avatar_url;
-      },
-    },
-    getCollaborators() {
-      // @todo Trigger update?
-      const collaborators: Collaborator[] = $state([
-        ...mr.reviewers.map((reviewer) =>
-          userToCollaborator(reviewer, mr.approvals),
-        ),
-        ...mr.assignees.map((user) => userToCollaborator(user)),
-      ]);
-
-      return collaborators;
-    },
-  };
-}
-
-function userToCollaborator(
-  user: GitLabUser,
-  approvals?: GitLabApprovals,
-): Collaborator {
-  const approved = approvals?.approved_by.find(
-    (reviewer) => reviewer.user.id === user.id,
-  );
-  return {
-    name: user.name,
-    getAvatar() {
-      return user.avatar_url;
-    },
-    icon: approved ? "completed" : undefined,
-    status: approved ? "Approved" : undefined,
-  };
 }

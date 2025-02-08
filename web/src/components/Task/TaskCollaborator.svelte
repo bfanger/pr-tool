@@ -34,8 +34,11 @@
 <style>
   .collaborator {
     display: flex;
+    align-items: center;
+
     margin-top: 0.5rem;
     margin-left: 1.2rem;
+
     white-space: nowrap;
   }
 
@@ -63,6 +66,7 @@
   }
 
   .name {
+    margin-top: -4px;
     font-size: 1.2rem;
   }
 
