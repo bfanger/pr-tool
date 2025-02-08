@@ -1,10 +1,12 @@
 <script lang="ts">
   import Spinner from "../../components/Spinner/Spinner.svelte";
-  import Todo from "../../components/Task/Task.svelte";
   import gitlab from "../../platforms/gitlab.svelte";
   import { configsSchema } from "../../platforms/types";
   import storage from "../../services/storage.svelte";
   import RefreshTrigger from "./RefreshTrigger.svelte";
+  import Todos from "../../components/TaskRows/TaskRows.svelte";
+  import TaskRow from "../../components/TaskRows/TaskRow.svelte";
+  import TaskRows from "../../components/TaskRows/TaskRows.svelte";
 
   const storedConfigs = storage("configs", configsSchema);
   let platforms = $derived(
@@ -38,30 +40,33 @@
 </script>
 
 <div class="content">
-  {#key platforms}
-    <div class="refresh">
-      <RefreshTrigger {platforms} />
-    </div>
-  {/key}
   {#if platforms.length === 0}
     <div>No platforms configured</div>
-  {:else if initializing}
-    <Spinner />
   {:else}
-    {#if tasksWithAttentionRequired.length > 0}
-      <section class="attention-required">
-        {#each tasksWithAttentionRequired as task (task.id)}
-          <Todo {task} />
-        {/each}
-      </section>
-    {/if}
-    {#if activeTasks.length > 0}
-      <div></div>
-      <section>
-        {#each activeTasks as task (task.id)}
-          <Todo {task} />
-        {/each}
-      </section>
+    {#key platforms}
+      <div class="refresh">
+        <RefreshTrigger {platforms} />
+      </div>
+    {/key}
+    {#if initializing}
+      <Spinner />
+    {:else}
+      <TaskRows
+        tasks={tasksWithAttentionRequired}
+        --margin-top="8px"
+        --margin-bottom="32px"
+      />
+
+      {#if activeTasks.length > 0}
+        <TaskRows tasks={activeTasks} />
+      {/if}
+
+      <style>
+        .attention-required {
+          margin-top: 8px;
+          margin-bottom: 32px;
+        }
+      </style>
     {/if}
   {/if}
 </div>
@@ -73,10 +78,5 @@
 
   .refresh {
     margin-bottom: 8px;
-  }
-
-  .attention-required {
-    margin-top: 8px;
-    margin-bottom: 32px;
   }
 </style>

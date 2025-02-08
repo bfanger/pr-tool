@@ -30,11 +30,11 @@
   type="textarea"
   label="Private Token"
   bind:value={auth.privateToken}
-  placeholder="abcdefghijklmnopqrst"
+  placeholder="glpat-abcdefghijklmnopqrst"
 >
   Create a
   <a
-    href="https://{auth.domain}/profile/personal_access_tokens"
+    href="https://{auth.domain ?? 'gitlab.com'}/profile/personal_access_tokens"
     target="_blank"
     rel="noreferrer"
   >
