@@ -35,12 +35,25 @@ const gitlabConfigSchema = z.object({
   }),
 });
 
+export type GitHubConfig = z.infer<typeof githubConfigSchema>;
+const githubConfigSchema = z.object({
+  type: z.literal("github"),
+  auth: z.object({
+    login: z.string(),
+    accessToken: z.string(),
+  }),
+});
+
+export type PlatformConfig = GitLabConfig | GitHubConfig;
 export const configsSchema = z
   .array(
-    gitlabConfigSchema.optional().catch((ctx) => {
-      console.warn(ctx.error);
-      return undefined;
-    }),
+    z
+      .union([gitlabConfigSchema, githubConfigSchema])
+      .optional()
+      .catch((ctx) => {
+        console.warn(ctx.error);
+        return undefined;
+      }),
   )
   .transform((configs) => configs.filter(Boolean))
   .catch((ctx) => {

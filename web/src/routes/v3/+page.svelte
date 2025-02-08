@@ -4,17 +4,18 @@
   import { configsSchema } from "../../platforms/types";
   import storage from "../../services/storage.svelte";
   import RefreshTrigger from "./RefreshTrigger.svelte";
-  import Todos from "../../components/TaskRows/TaskRows.svelte";
-  import TaskRow from "../../components/TaskRows/TaskRow.svelte";
   import TaskRows from "../../components/TaskRows/TaskRows.svelte";
+  import legacy from "../../platforms/legacy.svelte";
 
   const storedConfigs = storage("configs", configsSchema);
   let platforms = $derived(
     storedConfigs.value.map((config) => {
       if (config?.type === "gitlab") {
         return gitlab(config);
+      } else if (config) {
+        return legacy(config);
       }
-      throw new Error(`Unsupported platform: ${config?.type}`);
+      throw new Error(`Unsupported platform: ${(config as any)?.type}`);
     }),
   );
   let count = $derived(
