@@ -11,6 +11,7 @@ export type GitLabGetRequests = {
   "/merge_requests": GitLabMergeRequest[];
   "/projects": GitLabProject[];
   "/projects/{projectId}/merge_requests/{iid}/approvals": GitLabApprovals;
+  "/events": any;
 };
 
 export type GitLabUser = {
@@ -29,6 +30,7 @@ export type GitLabMergeRequest = {
   assignees: GitLabUser[];
   reviewers: GitLabUser[];
   web_url: string;
+  user_notes_count: number;
   updated_at: string;
 } & { [key: string]: unknown };
 
@@ -39,6 +41,14 @@ export type GitLabApprovals = {
 export type GitLabProject = {
   id: number;
   name: string;
+} & { [key: string]: unknown };
+
+export type GitLabEvent = {
+  action_name: "approved" | "pushed new" | "commented on" | "opened" | "closed";
+  author_id: number;
+  project_id: number;
+  target_type: "MergeRequest" | null;
+  target_id: number;
 } & { [key: string]: unknown };
 
 const responses = new WeakMap<any, Response>();

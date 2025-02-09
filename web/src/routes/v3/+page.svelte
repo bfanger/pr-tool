@@ -23,14 +23,13 @@
   <div>No platforms configured</div>
 {:else if initializing}
   <Spinner />
-{:else}
-  {#each Object.entries(groups) as [group, tasks]}
-    <h2 class="group">{group || "Untitled"}</h2>
-    {#if tasks}
-      <TaskRows {tasks} />
-    {/if}
-  {/each}
 {/if}
+{#each Object.entries(groups) as [group, tasks]}
+  <h2 class="group">{group || "Untitled"}</h2>
+  {#if tasks}
+    <TaskRows {tasks} />
+  {/if}
+{/each}
 
 <style>
   .group {

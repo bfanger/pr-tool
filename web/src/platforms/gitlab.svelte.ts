@@ -1,4 +1,5 @@
 import cache from "../services/cache";
+import poll from "../services/poll";
 import {
   gitlabGetAll,
   gitlabGet,
@@ -33,29 +34,49 @@ export default function gitlab({ auth }: GitLabConfig): Platform {
   const userKey = Symbol("user");
   const projectsKey = Symbol("projects");
   let refreshController = new AbortController();
-  const config = {
-    auth,
-    signal: refreshController.signal,
-  };
 
   function getUser() {
-    return cache(userKey, () => gitlabGet(`/user`, {}, config), {
-      dedupe: 10,
-      revalidate: 86400,
-    });
+    return cache(
+      userKey,
+      () => gitlabGet(`/user`, {}, { auth, signal: refreshController.signal }),
+      {
+        dedupe: 10,
+        revalidate: 86400,
+      },
+    );
   }
 
   function getProjectName(projectId: number) {
     return (
-      projects.get(projectId)?.name ??
-      `Project ${projectId} (${config.auth.domain})`
+      projects.get(projectId)?.name ?? `Project ${projectId} (${auth.domain})`
     );
   }
+  let previousUpdate: Date;
+  async function checkForUpdates() {
+    if (progress === "idle") {
+      progress = "updating";
+    }
+    const promise = gitlabGetAll(
+      "/events",
+      { searchParams: { scope: "all", after: previousUpdate.toISOString() } },
+      { auth, signal: refreshController.signal },
+    );
+    previousUpdate = new Date();
+    const events = await promise;
+    console.info(events);
+    if (progress === "updating") {
+      progress = "idle";
+    }
+  }
 
-  const refresh: Platform["refresh"] = async () => {
+  async function refresh() {
     refreshController.abort("refresh");
     refreshController = new AbortController();
-    config.signal = refreshController.signal;
+    previousUpdate = new Date();
+    const config = {
+      auth,
+      signal: refreshController.signal,
+    };
 
     if (progress !== "init") {
       progress = "updating";
@@ -119,6 +140,12 @@ export default function gitlab({ auth }: GitLabConfig): Platform {
         )),
       ];
       mergeRequests = new Map(mrsIncludingApprovals.map((mr) => [mr.id, mr]));
+      poll(checkForUpdates, {
+        gap: 300,
+        signal: refreshController.signal,
+      });
+      // previousUpdate = new Date(2025, 1, 4, 0, 0, 0);
+      // checkForUpdates();
       projects = new Map(
         (await projectPromise).map((project) => [project.id, project]),
       );
@@ -127,7 +154,7 @@ export default function gitlab({ auth }: GitLabConfig): Platform {
       progress = "error";
       throw error;
     }
-  };
+  }
 
   return {
     get progress() {
