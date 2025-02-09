@@ -6,34 +6,32 @@ import {
   type GitLabApprovals,
   type GitLabMergeRequest,
   type GitLabUser,
+  type GitLabProject,
 } from "./gitlab-api";
 import type { GitLabConfig, Platform, Progress } from "./types";
 
 export default function gitlab({ auth }: GitLabConfig): Platform {
   let progress: Progress = $state("init");
-  let activeMergeRequests = $state(
+  let currentUser: GitLabUser = $state(undefined as any);
+  let projects = $state(new Map<number, GitLabProject>());
+  let mergeRequests = $state(
     new Map<number, GitLabMergeRequest & { approvals?: GitLabApprovals }>(),
   );
-  let user: GitLabUser | undefined = $state();
-  let activeTasks = $derived(
-    activeMergeRequests
-      .values()
-      .map((mr) => gitlabMergeRequestToTask(mr))
-      .toArray(),
-  );
-  let tasksWithAttentionRequired = $derived(
-    activeMergeRequests
-      .values()
-      .filter((mr) => isAttentionNeeded(mr, user))
-      .map((mr) => gitlabMergeRequestToTask(mr))
-      .toArray(),
-  );
 
-  let stats: Platform["stats"] = $derived({
-    attentionRequired: tasksWithAttentionRequired.length,
-  });
+  let tasks = $derived(
+    mergeRequests
+      .values()
+      .map((mr) =>
+        gitlabMergeRequestToTask(mr, {
+          currentUserId: currentUser.id,
+          getProjectName,
+        }),
+      )
+      .toArray(),
+  );
 
   const userKey = Symbol("user");
+  const projectsKey = Symbol("projects");
   let refreshController = new AbortController();
   const config = {
     auth,
@@ -47,6 +45,13 @@ export default function gitlab({ auth }: GitLabConfig): Platform {
     });
   }
 
+  function getProjectName(projectId: number) {
+    return (
+      projects.get(projectId)?.name ??
+      `Project ${projectId} (${config.auth.domain})`
+    );
+  }
+
   const refresh: Platform["refresh"] = async () => {
     refreshController.abort("refresh");
     refreshController = new AbortController();
@@ -56,7 +61,12 @@ export default function gitlab({ auth }: GitLabConfig): Platform {
       progress = "updating";
     }
     try {
-      user = await getUser();
+      const projectPromise = cache(
+        projectsKey,
+        () => gitlabGetAll("/projects", {}, config),
+        { dedupe: 10, revalidate: 3600 },
+      );
+      currentUser = await getUser();
 
       const [reviewMrs, authoredMrs, assignedMrs] = await Promise.all([
         gitlabGetAll(
@@ -64,7 +74,7 @@ export default function gitlab({ auth }: GitLabConfig): Platform {
           {
             searchParams: {
               scope: "all",
-              reviewer_id: user.id,
+              reviewer_id: currentUser.id,
               state: "opened",
             },
           },
@@ -75,7 +85,7 @@ export default function gitlab({ auth }: GitLabConfig): Platform {
           {
             searchParams: {
               scope: "all",
-              author_id: user.id,
+              author_id: currentUser.id,
               state: "opened",
             },
           },
@@ -86,7 +96,7 @@ export default function gitlab({ auth }: GitLabConfig): Platform {
           {
             searchParams: {
               scope: "all",
-              assignee_id: user.id,
+              assignee_id: currentUser.id,
               state: "opened",
             },
           },
@@ -108,8 +118,9 @@ export default function gitlab({ auth }: GitLabConfig): Platform {
           }),
         )),
       ];
-      activeMergeRequests = new Map(
-        mrsIncludingApprovals.map((mr) => [mr.id, mr]),
+      mergeRequests = new Map(mrsIncludingApprovals.map((mr) => [mr.id, mr]));
+      projects = new Map(
+        (await projectPromise).map((project) => [project.id, project]),
       );
       progress = "idle";
     } catch (error) {
@@ -122,42 +133,9 @@ export default function gitlab({ auth }: GitLabConfig): Platform {
     get progress() {
       return progress;
     },
-    get stats() {
-      return stats;
-    },
-    get activeTasks() {
-      return activeTasks;
-    },
-    get tasksWithAttentionRequired() {
-      return tasksWithAttentionRequired;
+    get tasks() {
+      return tasks;
     },
     refresh,
   } satisfies Platform;
-}
-
-function isAttentionNeeded(
-  mr: GitLabMergeRequest & { approvals?: GitLabApprovals },
-  user: GitLabUser | undefined,
-): boolean {
-  if (!user || mr.draft) {
-    return false;
-  }
-  if (mr.author.id === user.id) {
-    if (mr.reviewers.length === 0) {
-      return true; // No reviewers assigned
-    }
-    return mr.reviewers.length === mr.approvals?.approved_by.length; // Approved, ready to merge
-  }
-  if (mr.assignees.find((assignee) => assignee.id === user.id)) {
-    return true; // Assigned
-  }
-  if (mr.reviewers.find((reviewer) => reviewer.id === user.id)) {
-    if (
-      mr.approvals?.approved_by.find((approval) => approval.user.id === user.id)
-    ) {
-      return false; // Already approved
-    }
-    return true; // Review requested
-  }
-  return false;
 }

@@ -1,83 +1,45 @@
 <script lang="ts">
   import Spinner from "../../components/Spinner/Spinner.svelte";
-  import gitlab from "../../platforms/gitlab.svelte";
-  import { configsSchema } from "../../platforms/types";
-  import storage from "../../services/storage.svelte";
-  import RefreshTrigger from "./RefreshTrigger.svelte";
   import TaskRows from "../../components/TaskRows/TaskRows.svelte";
-  import legacy from "../../platforms/legacy.svelte";
+  import { getContext } from "svelte";
+  import type { Platform } from "../../platforms/types";
+  import { each } from "lodash-es";
 
-  const storedConfigs = storage("configs", configsSchema);
-  let platforms = $derived(
-    storedConfigs.value.map((config) => {
-      if (config?.type === "gitlab") {
-        return gitlab(config);
-      } else if (config) {
-        return legacy(config);
-      }
-      throw new Error(`Unsupported platform: ${(config as any)?.type}`);
-    }),
-  );
-  let count = $derived(
-    platforms
-      .map((platform) => platform.stats.attentionRequired)
-      .reduce((a, b) => a + b, 0),
-  );
-  $effect(() => {
-    console.info("attentionRequired", count);
-  });
+  const ctx = getContext<{ platforms: Platform[] }>("platforms");
+  let platforms = $derived(ctx.platforms);
 
   let initializing = $derived(
     !platforms.find((platform) => platform.progress !== "init"),
   );
-
-  let tasksWithAttentionRequired = $derived(
-    platforms.map((platform) => platform.tasksWithAttentionRequired).flat(1),
-  );
-
-  let activeTasks = $derived(
-    platforms.map((platform) => platform.activeTasks).flat(1),
+  let groups = $derived(
+    Object.groupBy(
+      platforms.flatMap((platform) => platform.tasks),
+      (task) => task.getGroup() ?? "",
+    ),
   );
 </script>
 
-<div class="content">
-  {#if platforms.length === 0}
-    <div>No platforms configured</div>
-  {:else}
-    {#key platforms}
-      <div class="refresh">
-        <RefreshTrigger {platforms} />
-      </div>
-    {/key}
-    {#if initializing}
-      <Spinner />
-    {:else}
-      <TaskRows
-        tasks={tasksWithAttentionRequired}
-        --margin-top="8px"
-        --margin-bottom="32px"
-      />
-
-      {#if activeTasks.length > 0}
-        <TaskRows tasks={activeTasks} />
-      {/if}
-
-      <style>
-        .attention-required {
-          margin-top: 8px;
-          margin-bottom: 32px;
-        }
-      </style>
+{#if platforms.length === 0}
+  <div>No platforms configured</div>
+{:else if initializing}
+  <Spinner />
+{:else}
+  {#each Object.entries(groups) as [group, tasks]}
+    <h2 class="group">{group || "Untitled"}</h2>
+    {#if tasks}
+      <TaskRows {tasks} />
     {/if}
-  {/if}
-</div>
+  {/each}
+{/if}
 
 <style>
-  .content {
-    padding: 8px;
-  }
+  .group {
+    margin-top: 2.2rem;
+    margin-bottom: 1rem;
 
-  .refresh {
-    margin-bottom: 8px;
+    font-size: 1.4rem;
+    font-weight: normal;
+    text-transform: uppercase;
+    letter-spacing: 0.2px;
   }
 </style>

@@ -16,16 +16,8 @@ export default function legacy(config: GitHubConfig | GitLabConfig): Platform {
   const progress$ = new BehaviorSubject(0);
 
   let progress: Progress = $state("init");
-  let activeTasks: Task[] = $state([]);
+  let tasks: Task[] = $state([]);
   let currentProfile = $state<Profile | null>(null);
-  $effect(() => {
-    const subscription = provider.account().subscribe((value) => {
-      currentProfile = value;
-      Promise.resolve().then(() => {
-        subscription.unsubscribe();
-      });
-    });
-  });
 
   const avatars: {
     medium: Record<string, string>;
@@ -65,6 +57,15 @@ export default function legacy(config: GitHubConfig | GitLabConfig): Platform {
   );
 
   $effect(() => {
+    const subscription = provider.account().subscribe((value) => {
+      currentProfile = value;
+      Promise.resolve().then(() => {
+        subscription.unsubscribe();
+      });
+    });
+  });
+
+  $effect(() => {
     if (!currentProfile) {
       return;
     }
@@ -78,7 +79,7 @@ export default function legacy(config: GitHubConfig | GitLabConfig): Platform {
     );
     subscriptions.push(
       pullRequests$.subscribe((prs) => {
-        activeTasks = prs
+        tasks = prs
           .filter(
             (pr) =>
               pr.pullRequest.creator.id === currentProfile?.id ||
@@ -95,15 +96,17 @@ export default function legacy(config: GitHubConfig | GitLabConfig): Platform {
     };
   });
 
-  function prToTask({ pullRequest }: PullRequestWithProject): Task {
+  function prToTask({ pullRequest, project }: PullRequestWithProject): Task {
     return {
       id: `${pullRequest.id}`,
       url: pullRequest.url,
       title: pullRequest.title,
+      attentionNeeded: false,
       author: {
         name: pullRequest.creator.name,
         getAvatar: (size) => loadAvatar(pullRequest.creator, size),
       },
+      getGroup: () => project.name,
       getCollaborators() {
         return pullRequest.reviewers.map((reviewer) => ({
           name: reviewer.profile.name,
@@ -119,16 +122,12 @@ export default function legacy(config: GitHubConfig | GitLabConfig): Platform {
     get progress() {
       return progress;
     },
-    stats: {
-      attentionRequired: 0,
-    },
     refresh: () => {
       retry$.next();
       return Promise.resolve();
     },
-    get activeTasks() {
-      return activeTasks;
+    get tasks() {
+      return tasks;
     },
-    tasksWithAttentionRequired: [],
   };
 }

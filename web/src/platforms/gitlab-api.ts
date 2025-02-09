@@ -9,6 +9,7 @@ import type { Collaborator, Task } from "./types";
 export type GitLabGetRequests = {
   "/user": GitLabUser;
   "/merge_requests": GitLabMergeRequest[];
+  "/projects": GitLabProject[];
   "/projects/{projectId}/merge_requests/{iid}/approvals": GitLabApprovals;
 };
 
@@ -34,6 +35,11 @@ export type GitLabMergeRequest = {
 export type GitLabApprovals = {
   approved_by: { user: GitLabUser }[];
 };
+
+export type GitLabProject = {
+  id: number;
+  name: string;
+} & { [key: string]: unknown };
 
 const responses = new WeakMap<any, Response>();
 
@@ -76,7 +82,7 @@ export async function gitlabGet<T extends keyof GitLabGetRequests>(
 }
 
 /**
- *
+ * Retrieve all pages based on the `X-` headers.
  */
 export async function gitlabGetAll<T extends keyof GitLabGetRequests>(
   path: T,
@@ -86,7 +92,6 @@ export async function gitlabGetAll<T extends keyof GitLabGetRequests>(
   },
   config: ApiConfig,
 ): Promise<GitLabGetRequests[T]> {
-  // @todo Retrieve all pages based on the `X-` headers.
   const init = { ...options };
   if (!init.searchParams?.per_page) {
     init.searchParams = { ...init.searchParams, per_page: 100 };
@@ -122,17 +127,26 @@ export async function gitlabGetAll<T extends keyof GitLabGetRequests>(
 
 export function gitlabMergeRequestToTask(
   mr: GitLabMergeRequest & { approvals?: GitLabApprovals },
+  {
+    currentUserId,
+    getProjectName,
+  }: {
+    currentUserId: number;
+    getProjectName: (id: number) => string | undefined;
+  },
 ): Task {
   return {
     id: `${mr.id}`,
     title: mr.title,
     url: mr.web_url,
+    attentionNeeded: isAttentionNeeded(mr, currentUserId),
     author: {
       name: mr.author.name,
       getAvatar() {
         return mr.author.avatar_url;
       },
     },
+    getGroup: () => getProjectName(mr.project_id),
     getCollaborators() {
       // @todo Trigger update?
       return [
@@ -160,4 +174,33 @@ export function gitlabUserToCollaborator(
     icon: approved ? "completed" : undefined,
     status: approved ? "Approved" : undefined,
   };
+}
+
+function isAttentionNeeded(
+  mr: GitLabMergeRequest & { approvals?: GitLabApprovals },
+  currentUserId: number,
+): boolean {
+  if (!currentUserId || mr.draft) {
+    return false;
+  }
+  if (mr.author.id === currentUserId) {
+    if (mr.reviewers.length === 0) {
+      return true; // No reviewers assigned
+    }
+    return mr.reviewers.length === mr.approvals?.approved_by.length; // Approved, ready to merge
+  }
+  if (mr.assignees.find((assignee) => assignee.id === currentUserId)) {
+    return true; // Assigned
+  }
+  if (mr.reviewers.find((reviewer) => reviewer.id === currentUserId)) {
+    if (
+      mr.approvals?.approved_by.find(
+        (approval) => approval.user.id === currentUserId,
+      )
+    ) {
+      return false; // Already approved
+    }
+    return true; // Review requested
+  }
+  return false;
 }

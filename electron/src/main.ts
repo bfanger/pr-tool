@@ -27,7 +27,7 @@ function getWindowPosition() {
 
   // Center window horizontally below the tray icon
   let x = Math.round(
-    trayBounds.x + trayBounds.width / 2 - windowBounds.width / 2,
+    trayBounds.x + trayBounds.width / 2 - windowBounds.width / 2
   );
   const { width } = screen.getPrimaryDisplay().workAreaSize;
   if (trayBounds.x > 0 && trayBounds.x < width) {
@@ -48,6 +48,10 @@ function showWindow() {
   window.focus();
 }
 function toggleWindow() {
+  if (loaded === false) {
+    load();
+    return;
+  }
   if (window.isVisible()) {
     window.hide();
   } else {
@@ -83,6 +87,16 @@ function createTray() {
 nativeTheme.on("updated", () => {
   tray.setImage(iconFilename(currentIcon));
 });
+
+let loaded = false;
+async function load() {
+  await window.loadURL(
+    process.env.NODE_ENV === "development"
+      ? "http://localhost:5173/v3"
+      : "https://pr.bfanger.nl/v3"
+  );
+  loaded = true;
+}
 function createWindow() {
   window = new BrowserWindow({
     width: windowWidth,
@@ -99,11 +113,7 @@ function createWindow() {
       preload: path.join(currentDir, "preload.cjs"),
     },
   });
-  window.loadURL(
-    process.env.NODE_ENV === "development"
-      ? "http://localhost:5173/app"
-      : "https://pr.bfanger.nl/app",
-  );
+  load();
 
   window.webContents.setWindowOpenHandler(({ url }) => {
     open(url);

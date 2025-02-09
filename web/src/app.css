@@ -9,6 +9,7 @@
   --muted: #ababab;
   --border: #e4e4e4;
   --inset: #fff;
+  --inset-muted: #f9f9f9;
   --fieldset: #eee;
   --button-background: #fff;
   --button-text: #000;
@@ -36,6 +37,7 @@
     --muted: #7d7d7d;
     --border: #515151;
     --inset: #212121;
+    --inset-muted: #2b2b2b;
     --fieldset: #393939;
     --button-background: #6b6b6b;
     --button-text: #fff;

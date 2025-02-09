@@ -55,9 +55,9 @@
   {#await promise}
     Refreshing...
   {:then _}
-    Refresh all
+    Refresh
   {:catch}
-    Refresh all
+    Refresh
   {/await}
 </Button>
 

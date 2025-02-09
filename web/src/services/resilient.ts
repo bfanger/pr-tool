@@ -15,11 +15,10 @@ export default async function resilient<T>(
   options: Options,
   fn: () => Promise<T>,
 ): Promise<T> {
-  const { signal, retries, timeout, delay, jitter } = options;
+  const { signal, retries, timeout, delay = 0, jitter = 0.1 } = options;
   if (delay) {
     await sleep(applyJitter(delay, jitter), { signal });
   }
-
   const timeoutController = new AbortController();
   const timer = setTimeout(
     () => timeoutController.abort("timed out"),
@@ -46,8 +45,10 @@ export default async function resilient<T>(
     return resilient(
       {
         ...options,
+        delay: delay + 500,
         retries: retries - 1,
         timeout: timeout * 1.5,
+        jitter: jitter * 1.5,
       },
       fn,
     );
@@ -57,7 +58,7 @@ export default async function resilient<T>(
   }
 }
 
-function applyJitter(value: number, jitter = 0.1) {
+function applyJitter(value: number, jitter: number) {
   const noise = value * jitter * Math.random();
   return value + noise;
 }

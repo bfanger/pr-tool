@@ -10,7 +10,13 @@
   let { url, title, author } = $derived(task);
 </script>
 
-<a class="todo" href={url} target="_blank" rel="noreferrer">
+<a
+  class="todo"
+  href={url}
+  class:muted={!task.attentionNeeded}
+  target="_blank"
+  rel="noreferrer"
+>
   <div class="title-row">
     <span class="avatar">
       <Avatar
@@ -41,6 +47,16 @@
     text-decoration: none;
 
     background: var(--inset);
+
+    &.muted {
+      background: var(--inset-muted);
+      transition: background 0.3s;
+
+      &:hover {
+        background: var(--inset);
+        transition-duration: 0.05s;
+      }
+    }
   }
 
   .todo:first-child {

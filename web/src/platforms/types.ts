@@ -4,23 +4,25 @@ export type Progress = "init" | "error" | "updating" | "idle";
 
 export type Platform = {
   progress: Progress;
-  stats: { attentionRequired: number };
   refresh: () => Promise<void>;
-
-  activeTasks: Task[];
-  tasksWithAttentionRequired: Task[];
+  tasks: Task[];
 };
+
 export type Task = {
   id: string;
   url: string;
   title: string;
+  attentionNeeded: boolean;
   author: Person;
+  getGroup(): string | undefined;
   getCollaborators: () => Collaborator[];
 };
+
 export type Person = {
   name: string;
   getAvatar: (size: "medium" | "large") => string | undefined;
 };
+
 export type Collaborator = Person & {
   icon?: "completed";
   status?: string;
