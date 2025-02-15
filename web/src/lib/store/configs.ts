@@ -1,10 +1,11 @@
 import { Observable } from "rxjs";
 import { writable } from "svelte/store";
 import type { ProviderConfig } from "$lib/streams/providers";
-import storage from "$lib/services/storage";
+import { z } from "zod";
+import storage from "../../services/storage.svelte";
 
 const { subscribe, update } = writable<ProviderConfig[]>(
-  storage.get("configs", []),
+  storage("configs", z.array(z.any()).catch([])).value,
 );
 export default {
   subscribe,
@@ -12,7 +13,8 @@ export default {
   add(config: ProviderConfig) {
     update((state) => {
       const configs = [...state, config];
-      storage.set("configs", configs);
+      // storage.set("configs", configs);
+      storage("configs", z.array(z.any()).catch([])).value = configs;
       return configs;
     });
   },
@@ -20,7 +22,8 @@ export default {
     update((state) => {
       // projects.removeFrom(account.organization)
       const configs = state.filter((c) => c !== config);
-      storage.set("configs", configs);
+      storage("configs", z.array(z.any()).catch([])).value = configs;
+      // storage.set("configs", configs);
       return configs;
     });
   },

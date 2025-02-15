@@ -3,6 +3,19 @@ import { type TypeOf, type ZodType } from "zod";
 
 const namespace = "app_";
 
+const signal = new (class {
+  localStorage: Record<string, string | null | undefined> = $state({});
+  sessionStorage: Record<string, string | null | undefined> = $state({});
+})();
+
+if (browser) {
+  window.addEventListener("storage", ({ key, newValue }) => {
+    if (key?.startsWith(namespace)) {
+      signal.localStorage[key.substring(namespace.length)] = newValue;
+    }
+  });
+}
+
 /**
  * Typesafe reactive API using Signals for interacting with localStorage or sessionStorage
  *
@@ -26,41 +39,37 @@ export default function storage<T extends ZodType<any, any, any>>(
   type: "localStorage" | "sessionStorage" = "localStorage",
 ) {
   const backend = init(type);
-  let raw: string | null = $state(backend.getItem(namespace + key));
+  let jsonValue: string | null | undefined = backend.getItem(namespace + key);
+  if (signal[type][key] !== jsonValue) {
+    signal[type][key] = jsonValue;
+  }
   let value = $derived.by(() => {
     let parsed: unknown;
     try {
-      parsed = JSON.parse(raw as string);
-    } catch {
-      //
+      jsonValue = signal[type][key];
+      if (typeof jsonValue === "string") {
+        parsed = JSON.parse(jsonValue);
+      }
+    } catch (err) {
+      console.warn(
+        `Invalid JSON in ${type} for key: ${key}\n${(err as Error).message}`,
+      );
     }
 
     return schema.parse(parsed) as TypeOf<T>;
   });
-
-  if (browser && type === "localStorage") {
-    $effect(() => {
-      const listener = (event: StorageEvent) => {
-        if (event.key === namespace + key) {
-          raw = event.newValue;
-        }
-      };
-      window.addEventListener("storage", listener);
-      return () => {
-        window.removeEventListener("storage", listener);
-      };
-    });
-  }
 
   return {
     get value() {
       return value;
     },
     set value(update: TypeOf<T>) {
-      raw = JSON.stringify(update);
-      backend.setItem(namespace + key, raw);
+      jsonValue = JSON.stringify(update);
+      signal[type][key] = jsonValue;
+      backend.setItem(namespace + key, jsonValue);
     },
     reset() {
+      signal[type][key] = null;
       backend.removeItem(namespace + key);
     },
   };

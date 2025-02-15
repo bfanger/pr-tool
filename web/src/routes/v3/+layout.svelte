@@ -6,6 +6,7 @@
   import { setContext } from "svelte";
   import TrayIcon from "./TrayIcon.svelte";
   import RefreshTrigger from "./RefreshTrigger.svelte";
+  import Onboarding from "../../components/Onboarding/Onboarding.svelte";
 
   let { children } = $props();
 
@@ -28,15 +29,21 @@
   });
 </script>
 
-<TrayIcon {platforms} />
-<div class="layout">
-  {#key platforms}
-    <div class="refresh">
-      <RefreshTrigger {platforms} />
-    </div>
-  {/key}
-  {@render children()}
-</div>
+{#if platforms.length > 0}
+  <TrayIcon {platforms} />
+  <div class="layout">
+    {#key platforms}
+      <div class="refresh">
+        <RefreshTrigger {platforms} />
+      </div>
+    {/key}
+    {@render children()}
+  </div>
+{:else}
+  <div class="layout">
+    <Onboarding />
+  </div>
+{/if}
 
 <style>
   .layout {

@@ -1,40 +1,40 @@
 <script lang="ts">
-  import { createEventDispatcher } from "svelte";
-  import type { GitlabProviderAuth } from "$lib/models/gitlab/GitlabProvider";
   import type { ProviderConfig } from "$lib/streams/providers";
+  import { createEventDispatcher } from "svelte";
+  import extractDomain from "../../services/extractDomain";
   import TextInput from "./TextInput.svelte";
 
   const dispatch = createEventDispatcher();
 
-  const auth: GitlabProviderAuth = {
-    domain: "",
-    privateToken: "",
-  };
-  $: {
-    const config: ProviderConfig = {
-      type: "gitlab",
-      auth: { ...auth },
-    };
+  let domain = $state("");
+  let privateToken = $state("");
+
+  let config: ProviderConfig = $derived({
+    type: "gitlab",
+    auth: { domain: extractDomain(domain) || "gitlab.com", privateToken },
+  });
+
+  $effect(() => {
     dispatch("config", config);
-  }
+  });
 </script>
 
 <TextInput
   id="Gitlab-domain"
   label="Domain"
-  bind:value={auth.domain}
+  bind:value={domain}
   placeholder="gitlab.com"
 />
 <TextInput
   id="gitlab-private-token"
   type="textarea"
   label="Private Token"
-  bind:value={auth.privateToken}
+  bind:value={privateToken}
   placeholder="glpat-abcdefghijklmnopqrst"
 >
   Create a
   <a
-    href="https://{auth.domain ?? 'gitlab.com'}/profile/personal_access_tokens"
+    href="https://{domain || 'gitlab.com'}/profile/personal_access_tokens"
     target="_blank"
     rel="noreferrer"
   >

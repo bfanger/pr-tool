@@ -3,7 +3,6 @@
   import TaskRows from "../../components/TaskRows/TaskRows.svelte";
   import { getContext } from "svelte";
   import type { Platform } from "../../platforms/types";
-  import { each } from "lodash-es";
 
   const ctx = getContext<{ platforms: Platform[] }>("platforms");
   let platforms = $derived(ctx.platforms);
