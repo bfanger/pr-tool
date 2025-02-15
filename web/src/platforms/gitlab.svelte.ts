@@ -1,3 +1,6 @@
+/**
+ * https://docs.gitlab.com/ee/api/rest/
+ */
 import cache from "../services/cache";
 import poll from "../services/poll";
 import {
@@ -14,7 +17,7 @@ import type { GitLabConfig, Platform, Progress } from "./types";
 export default function gitlab({ auth }: GitLabConfig): Platform {
   let progress: Progress = $state("init");
   let currentUser: GitLabUser = $state(undefined as any);
-  let projects = $state(new Map<number, GitLabProject>());
+  const projects: Record<number, GitLabProject> = $state({});
   let mergeRequests = $state(
     new Map<number, GitLabMergeRequest & { approvals?: GitLabApprovals }>(),
   );
@@ -47,9 +50,7 @@ export default function gitlab({ auth }: GitLabConfig): Platform {
   }
 
   function getProjectName(projectId: number) {
-    return (
-      projects.get(projectId)?.name ?? `Project ${projectId} (${auth.domain})`
-    );
+    return projects[projectId]?.name ?? `Project ${projectId} (${auth.domain})`;
   }
   let previousUpdate: Date;
   async function checkForUpdates() {
@@ -84,7 +85,15 @@ export default function gitlab({ auth }: GitLabConfig): Platform {
     try {
       const projectPromise = cache(
         projectsKey,
-        () => gitlabGetAll("/projects", {}, config),
+        () =>
+          gitlabGetAll(
+            "/projects",
+            { searchParams: { order_by: "last_activity_at", per_page: 50 } },
+            config,
+            (project) => {
+              projects[project.id] = project;
+            },
+          ),
         { dedupe: 10, revalidate: 3600 },
       );
       currentUser = await getUser();
@@ -146,9 +155,7 @@ export default function gitlab({ auth }: GitLabConfig): Platform {
       });
       // previousUpdate = new Date(2025, 1, 4, 0, 0, 0);
       // checkForUpdates();
-      projects = new Map(
-        (await projectPromise).map((project) => [project.id, project]),
-      );
+      await projectPromise;
       progress = "idle";
     } catch (error) {
       progress = "error";

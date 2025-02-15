@@ -1,6 +1,7 @@
 :root {
-  --font: -apple-system, "BlinkMacSystemFont", "Helvetica Neue", "Helvetica",
-    sans-serif;
+  --font:
+    "SF Pro Display", -apple-system, "BlinkMacSystemFont", "Helvetica Neue",
+    "Helvetica", sans-serif;
   --hairline: 1px;
 
   /* .lightmode { */

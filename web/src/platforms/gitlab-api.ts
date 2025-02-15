@@ -101,6 +101,7 @@ export async function gitlabGetAll<T extends keyof GitLabGetRequests>(
     searchParams?: Record<string, number | string>;
   },
   config: ApiConfig,
+  stream?: (item: GitLabGetRequests[T][number]) => void | Promise<void>,
 ): Promise<GitLabGetRequests[T]> {
   const init = { ...options };
   if (!init.searchParams?.per_page) {
@@ -118,6 +119,9 @@ export async function gitlabGetAll<T extends keyof GitLabGetRequests>(
   if (Number.isNaN(pageCount) || pageCount === 1) {
     return page1;
   }
+  const streamPromise = Promise.all(
+    stream ? page1.map((item: any) => stream(item)) : [],
+  );
 
   const delay = config.delay ?? 0;
   const remainingPages: GitLabGetRequests[T][] = await Promise.all(
@@ -129,9 +133,15 @@ export async function gitlabGetAll<T extends keyof GitLabGetRequests>(
           searchParams: { ...init.searchParams, page: i + 2 },
         },
         { ...config, delay: delay + (i + 1) * 75 },
-      ),
+      ).then(async (page) => {
+        if (stream) {
+          await Promise.all(page.map((item: any) => stream(item)));
+        }
+        return page;
+      }),
     ),
   );
+  await streamPromise;
   return [page1, ...remainingPages].flat() as any as GitLabGetRequests[T];
 }
 

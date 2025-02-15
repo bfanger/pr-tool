@@ -2,7 +2,7 @@
   import placeholderSvg from "./placeholder.svg";
 
   type Props = {
-    size: "medium" | "large";
+    size: "small" | "medium" | "large";
     src?: string;
     title?: string;
   };
@@ -18,13 +18,20 @@
     border-radius: 50%;
   }
 
+  [data-size="small"] {
+    width: 19px;
+    height: 19px;
+  }
+
   [data-size="medium"] {
-    width: 2.4rem;
-    height: 2.4rem;
+    width: 27px;
+    height: 27px;
+    border-radius: 6px;
+    box-shadow: 1px 1px 2px rgb(0 0 0 / 10%);
   }
 
   [data-size="large"] {
-    width: 40px;
-    height: 40px;
+    width: 38px;
+    height: 38px;
   }
 </style>

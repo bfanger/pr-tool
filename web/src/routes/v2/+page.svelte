@@ -77,7 +77,7 @@
   {/each}
 </TabbedPanel>
 <div class="settings">
-  <Button href="/app/settings" small>Settings</Button>
+  <Button href="/v2/settings" small>Settings</Button>
 </div>
 <slot />
 

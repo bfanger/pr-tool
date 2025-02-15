@@ -19,7 +19,7 @@
 <div class="collaborator">
   <div class="avatar-and-icon">
     <div class="avatar" class:has-icon={icon}>
-      <Avatar src={avatar} size="medium" />
+      <Avatar src={avatar} size="small" />
     </div>
     {#if icon}
       <div class="icon" style="background-image:url('{icon}')"></div>
@@ -35,11 +35,16 @@
   .collaborator {
     display: flex;
     align-items: center;
-
-    margin-top: 0.5rem;
-    margin-left: 1.2rem;
-
+    color: var(--color);
     white-space: nowrap;
+
+    @media (prefers-color-scheme: light) {
+      --color: #747474;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      --color: #9f9f9f;
+    }
   }
 
   .avatar-and-icon {
@@ -68,6 +73,7 @@
   .name {
     margin-top: -4px;
     font-size: 1.2rem;
+    color: var(--text-muted);
   }
 
   .status {

@@ -7,6 +7,7 @@
   import TrayIcon from "./TrayIcon.svelte";
   import RefreshTrigger from "./RefreshTrigger.svelte";
   import Onboarding from "../../components/Onboarding/Onboarding.svelte";
+  import Button from "../../components/Button/Button.svelte";
 
   let { children } = $props();
 
@@ -33,9 +34,14 @@
   <TrayIcon {platforms} />
   <div class="layout">
     {#key platforms}
-      <div class="refresh">
-        <RefreshTrigger {platforms} />
-      </div>
+      <header class="header">
+        <div>
+          <RefreshTrigger {platforms} />
+        </div>
+        <div>
+          <Button href="/v3/settings" size="small">Settings</Button>
+        </div>
+      </header>
     {/key}
     {@render children()}
   </div>
@@ -56,10 +62,26 @@
 
     font-family: var(--font);
     font-size: 1.4rem;
+    color: var(--color);
     letter-spacing: 0.1px;
+
+    background: var(--background);
+
+    @media (prefers-color-scheme: light) {
+      --background: #ebebeb;
+      --color: #242424;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      --background: #282727;
+      --color: #e9e9e9;
+    }
   }
 
-  .refresh {
+  .header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
     margin-bottom: 8px;
   }
 </style>

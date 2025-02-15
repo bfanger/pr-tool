@@ -32,12 +32,9 @@
 
 <style>
   .group {
-    margin-top: 2.2rem;
+    margin-top: 2.9rem;
     margin-bottom: 1rem;
-
     font-size: 1.4rem;
-    font-weight: normal;
-    text-transform: uppercase;
-    letter-spacing: 0.2px;
+    font-weight: 600;
   }
 </style>

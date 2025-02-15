@@ -3,10 +3,14 @@ import { type TypeOf, type ZodType } from "zod";
 
 const namespace = "app_";
 
-const signal = new (class {
-  localStorage: Record<string, string | null | undefined> = $state({});
-  sessionStorage: Record<string, string | null | undefined> = $state({});
-})();
+type StorageType = "localStorage" | "sessionStorage";
+const signal: Record<
+  StorageType,
+  Record<string, string | null | undefined>
+> = $state({
+  localStorage: {},
+  sessionStorage: {},
+});
 
 if (browser) {
   window.addEventListener("storage", ({ key, newValue }) => {
@@ -36,7 +40,7 @@ if (browser) {
 export default function storage<T extends ZodType<any, any, any>>(
   key: string,
   schema: T,
-  type: "localStorage" | "sessionStorage" = "localStorage",
+  type: StorageType = "localStorage",
 ) {
   const backend = init(type);
   let jsonValue: string | null | undefined = backend.getItem(namespace + key);
@@ -55,7 +59,6 @@ export default function storage<T extends ZodType<any, any, any>>(
         `Invalid JSON in ${type} for key: ${key}\n${(err as Error).message}`,
       );
     }
-
     return schema.parse(parsed) as TypeOf<T>;
   });
 
