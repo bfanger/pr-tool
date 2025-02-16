@@ -212,6 +212,18 @@ export function gitlabUserToCollaborator(
   };
 }
 
+export async function gitLabMergeRequestWithApprovals(
+  mr: GitLabMergeRequest,
+  config: ApiConfig,
+): Promise<GitLabMergeRequest & { approvals?: GitLabApprovals }> {
+  const approvals = await gitlabGet(
+    "/projects/{projectId}/merge_requests/{iid}/approvals",
+    { params: { projectId: mr.project_id, iid: mr.iid } },
+    config,
+  );
+  return { ...mr, approvals };
+}
+
 function isAttentionNeeded(
   mr: GitLabMergeRequest & { approvals?: GitLabApprovals },
   currentUserId: number,

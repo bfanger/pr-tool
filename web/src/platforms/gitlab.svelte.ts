@@ -11,6 +11,7 @@ import {
   type GitLabMergeRequest,
   type GitLabUser,
   type GitLabProject,
+  gitLabMergeRequestWithApprovals,
 } from "./gitlab-api";
 import type { GitLabConfig, Platform, Progress } from "./types";
 
@@ -95,17 +96,25 @@ export default function gitlab({ auth }: GitLabConfig): Platform {
                 }
                 return;
               }
-              const approvals = await gitlabGet(
-                "/projects/{projectId}/merge_requests/{iid}/approvals",
-                {
-                  params: { projectId: mr.project_id, iid: mr.iid },
-                },
-                { auth, signal, delay: i * 150 },
-              );
-              mergeRequests[mr.id] = { ...mr, approvals };
+              mergeRequests[mr.id] = await gitLabMergeRequestWithApprovals(mr, {
+                auth,
+                signal,
+                delay: i * 150,
+              });
             },
           );
         }),
+      );
+      await Promise.all(
+        Object.values(mergeRequests)
+          .filter((mr) => !updatedProjects.has(mr.project_id))
+          .map(async (mr, i) => {
+            mergeRequests[mr.id] = await gitLabMergeRequestWithApprovals(mr, {
+              auth,
+              signal,
+              delay: 100 * i,
+            });
+          }),
       );
     } catch (err) {
       progress = "error";
@@ -182,25 +191,20 @@ export default function gitlab({ auth }: GitLabConfig): Platform {
       const mrsIncludingApprovals = [
         ...assignedMrs,
         ...(await Promise.all(
-          [authoredMrs, reviewMrs].flat().map(async (mr, i) => {
-            const approvals = await gitlabGet(
-              "/projects/{projectId}/merge_requests/{iid}/approvals",
-              {
-                params: { projectId: mr.project_id, iid: mr.iid },
-              },
-              { auth, signal, delay: i * 75 },
-            );
-            return { ...mr, approvals };
-          }),
+          [authoredMrs, reviewMrs].flat().map(async (mr, i) =>
+            gitLabMergeRequestWithApprovals(mr, {
+              auth,
+              signal,
+              delay: i * 75,
+            }),
+          ),
         )),
       ];
       mergeRequests = Object.fromEntries(
         mrsIncludingApprovals.map((mr) => [mr.id, mr]),
       );
-      poll(() => checkForUpdates(signal), {
-        gap: 300,
-        signal,
-      });
+
+      poll(() => checkForUpdates(signal), { gap: 300, signal });
 
       await projectPromise;
       progress = "idle";
