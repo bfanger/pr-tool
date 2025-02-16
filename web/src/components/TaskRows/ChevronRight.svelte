@@ -12,13 +12,6 @@
   .chevron-right {
     aspect-ratio: 320/512;
     width: 8px;
-
-    @media (prefers-color-scheme: light) {
-      fill: #ababab;
-    }
-
-    @media (prefers-color-scheme: dark) {
-      fill: #636363;
-    }
+    fill: light-dark(#ababab, #636363);
   }
 </style>

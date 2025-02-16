@@ -29,6 +29,7 @@
   --progressbar-progress: #1887fa;
 
   color: var(--text);
+  color-scheme: light dark;
   background: var(--background);
 
   @media (prefers-color-scheme: dark) {

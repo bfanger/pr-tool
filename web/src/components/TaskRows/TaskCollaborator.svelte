@@ -35,16 +35,8 @@
   .collaborator {
     display: flex;
     align-items: center;
-    color: var(--color);
+    color: light-dark(#747474, #9f9f9f);
     white-space: nowrap;
-
-    @media (prefers-color-scheme: light) {
-      --color: #747474;
-    }
-
-    @media (prefers-color-scheme: dark) {
-      --color: #9f9f9f;
-    }
   }
 
   .avatar-and-icon {

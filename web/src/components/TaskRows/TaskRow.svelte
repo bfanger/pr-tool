@@ -44,6 +44,8 @@
 
 <style>
   .todo {
+    --border: light-dark(#dadada, #4b4b4b);
+
     display: flex;
     align-items: center;
 
@@ -55,22 +57,10 @@
     color: var(--text);
     text-decoration: none;
 
-    background: var(--background);
+    background: light-dark(#e7e7e7, #2b2a2a);
 
     &:active {
-      background: var(--background-pressed);
-    }
-
-    @media (prefers-color-scheme: light) {
-      --background: #e7e7e7;
-      --background-pressed: #e0e0e0;
-      --border: #dadada;
-      --indicator: #4086f7;
-    }
-
-    @media (prefers-color-scheme: dark) {
-      --background: #2b2a2a;
-      --border: #4b4b4b;
+      background: light-dark(#e0e0e0, #373635);
     }
   }
 
@@ -108,7 +98,7 @@
     height: 0.8rem;
     border-radius: 50%;
 
-    background: var(--indicator);
+    background: light-dark(#699ff9, #5c86e4);
   }
 
   .title {
