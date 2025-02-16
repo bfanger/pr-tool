@@ -7,11 +7,16 @@
     platforms: Platform[];
   };
   let { platforms }: Props = $props();
-  let promise = $state<Promise<void>>();
+  let promise = $state<Promise<any>>();
+  let aborts: (() => void)[] = [];
 
   function refreshAll() {
+    aborts = [];
     promise = Promise.allSettled(
-      platforms.map((platform) => platform.refresh()),
+      platforms.map((platform) => {
+        aborts.push(platform.abort);
+        return platform.refresh();
+      }),
     ).then((results) => {
       for (const result of results) {
         if (result.status === "rejected") {
@@ -39,6 +44,9 @@
         "change",
         handleNetworkChange,
       );
+      for (const abort of aborts) {
+        abort();
+      }
     };
   });
 

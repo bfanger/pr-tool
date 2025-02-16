@@ -39,7 +39,7 @@
           <RefreshTrigger {platforms} />
         </div>
         <div>
-          <Button href="/v3/settings" size="small">Settings</Button>
+          <Button href="/v3/settings">Settings</Button>
         </div>
       </header>
     {/key}

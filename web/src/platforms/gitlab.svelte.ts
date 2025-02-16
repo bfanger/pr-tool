@@ -38,15 +38,11 @@ export default function gitlab({ auth }: GitLabConfig): Platform {
   let refreshController = new AbortController();
   let previousUpdate: Date;
 
-  function getUser() {
-    return cache(
-      userKey,
-      () => gitlabGet(`/user`, {}, { auth, signal: refreshController.signal }),
-      {
-        dedupe: 10,
-        revalidate: 86400,
-      },
-    );
+  function getUser(signal: AbortSignal) {
+    return cache(userKey, () => gitlabGet(`/user`, {}, { auth, signal }), {
+      dedupe: 10,
+      revalidate: 86400,
+    });
   }
 
   function getProjectName(projectId: number) {
@@ -129,9 +125,10 @@ export default function gitlab({ auth }: GitLabConfig): Platform {
   }
 
   async function refresh() {
-    refreshController.abort("refresh");
+    refreshController.abort();
     refreshController = new AbortController();
     const signal = refreshController.signal;
+
     previousUpdate = new Date();
 
     if (progress !== "init") {
@@ -151,7 +148,7 @@ export default function gitlab({ auth }: GitLabConfig): Platform {
           ),
         { dedupe: 10, revalidate: 3600 },
       );
-      currentUser = await getUser();
+      currentUser = await getUser(signal);
 
       const [reviewMrs, authoredMrs, assignedMrs] = await Promise.all([
         gitlabGetAll(
@@ -222,5 +219,8 @@ export default function gitlab({ auth }: GitLabConfig): Platform {
       return tasks;
     },
     refresh,
+    abort: () => {
+      refreshController.abort();
+    },
   } satisfies Platform;
 }

@@ -126,6 +126,7 @@ export default function legacy(config: GitHubConfig | GitLabConfig): Platform {
       retry$.next();
       return Promise.resolve();
     },
+    abort() {},
     get tasks() {
       return tasks;
     },
