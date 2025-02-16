@@ -46,7 +46,9 @@
         </div>
       </header>
     {/key}
-    {@render children()}
+    <main class="content">
+      {@render children()}
+    </main>
   </div>
 {:else}
   <div class="layout">
@@ -61,7 +63,6 @@
     min-height: 100%;
     margin-right: auto;
     margin-left: auto;
-    padding: 8px;
 
     font-family: var(--font);
     font-size: 1.4rem;
@@ -85,6 +86,20 @@
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    margin-bottom: 8px;
+    padding: 0.8rem;
+
+    @media (prefers-color-scheme: light) {
+      border-bottom: 1px solid #c9c9c9;
+      background: #dfdedf;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      border-bottom: 1px solid #000;
+      background: #4c4b4b;
+    }
+  }
+
+  .content {
+    padding: 0.8rem;
   }
 </style>

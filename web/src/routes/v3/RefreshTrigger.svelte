@@ -55,9 +55,18 @@
       refreshAll();
     }
   }
+
+  function handleFocus() {
+    for (const platform of platforms) {
+      if (platform.progress === "error" || platform.progress === "idle") {
+        platform.refresh();
+      }
+    }
+  }
 </script>
 
 <svelte:document onvisibilitychange={handleVisibilityChange} />
+<svelte:window onfocus={handleFocus} />
 
 <Button onclick={refreshAll}>Refresh</Button>
 {#await promise}
