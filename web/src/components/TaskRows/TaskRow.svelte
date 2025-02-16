@@ -9,6 +9,7 @@
   };
   let { task }: Props = $props();
   let { url, title, author } = $derived(task);
+  let collaborators = $derived(task.getCollaborators());
 </script>
 
 <a class="todo" href={url} target="_blank" rel="noreferrer">
@@ -21,11 +22,13 @@
     <div class="title">
       {title}
     </div>
-    <div class="collaborators">
-      {#each task.getCollaborators() as collaborator}
-        <TaskCollaborator {collaborator} />
-      {/each}
-    </div>
+    {#if collaborators.length > 0}
+      <div class="collaborators">
+        {#each collaborators as collaborator}
+          <TaskCollaborator {collaborator} />
+        {/each}
+      </div>
+    {/if}
   </div>
   <div class="avatar">
     <Avatar
@@ -42,6 +45,7 @@
 <style>
   .todo {
     display: flex;
+    align-items: center;
 
     padding: 0.8rem;
     border-right: var(--hairline) solid var(--border);

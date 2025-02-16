@@ -3,7 +3,7 @@
  */
 import type { PathParams } from "../services/buildUrl";
 import buildUrl from "../services/buildUrl";
-import harden from "../services/resilient";
+import resilient from "../services/resilient";
 import type { Collaborator, Task } from "./types";
 
 export type GitLabGetRequests = {
@@ -84,7 +84,7 @@ export async function gitlabGet<T extends keyof GitLabGetRequests>(
   const headers = new Headers(init.headers);
   headers.set("Private-Token", auth.privateToken);
   const url = buildUrl(path, params ?? ({} as PathParams<T>), searchParams);
-  const response = await harden(
+  const response = await resilient(
     {
       delay,
       retries: 3,

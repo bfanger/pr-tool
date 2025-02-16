@@ -8,6 +8,7 @@
   import RefreshTrigger from "./RefreshTrigger.svelte";
   import Onboarding from "../../components/Onboarding/Onboarding.svelte";
   import Button from "../../components/Button/Button.svelte";
+  import github from "../../platforms/github.svelte";
 
   let { children } = $props();
 
@@ -16,6 +17,8 @@
     storedConfigs.value.map((config) => {
       if (config?.type === "gitlab") {
         return gitlab(config);
+      } else if (config?.type === "github") {
+        return github(config);
       } else if (config) {
         return legacy(config);
       }
