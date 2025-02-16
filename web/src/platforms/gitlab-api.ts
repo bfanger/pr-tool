@@ -232,6 +232,12 @@ function isAttentionNeeded(
     return false;
   }
   if (mr.author.id === currentUserId) {
+    if (mr.has_conflicts) {
+      return true; // Merge Conflicts
+    }
+    if (mr.user_notes_count > 0) {
+      return true; // Has comments (TODO: check resolved)
+    }
     if (mr.reviewers.length === 0) {
       return true; // No reviewers assigned
     }
