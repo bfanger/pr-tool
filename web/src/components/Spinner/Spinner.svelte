@@ -2,12 +2,14 @@
   import azurePng from "./azure-devops.png";
   import bitbucketPng from "./bitbucket.png";
   import gitlabPng from "./gitlab.png";
+  import gilhubSvg from "./github.svg";
 </script>
 
 <div class="spinner">
   <img class="dot" src={azurePng} alt="." />
   <img class="dot" src={gitlabPng} alt="." />
   <img class="dot" src={bitbucketPng} alt="." />
+  <img class="dot" src={gilhubSvg} alt="." />
 </div>
 
 <style>
@@ -27,14 +29,18 @@
 
     object-fit: contain;
 
-    animation: spin infinite 1.8s cubic-bezier(0.46, 0.01, 0.76, 0.63);
+    animation: spin infinite 1.8s cubic-bezier(0.23, -0.17, 0.67, 1.27);
 
     &:nth-child(1) {
-      animation-delay: -0.6s;
+      animation-delay: -0.45s;
     }
 
     &:nth-child(2) {
-      animation-delay: -1.2s;
+      animation-delay: -0.9s;
+    }
+
+    &:nth-child(3) {
+      animation-delay: -1.35s;
     }
   }
 
