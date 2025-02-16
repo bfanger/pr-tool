@@ -51,15 +51,10 @@
 
 <svelte:document onvisibilitychange={handleVisibilityChange} />
 
-<Button onclick={refreshAll}>
-  {#await promise}
-    Refreshing...
-  {:then _}
-    Refresh
-  {:catch}
-    Refresh
-  {/await}
-</Button>
+<Button onclick={refreshAll}>Refresh</Button>
+{#await promise}
+  Refreshing...
+{/await}
 
 {#each platforms as platform}
   {#if platform.progress === "error"}

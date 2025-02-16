@@ -23,18 +23,29 @@
 {:else if initializing}
   <Spinner />
 {/if}
-{#each Object.entries(groups) as [group, tasks]}
-  <h2 class="group">{group || "Untitled"}</h2>
-  {#if tasks}
-    <TaskRows {tasks} />
-  {/if}
-{/each}
+<div class="groups">
+  {#each Object.entries(groups) as [group, tasks]}
+    {#if tasks}
+      <div>
+        <h2 class="title">{group || "Untitled"}</h2>
+        <TaskRows {tasks} />
+      </div>
+    {/if}
+  {/each}
+</div>
 
 <style>
-  .group {
-    margin-top: 2.9rem;
+  .groups {
+    display: flex;
+    flex-direction: column;
+    gap: 2.9rem;
+  }
+
+  .title {
+    margin-top: 0;
     margin-bottom: 1rem;
-    font-size: 1.4rem;
-    font-weight: 600;
+    font:
+      600 1.4rem "SF Pro Display",
+      var(--font);
   }
 </style>
