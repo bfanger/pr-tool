@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export type Progress = "init" | "error" | "updating" | "idle";
+export type Progress = "init" | "error" | "refreshing" | "updating" | "idle";
 
 export type Platform = {
   progress: Progress;

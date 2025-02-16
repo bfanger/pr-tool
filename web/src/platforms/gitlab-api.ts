@@ -10,8 +10,9 @@ export type GitLabGetRequests = {
   "/user": GitLabUser;
   "/merge_requests": GitLabMergeRequest[];
   "/projects": GitLabProject[];
+  "/projects/{projectId}/merge_requests": GitLabMergeRequest[];
   "/projects/{projectId}/merge_requests/{iid}/approvals": GitLabApprovals;
-  "/events": any;
+  "/events": GitLabEvent[];
 };
 
 export type GitLabUser = {
@@ -43,8 +44,18 @@ export type GitLabProject = {
   name: string;
 } & { [key: string]: unknown };
 
+export const gitlabEventsTypes = [
+  "accepted",
+  "approved",
+  "closed",
+  "commented on",
+  "deleted",
+  "opened",
+  "pushed new",
+  "pushed to",
+] as const;
 export type GitLabEvent = {
-  action_name: "approved" | "pushed new" | "commented on" | "opened" | "closed";
+  action_name: (typeof gitlabEventsTypes)[number];
   author_id: number;
   project_id: number;
   target_type: "MergeRequest" | null;
@@ -101,7 +112,11 @@ export async function gitlabGetAll<T extends keyof GitLabGetRequests>(
     searchParams?: Record<string, number | string>;
   },
   config: ApiConfig,
-  stream?: (item: GitLabGetRequests[T][number]) => void | Promise<void>,
+  stream?: (
+    item: GitLabGetRequests[T] extends any[]
+      ? GitLabGetRequests[T][number]
+      : never,
+  ) => void | Promise<void>,
 ): Promise<GitLabGetRequests[T]> {
   const init = { ...options };
   if (!init.searchParams?.per_page) {
@@ -116,12 +131,13 @@ export async function gitlabGetAll<T extends keyof GitLabGetRequests>(
     response.headers.get("x-total-pages") as string,
     10,
   );
+  const streamPromise = Promise.all(
+    stream ? (page1 as any[]).map((item: any) => stream(item)) : [],
+  );
   if (Number.isNaN(pageCount) || pageCount === 1) {
+    await streamPromise;
     return page1;
   }
-  const streamPromise = Promise.all(
-    stream ? page1.map((item: any) => stream(item)) : [],
-  );
 
   const delay = config.delay ?? 0;
   const remainingPages: GitLabGetRequests[T][] = await Promise.all(
@@ -135,7 +151,7 @@ export async function gitlabGetAll<T extends keyof GitLabGetRequests>(
         { ...config, delay: delay + (i + 1) * 75 },
       ).then(async (page) => {
         if (stream) {
-          await Promise.all(page.map((item: any) => stream(item)));
+          await Promise.all((page as any).map((item: any) => stream(item)));
         }
         return page;
       }),

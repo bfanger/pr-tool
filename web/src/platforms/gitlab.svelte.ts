@@ -18,25 +18,24 @@ export default function gitlab({ auth }: GitLabConfig): Platform {
   let progress: Progress = $state("init");
   let currentUser: GitLabUser = $state(undefined as any);
   const projects: Record<number, GitLabProject> = $state({});
-  let mergeRequests = $state(
-    new Map<number, GitLabMergeRequest & { approvals?: GitLabApprovals }>(),
-  );
+  let mergeRequests: Record<
+    number,
+    GitLabMergeRequest & { approvals?: GitLabApprovals }
+  > = $state({});
 
   let tasks = $derived(
-    mergeRequests
-      .values()
-      .map((mr) =>
-        gitlabMergeRequestToTask(mr, {
-          currentUserId: currentUser.id,
-          getProjectName,
-        }),
-      )
-      .toArray(),
+    Object.values(mergeRequests).map((mr) =>
+      gitlabMergeRequestToTask(mr, {
+        currentUserId: currentUser.id,
+        getProjectName,
+      }),
+    ),
   );
 
   const userKey = Symbol("user");
   const projectsKey = Symbol("projects");
   let refreshController = new AbortController();
+  let previousUpdate: Date;
 
   function getUser() {
     return cache(
@@ -52,20 +51,70 @@ export default function gitlab({ auth }: GitLabConfig): Platform {
   function getProjectName(projectId: number) {
     return projects[projectId]?.name ?? `Project ${projectId} (${auth.domain})`;
   }
-  let previousUpdate: Date;
-  async function checkForUpdates() {
+
+  async function checkForUpdates(signal: AbortSignal) {
+    const updateStart = new Date();
     if (progress === "idle") {
       progress = "updating";
     }
-    const promise = gitlabGetAll(
-      "/events",
-      { searchParams: { scope: "all", after: previousUpdate.toISOString() } },
-      { auth, signal: refreshController.signal },
-    );
-    previousUpdate = new Date();
-    const events = await promise;
-    console.info(events);
-    if (progress === "updating") {
+    try {
+      const promise = gitlabGetAll(
+        "/events",
+        { searchParams: { scope: "all", after: previousUpdate.toISOString() } },
+        { auth, signal },
+      );
+      const events = await promise;
+      const updatedProjects = new Set<number>();
+      for (const event of events) {
+        if (event.project_id) {
+          updatedProjects.add(event.project_id);
+        }
+      }
+      await Promise.all(
+        updatedProjects.values().map(async (projectId, i) => {
+          await gitlabGetAll(
+            "/projects/{projectId}/merge_requests",
+            { params: { projectId }, searchParams: { scope: "all" } },
+            { auth, signal },
+            async (mr) => {
+              if (mr.state !== "open") {
+                if (mergeRequests[mr.id]) {
+                  delete mergeRequests[mr.id];
+                }
+                return;
+              }
+              if (
+                mr.author.id !== currentUser.id &&
+                !(
+                  mr.assignees.find((user) => user.id === currentUser.id) ||
+                  mr.reviewers.find((user) => user.id === currentUser.id)
+                )
+              ) {
+                if (mergeRequests[mr.id]) {
+                  delete mergeRequests[mr.id];
+                }
+                return;
+              }
+              const approvals = await gitlabGet(
+                "/projects/{projectId}/merge_requests/{iid}/approvals",
+                {
+                  params: { projectId: mr.project_id, iid: mr.iid },
+                },
+                { auth, signal, delay: i * 150 },
+              );
+              mergeRequests[mr.id] = { ...mr, approvals };
+            },
+          );
+        }),
+      );
+    } catch (err) {
+      progress = "error";
+      throw err;
+    }
+    if (previousUpdate.getTime() < updateStart.getTime()) {
+      previousUpdate = updateStart;
+    }
+    if (progress === "updating" || progress === "error") {
       progress = "idle";
     }
   }
@@ -73,14 +122,11 @@ export default function gitlab({ auth }: GitLabConfig): Platform {
   async function refresh() {
     refreshController.abort("refresh");
     refreshController = new AbortController();
+    const signal = refreshController.signal;
     previousUpdate = new Date();
-    const config = {
-      auth,
-      signal: refreshController.signal,
-    };
 
     if (progress !== "init") {
-      progress = "updating";
+      progress = "refreshing";
     }
     try {
       const projectPromise = cache(
@@ -89,7 +135,7 @@ export default function gitlab({ auth }: GitLabConfig): Platform {
           gitlabGetAll(
             "/projects",
             { searchParams: { order_by: "last_activity_at", per_page: 50 } },
-            config,
+            { auth, signal },
             (project) => {
               projects[project.id] = project;
             },
@@ -108,7 +154,7 @@ export default function gitlab({ auth }: GitLabConfig): Platform {
               state: "opened",
             },
           },
-          { ...config, delay: 0 },
+          { auth, signal, delay: 0 },
         ),
         gitlabGetAll(
           `/merge_requests`,
@@ -119,7 +165,7 @@ export default function gitlab({ auth }: GitLabConfig): Platform {
               state: "opened",
             },
           },
-          { ...config, delay: 25 },
+          { auth, signal, delay: 25 },
         ),
         gitlabGetAll(
           `/merge_requests`,
@@ -130,7 +176,7 @@ export default function gitlab({ auth }: GitLabConfig): Platform {
               state: "opened",
             },
           },
-          { ...config, delay: 50, jitter: 2 },
+          { auth, signal, delay: 50, jitter: 2 },
         ),
       ]);
       const mrsIncludingApprovals = [
@@ -142,19 +188,20 @@ export default function gitlab({ auth }: GitLabConfig): Platform {
               {
                 params: { projectId: mr.project_id, iid: mr.iid },
               },
-              { ...config, delay: i * 75 },
+              { auth, signal, delay: i * 75 },
             );
             return { ...mr, approvals };
           }),
         )),
       ];
-      mergeRequests = new Map(mrsIncludingApprovals.map((mr) => [mr.id, mr]));
-      poll(checkForUpdates, {
+      mergeRequests = Object.fromEntries(
+        mrsIncludingApprovals.map((mr) => [mr.id, mr]),
+      );
+      poll(() => checkForUpdates(signal), {
         gap: 300,
-        signal: refreshController.signal,
+        signal,
       });
-      // previousUpdate = new Date(2025, 1, 4, 0, 0, 0);
-      // checkForUpdates();
+
       await projectPromise;
       progress = "idle";
     } catch (error) {
