@@ -228,10 +228,13 @@ function isAttentionNeeded(
   mr: GitLabMergeRequest & { approvals?: GitLabApprovals },
   currentUserId: number,
 ): boolean {
-  if (!currentUserId || mr.draft) {
+  if (!currentUserId) {
     return false;
   }
   if (mr.author.id === currentUserId) {
+    if (mr.draft) {
+      return true; // In draft by current user
+    }
     if (mr.has_conflicts) {
       return true; // Merge Conflicts
     }
@@ -242,6 +245,8 @@ function isAttentionNeeded(
       return true; // No reviewers assigned
     }
     return mr.reviewers.length === mr.approvals?.approved_by.length; // Approved, ready to merge
+  } else if (mr.draft) {
+    return false; // In draft by others
   }
   if (mr.assignees.find((assignee) => assignee.id === currentUserId)) {
     return true; // Assigned

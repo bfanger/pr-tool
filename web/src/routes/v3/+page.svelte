@@ -7,32 +7,32 @@
   const ctx = getContext<{ platforms: Platform[] }>("platforms");
   let platforms = $derived(ctx.platforms);
 
-  let initializing = $derived(
-    !platforms.find((platform) => platform.progress !== "init"),
-  );
+  let allTasks = $derived(platforms.flatMap((platform) => platform.tasks));
   let groups = $derived(
-    Object.groupBy(
-      platforms.flatMap((platform) => platform.tasks),
-      (task) => task.getGroup() ?? "",
-    ),
+    Object.groupBy(allTasks, (task) => task.getGroup() ?? ""),
   );
 </script>
 
-{#if platforms.length === 0}
-  <div>No platforms configured</div>
-{:else if initializing}
-  <Spinner />
+{#if allTasks.length === 0}
+  {#if platforms.some((platform) => platform.progress === "updating" || platform.progress === "refreshing")}
+    <Spinner />
+  {:else if platforms.some((platform) => platform.progress === "error")}
+    <div>Failed to load items</div>
+  {:else}
+    <div>No items</div>
+  {/if}
+{:else}
+  <div class="groups">
+    {#each Object.entries(groups) as [group, tasks]}
+      {#if tasks?.length}
+        <div>
+          <h2 class="title">{group || "Untitled"}</h2>
+          <TaskRows {tasks} />
+        </div>
+      {/if}
+    {/each}
+  </div>
 {/if}
-<div class="groups">
-  {#each Object.entries(groups) as [group, tasks]}
-    {#if tasks}
-      <div>
-        <h2 class="title">{group || "Untitled"}</h2>
-        <TaskRows {tasks} />
-      </div>
-    {/if}
-  {/each}
-</div>
 
 <style>
   .groups {

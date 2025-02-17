@@ -60,7 +60,7 @@ export const configsSchema = z
   )
   .transform((configs) => configs.filter(Boolean))
   .catch((ctx) => {
-    if (ctx.input !== null) {
+    if (ctx.input !== null && ctx.input !== undefined) {
       console.warn(ctx.error);
     }
     return [];
