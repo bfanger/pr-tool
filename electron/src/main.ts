@@ -61,7 +61,7 @@ function toggleWindow() {
 
 if (process.env.NODE_ENV !== "development") {
   // Don't show the app in the doc
-  app.dock.hide();
+  app.dock?.hide();
 }
 
 // Quit the app when the window is closed
