@@ -13,11 +13,11 @@
 </script>
 
 <a class="todo" href={url} target="_blank" rel="noreferrer">
-  <span class="indicator-spacer">
+  <div class="indicator-spacer">
     {#if task.attentionNeeded}
-      <span class="indicator"></span>
+      <i class="indicator"></i>
     {/if}
-  </span>
+  </div>
   <div class="title-and-collaborators">
     <div class="title">
       {title}
@@ -84,6 +84,7 @@
 
   .indicator-spacer {
     position: relative;
+    align-self: stretch;
     width: 1.6rem;
   }
 
@@ -98,7 +99,7 @@
     height: 0.8rem;
     border-radius: 50%;
 
-    background: light-dark(#699ff9, #5c86e4);
+    background: light-dark(#3378f6, #3a82f7);
   }
 
   .title {

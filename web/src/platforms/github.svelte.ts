@@ -3,11 +3,7 @@
  */
 
 import poll from "../services/poll";
-import {
-  githubGraphql,
-  githubPullRequestsQuery,
-  type GitHubPullRequests,
-} from "./github-api";
+import { githubGraphql, githubQuery, type GithubQuery } from "./github-api";
 import type {
   Collaborator,
   GitHubConfig,
@@ -28,50 +24,48 @@ export default function github({ auth }: GitHubConfig): Platform {
       progress = "updating";
     }
     try {
-      const data = await githubGraphql<GitHubPullRequests>(
-        githubPullRequestsQuery,
+      const data = await githubGraphql<GithubQuery>(
+        githubQuery,
+        { login: auth.login },
         { auth, signal },
       );
 
       tasks = [];
-      for (const repository of data.repositoryOwner.repositories.nodes) {
-        for (const pr of repository.pullRequests.nodes) {
-          if (
-            pr.author.login === auth.login ||
-            pr.assignees.nodes.find((user) => user.login === auth.login) ||
-            pr.latestReviews.nodes.find(
-              (review) => review.author.login === auth.login,
-            )
-          ) {
-            tasks.push({
-              id: pr.id,
-              title: pr.title,
-              url: pr.url,
-              attentionNeeded: false,
-              author: {
-                getAvatar: () => pr.author.avatarUrl,
-                name: pr.author.login,
-              },
-              getCollaborators() {
-                const collaborators: Collaborator[] = [];
-                for (const assignee of pr.assignees.nodes) {
-                  collaborators.push({
-                    getAvatar: () => assignee.avatarUrl,
-                    name: assignee.login,
-                  });
-                }
-                for (const review of pr.latestReviews.nodes) {
-                  collaborators.push({
-                    getAvatar: () => review.author.avatarUrl,
-                    name: review.author.login,
-                  });
-                }
-                return collaborators;
-              },
-              getGroup: () => repository.name,
-            });
-          }
+      const minimumDate = new Date();
+      minimumDate.setMonth(minimumDate.getMonth() - 6);
+
+      for (const pr of data.user.pullRequests.nodes) {
+        const updateAt = new Date(pr.updatedAt);
+        if (updateAt.getTime() < minimumDate.getTime()) {
+          continue;
         }
+        tasks.push({
+          id: pr.id,
+          title: pr.title,
+          url: pr.url,
+          attentionNeeded: false,
+          author: {
+            getAvatar: () => data.user.avatarUrl,
+            name: data.user.name,
+          },
+          getCollaborators() {
+            const collaborators: Collaborator[] = [];
+            for (const assignee of pr.assignees.nodes) {
+              collaborators.push({
+                getAvatar: () => assignee.avatarUrl,
+                name: assignee.login,
+              });
+            }
+            for (const review of pr.latestReviews.nodes) {
+              collaborators.push({
+                getAvatar: () => review.author.avatarUrl,
+                name: review.author.login,
+              });
+            }
+            return collaborators;
+          },
+          getGroup: () => pr.repository.name,
+        });
       }
       progress = "idle";
     } catch (err) {

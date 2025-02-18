@@ -1,31 +1,30 @@
 import gql from "../services/gql";
 import sleep from "../services/sleep";
 
-export type GitHubPullRequests = {
-  repositoryOwner: {
-    repositories: {
+export type GithubQuery = {
+  user: {
+    avatarUrl: string;
+    name: string;
+    pullRequests: {
+      totalCount: number;
       nodes: {
-        name: string;
-        pullRequests: {
+        id: string;
+        title: string;
+        updatedAt: string;
+        url: string;
+        repository: { name: string };
+        assignees: { nodes: { login: string; avatarUrl: string }[] };
+        reviewRequests: {
           nodes: {
-            id: string;
-            title: string;
-            url: string;
-            author: { avatarUrl: string; login: string };
-            assignees: { nodes: { login: string; avatarUrl: string }[] };
-            reviewRequests: {
-              nodes: {
-                login: string;
-                avatarUrl: string;
-              }[];
-            };
-            latestReviews: {
-              nodes: {
-                author: {
-                  login: string;
-                  avatarUrl: string;
-                };
-              }[];
+            login: string;
+            avatarUrl: string;
+          }[];
+        };
+        latestReviews: {
+          nodes: {
+            author: {
+              login: string;
+              avatarUrl: string;
             };
           }[];
         };
@@ -33,40 +32,36 @@ export type GitHubPullRequests = {
     };
   };
 };
-export const githubPullRequestsQuery = gql`
-  query PullRequests($login: String!) {
-    repositoryOwner(login: $login) {
-      repositories(first: 100, isArchived: false) {
+export const githubQuery = gql`
+  query GitHubInfo($login: String!) {
+    user(login: $login) {
+      avatarUrl
+      name
+      pullRequests(
+        first: 25
+        states: OPEN
+        orderBy: { field: UPDATED_AT, direction: DESC }
+      ) {
+        totalCount
         nodes {
-          ... on Repository {
+          id
+          url
+          title
+          updatedAt
+          repository {
             name
-            pullRequests(first: 25, states: OPEN) {
-              nodes {
-                id
-                url
-                title
-                author {
-                  avatarUrl
-                  login
-                }
-                author {
-                  avatarUrl
-                  login
-                }
-                assignees(first: 5) {
-                  nodes {
-                    login
-                    avatarUrl
-                  }
-                }
-                latestReviews(first: 5) {
-                  nodes {
-                    author {
-                      login
-                      avatarUrl
-                    }
-                  }
-                }
+          }
+          assignees(first: 5) {
+            nodes {
+              login
+              avatarUrl
+            }
+          }
+          latestReviews(first: 5) {
+            nodes {
+              author {
+                login
+                avatarUrl
               }
             }
           }
@@ -84,13 +79,14 @@ type ApiConfig = {
 
 export async function githubGraphql<T>(
   query: string,
+  variables: Record<string, any>,
   config: ApiConfig,
 ): Promise<T> {
   const init: RequestInit = {};
   init.method = "POST";
   init.body = JSON.stringify({
     query,
-    variables: { login: config.auth.login },
+    variables,
   });
   const headers = new Headers(init.headers);
   headers.set("Authorization", `Bearer ${config.auth.accessToken}`);
@@ -109,7 +105,7 @@ export async function githubGraphql<T>(
         const resetDate = new Date(+reset * 1000);
         const delay = Math.max(0, resetDate.getTime() - Date.now()) + 1000;
         await sleep(delay + 5_000, { signal: config.signal });
-        return githubGraphql(query, config);
+        return githubGraphql(query, variables, config);
       }
     }
     throw new Error(data.errors.map((e: any) => e.message).join("\n"));
