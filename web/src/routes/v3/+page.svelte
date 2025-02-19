@@ -7,7 +7,16 @@
   const ctx = getContext<{ platforms: Platform[] }>("platforms");
   let platforms = $derived(ctx.platforms);
 
-  let allTasks = $derived(platforms.flatMap((platform) => platform.tasks));
+  let allTasks = $derived(
+    platforms
+      .flatMap((platform) => platform.tasks)
+      .toSorted((a, b) => {
+        if (a.attentionNeeded && !b.attentionNeeded) {
+          return -1;
+        }
+        return a.timestamp - b.timestamp;
+      }),
+  );
   let groups = $derived(
     Object.groupBy(allTasks, (task) => task.getGroup() ?? ""),
   );

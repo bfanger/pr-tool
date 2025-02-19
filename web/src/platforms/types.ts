@@ -14,6 +14,7 @@ export type Task = {
   url: string;
   title: string;
   attentionNeeded: boolean;
+  timestamp: number;
   author: Person;
   getGroup(): string | undefined;
   getCollaborators: () => Collaborator[];
@@ -47,11 +48,34 @@ const githubConfigSchema = z.object({
   }),
 });
 
-export type PlatformConfig = GitLabConfig | GitHubConfig;
+export type AzureDevOpsConfig = z.infer<typeof azureDevOpsConfigSchema>;
+const azureDevOpsConfigSchema = z.object({
+  type: z.literal("azure-devops"),
+  auth: z.object({
+    organization: z.string(),
+    personalAccessToken: z.string(),
+  }),
+});
+
+export type BitbucketConfig = z.infer<typeof bitbucketConfigSchema>;
+const bitbucketConfigSchema = z.object({
+  type: z.literal("bitbucket"),
+  auth: z.object({
+    domain: z.string(),
+    personalAccessToken: z.string(),
+    proxy: z.boolean(),
+  }),
+});
+export type PlatformConfig = z.infer<typeof configsSchema>;
 export const configsSchema = z
   .array(
     z
-      .union([gitlabConfigSchema, githubConfigSchema])
+      .union([
+        gitlabConfigSchema,
+        githubConfigSchema,
+        azureDevOpsConfigSchema,
+        bitbucketConfigSchema,
+      ])
       .optional()
       .catch((ctx) => {
         console.warn(ctx.error);

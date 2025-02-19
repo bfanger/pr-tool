@@ -12,7 +12,7 @@
   let collaborators = $derived(task.getCollaborators());
 </script>
 
-<a class="todo" href={url} target="_blank" rel="noreferrer">
+<a class="task" href={url} target="_blank" rel="noreferrer">
   <div class="indicator-spacer">
     {#if task.attentionNeeded}
       <i class="indicator"></i>
@@ -31,11 +31,7 @@
     {/if}
   </div>
   <div class="avatar">
-    <Avatar
-      src={author?.getAvatar("large")}
-      title={author?.name}
-      size="medium"
-    />
+    <Avatar src={author.getAvatar("large")} title={author.name} size="medium" />
   </div>
   <div class="chevron">
     <ChevronRight />
@@ -43,10 +39,11 @@
 </a>
 
 <style>
-  .todo {
+  .task {
     --border: light-dark(#dadada, #4b4b4b);
 
     display: flex;
+    gap: 0.6rem;
     align-items: center;
 
     padding: 0.8rem;
@@ -64,13 +61,13 @@
     }
   }
 
-  .todo:first-child {
+  .task:first-child {
     border-top: var(--hairline) solid var(--border);
     border-top-left-radius: 0.6rem;
     border-top-right-radius: 0.6rem;
   }
 
-  .todo:last-child {
+  .task:last-child {
     border-bottom-right-radius: 0.6rem;
     border-bottom-left-radius: 0.6rem;
   }
@@ -85,12 +82,12 @@
   .indicator-spacer {
     position: relative;
     align-self: stretch;
-    width: 1.6rem;
+    width: 0.8rem;
   }
 
   .indicator {
     position: absolute;
-    top: 0.3rem;
+    top: 0.4rem;
     left: 0;
 
     display: inline-block;
@@ -115,7 +112,7 @@
   .avatar {
     flex-shrink: 0;
     align-self: center;
-    margin-right: 1rem;
+    margin-right: 0.4rem;
   }
 
   .chevron {

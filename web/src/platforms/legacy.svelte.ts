@@ -1,6 +1,8 @@
 import { providerFromConfig } from "$lib/streams/providers";
 import { BehaviorSubject, map, retry, Subject } from "rxjs";
 import type {
+  AzureDevOpsConfig,
+  BitbucketConfig,
   GitHubConfig,
   GitLabConfig,
   Platform,
@@ -11,7 +13,9 @@ import dripFlat from "$lib/services/dripFlat";
 import type { PullRequestWithProject } from "$lib/models/Provider";
 import type { Profile } from "$lib/models/Profile";
 
-export default function legacy(config: GitHubConfig | GitLabConfig): Platform {
+export default function legacy(
+  config: GitHubConfig | GitLabConfig | AzureDevOpsConfig | BitbucketConfig,
+): Platform {
   const provider = providerFromConfig(config);
   const progress$ = new BehaviorSubject(0);
 
@@ -102,6 +106,7 @@ export default function legacy(config: GitHubConfig | GitLabConfig): Platform {
       url: pullRequest.url,
       title: pullRequest.title,
       attentionNeeded: false,
+      timestamp: pullRequest.timestamp,
       author: {
         name: pullRequest.creator.name,
         getAvatar: (size) => loadAvatar(pullRequest.creator, size),

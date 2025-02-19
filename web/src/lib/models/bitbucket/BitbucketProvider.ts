@@ -146,6 +146,7 @@ export default class BitbucketProvider implements Provider {
             id: pr.id,
             title: pr.title,
             fase: "READY",
+            timestamp: pr.updatedDate * 1000,
             url: pr.links!.self[0]!.href,
             reviewers: pr.reviewers.map((author) => {
               const reviewer: Reviewer = {

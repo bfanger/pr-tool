@@ -31,6 +31,7 @@ function transformPullRequest(pr: ApiPullRequest): PullRequest {
     url: match
       ? `${match[1]}${encodedProject}/_git/${encodedRepo}/pullrequest/${pr.pullRequestId}`
       : "",
+    timestamp: new Date(pr.creationDate).getTime(),
     creator: fromCreatedBy(pr.createdBy),
     reviewers: pr.reviewers
       .filter((reviewer) => {

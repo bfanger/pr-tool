@@ -44,6 +44,7 @@ export default function github({ auth }: GitHubConfig): Platform {
           title: pr.title,
           url: pr.url,
           attentionNeeded: false,
+          timestamp: updateAt.getTime(),
           author: {
             getAvatar: () => data.user.avatarUrl,
             name: data.user.name,

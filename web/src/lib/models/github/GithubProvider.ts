@@ -92,6 +92,7 @@ export default class GithubProvider implements Provider {
             title: pr.title,
             fase: "READY",
             url: pr.html_url,
+            timestamp: new Date(pr.updated_at).getTime(),
             creator: {
               id: pr.user!.login,
               name: pr.user!.name,

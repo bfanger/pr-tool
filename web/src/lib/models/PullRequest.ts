@@ -15,6 +15,7 @@ export type PullRequest = {
   fase: PullRequestFase;
   url: string;
   creator: Profile;
+  timestamp: number;
   reviewers: Reviewer[];
   // project: Project
 };

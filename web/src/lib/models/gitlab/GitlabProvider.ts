@@ -89,6 +89,7 @@ export default class GitlabProvider implements Provider {
               title: pr.title,
               fase: "READY",
               url: pr.web_url,
+              timestamp: new Date(pr.updated_at).getTime(),
               creator: userToProfile(pr.author),
               reviewers: (pr.reviewers.length > 0
                 ? pr.reviewers
