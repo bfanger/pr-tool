@@ -176,7 +176,7 @@ export function gitlabMergeRequestToTask(
     title: mr.title,
     url: mr.web_url,
     attentionNeeded: isAttentionNeeded(mr, currentUserId),
-    timestamp: 0,
+    timestamp: new Date(mr.updated_at).getTime(),
     author: {
       name: mr.author.name,
       getAvatar() {

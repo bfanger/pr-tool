@@ -32,7 +32,7 @@ export default function github({ auth }: GitHubConfig): Platform {
 
       tasks = [];
       const minimumDate = new Date();
-      minimumDate.setMonth(minimumDate.getMonth() - 6);
+      minimumDate.setMonth(minimumDate.getMonth() - 18);
 
       for (const pr of data.user.pullRequests.nodes) {
         const updateAt = new Date(pr.updatedAt);
