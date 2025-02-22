@@ -66,21 +66,28 @@ const bitbucketConfigSchema = z.object({
     proxy: z.boolean(),
   }),
 });
-export type PlatformConfig = z.infer<typeof configsSchema>;
+
+export type JiraConfig = z.infer<typeof jiraConfigSchema>;
+const jiraConfigSchema = z.object({
+  type: z.literal("jira"),
+  cloudid: z.string(),
+  domain: z.string(),
+});
+
+export type PlatformConfig = z.infer<typeof platformConfig>;
+const platformConfig = z.union([
+  gitlabConfigSchema,
+  githubConfigSchema,
+  azureDevOpsConfigSchema,
+  bitbucketConfigSchema,
+  jiraConfigSchema,
+]);
 export const configsSchema = z
   .array(
-    z
-      .union([
-        gitlabConfigSchema,
-        githubConfigSchema,
-        azureDevOpsConfigSchema,
-        bitbucketConfigSchema,
-      ])
-      .optional()
-      .catch((ctx) => {
-        console.warn(ctx.error);
-        return undefined;
-      }),
+    platformConfig.optional().catch((ctx) => {
+      console.warn(ctx.error);
+      return undefined;
+    }),
   )
   .transform((configs) => configs.filter(Boolean))
   .catch((ctx) => {

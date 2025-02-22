@@ -44,7 +44,7 @@ export default function storage<T extends ZodType<any, any, any>>(
 ) {
   const backend = init(type);
   let jsonValue: string | null | undefined = backend.getItem(namespace + key);
-  if (signal[type][key] !== jsonValue) {
+  if (!(key in signal[type]) || signal[type][key] !== jsonValue) {
     signal[type][key] = jsonValue;
   }
   let value = $derived.by(() => {

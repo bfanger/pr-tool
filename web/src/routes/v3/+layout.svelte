@@ -9,6 +9,7 @@
   import Onboarding from "../../components/Onboarding/Onboarding.svelte";
   import Button from "../../components/Button/Button.svelte";
   import github from "../../platforms/github.svelte";
+  import jira from "../../platforms/jira.svelte";
 
   let { children } = $props();
 
@@ -19,6 +20,8 @@
         return gitlab(config);
       } else if (config?.type === "github") {
         return github(config);
+      } else if (config?.type === "jira") {
+        return jira(config);
       } else if (config) {
         return legacy(config);
       }

@@ -8,11 +8,13 @@
   import bitbucketPng from "../../assets/img/bitbucket.png";
   import githubSvg from "../../assets/img/github.svg";
   import gitlabPng from "../../assets/img/gitlab.png";
+  import jiraPng from "../../assets/img/jira.png";
   import Button from "./Button.svelte";
   import ConfigAzureDevops from "./ConfigAzureDevops.svelte";
   import ConfigBitbucket from "./ConfigBitbucket.svelte";
   import ConfigGithub from "./ConfigGithub.svelte";
   import ConfigGitlab from "./ConfigGitlab.svelte";
+  import ConfigJira from "$lib/components/ConfigJira.svelte";
 
   let type: ProviderConfig["type"] = "azure-devops";
   let loading = false;
@@ -41,6 +43,12 @@
       icon: bitbucketPng,
       label: "Bitbucket",
       Component: ConfigBitbucket,
+    },
+    {
+      type: "jira",
+      icon: jiraPng,
+      label: "Jira",
+      Component: ConfigJira,
     },
   ];
 
@@ -102,7 +110,7 @@
       on:config={({ detail }) => config$.next(detail)}
     />
   </div>
-  {#if activeProvider.type !== "github"}
+  {#if activeProvider.type !== "github" && activeProvider.type !== "jira"}
     <div class="buttons">
       <Button disabled={status.disabled}>Add account</Button>
     </div>
