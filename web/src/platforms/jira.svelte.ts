@@ -24,15 +24,9 @@ export default function jira(config: JiraConfig): Platform {
   async function refresh() {
     abortController.abort();
     abortController = new AbortController();
-    const accessToken = localStorage.getItem("app_jira_accessToken");
-    const refreshToken = localStorage.getItem("app_jira_refreshToken");
-    if (!accessToken || !refreshToken) {
-      throw new Error("Missing tokens");
-    }
+
     const apiConfig = {
       cloudid: config.cloudid,
-      accessToken,
-      refreshToken,
       signal: abortController.signal,
     };
     const results = await jiraGet(

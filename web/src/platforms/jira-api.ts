@@ -13,11 +13,10 @@ type JiraGetRequests = {
 
 type ApiConfig = {
   cloudid: string;
-  accessToken: string;
-  refreshToken: string;
   signal: AbortSignal;
   delay?: number;
   jitter?: number;
+  refreshed?: true;
 };
 export async function jiraGet<T extends keyof JiraGetRequests>(
   path: T,
@@ -28,19 +27,26 @@ export async function jiraGet<T extends keyof JiraGetRequests>(
   config: ApiConfig,
 ): Promise<JiraGetRequests[T]> {
   const { params, searchParams, ...init } = request;
-  //   const url = `${config.domain}${buildUrl(path, params ?? ({} as PathParams<T>), searchParams)}`;
-  //   console.log({ url, config, path, request });
   init.headers = new Headers(init.headers);
+  const accessToken = localStorage.getItem("app_jira_accessToken");
+  if (!accessToken) {
+    throw new Error("Missing accessToken");
+  }
   const url = `https://api.atlassian.com/ex/jira/${config.cloudid}${buildUrl(path, params ?? ({} as PathParams<T>), searchParams)}`;
-  init.headers.set("Authorization", `Bearer ${config.accessToken}`);
-  //
-  // fetch(
+  init.headers.set("Authorization", `Bearer ${accessToken}`);
   const response = await fetch(url, init);
   let data;
   if (response.headers.get("Content-Type")?.startsWith("application/json")) {
     data = await response.json();
   }
   if (!response.ok) {
+    if (response.status === 401) {
+      if (!config.refreshed) {
+        await refreshTokens();
+        return jiraGet(path, request, { ...config, refreshed: true });
+      }
+      throw new Error("Unauthorized");
+    }
     const result = z
       .object({ errorMessages: z.array(z.string()) })
       .safeParse(data);
@@ -51,6 +57,37 @@ export async function jiraGet<T extends keyof JiraGetRequests>(
   }
   return data;
 }
+
+let refreshPromise: Promise<void> | undefined;
+async function refreshTokens() {
+  if (!refreshPromise) {
+    refreshPromise = (async () => {
+      const response = await fetch("/app/oauth/jira/refresh", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          refreshToken: localStorage.getItem("app_jira_refreshToken"),
+        }),
+      });
+      if (!response.ok) {
+        throw new Error("Refreshing token failed");
+      }
+      const { accessToken, refreshToken } = z
+        .object({ accessToken: z.string(), refreshToken: z.string() })
+        .parse(await response.json());
+      localStorage.setItem("app_jira_accessToken", accessToken);
+      localStorage.setItem("app_jira_refreshToken", refreshToken);
+    })();
+    refreshPromise.catch((err) => {
+      refreshPromise = undefined;
+      throw err;
+    });
+  }
+  return refreshPromise;
+}
+
 type SearchResultDto = {
   expand: string;
   startAt: number;
@@ -58,6 +95,7 @@ type SearchResultDto = {
   total: number;
   issues: IssueDto[];
 };
+
 type IssueDto = {
   expand: string;
   id: string;
@@ -81,7 +119,19 @@ type IssueDto = {
     aggregatetimeoriginalestimate: number | null;
     timeestimate: number | null;
     versions: any[];
-    issuelinks: Issuelink[];
+    issuelinks: {
+      id: string;
+      self: string;
+      type: {
+        id: string;
+        name: string;
+        inward: string;
+        outward: string;
+        self: string;
+      };
+      outwardIssue?: ParentDto;
+      inwardIssue?: ParentDto;
+    }[];
     assignee: UserDto;
     status: StatusDto;
     components: any[];
@@ -155,14 +205,16 @@ type IssueDto = {
     summary: string;
     environment: null;
     duedate: null;
-    parent?: Parent;
+    parent?: ParentDto;
   };
 };
+
 type ProgressDto = {
   progress: number;
   total: number;
   percent?: number;
 };
+
 type UserDto = {
   self: string;
   accountId: string;
@@ -185,31 +237,18 @@ type MarkDto = {
   type: string;
 };
 
-type Issuelink = {
-  id: string;
-  self: string;
-  type: {
-    id: string;
-    name: string;
-    inward: string;
-    outward: string;
-    self: string;
-  };
-  outwardIssue?: Parent;
-  inwardIssue?: Parent;
-};
-type Parent = {
+type ParentDto = {
   id: string;
   key: string;
   self: string;
-  fields: ParentFields;
+  fields: {
+    summary: string;
+    status: StatusDto;
+    priority: PriorityDto;
+    issuetype: IssueTypeDto;
+  };
 };
-type ParentFields = {
-  summary: string;
-  status: StatusDto;
-  priority: PriorityDto;
-  issuetype: IssueTypeDto;
-};
+
 type IssueTypeDto = {
   self: string;
   id: string;
