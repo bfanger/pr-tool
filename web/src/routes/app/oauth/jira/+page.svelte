@@ -2,16 +2,14 @@
   import { browser } from "$app/environment";
   import { onMount } from "svelte";
   import Button from "../../../../components/Button/Button.svelte";
-  import { jiraLoginUrl } from "../../../../platforms/jira-api";
   import Warning from "$lib/components/Warning.svelte";
   import { z } from "zod";
   import { configsSchema, type JiraConfig } from "../../../../platforms/types";
   import storage from "../../../../services/storage.svelte";
   import { goto } from "$app/navigation";
-  import { jiraTokensSchema } from "../../../../platforms/jira.svelte";
+  import { jiraLogin } from "../../../../platforms/jira.svelte";
 
   const storedConfigs = storage("configs", configsSchema);
-  const jiraTokens = storage("jira_tokens", jiraTokensSchema);
 
   let { data } = $props();
 
@@ -31,10 +29,8 @@
         )
         .parse(await response.json());
 
-      jiraTokens.value = {
-        accessToken: data.accessToken,
-        refreshToken: data.refreshToken,
-      };
+      localStorage.setItem("app_jira_accessToken", data.accessToken);
+      localStorage.setItem("app_jira_refreshToken", data.refreshToken);
 
       for (const resource of resources) {
         const exists = storedConfigs.value.some(
@@ -59,7 +55,7 @@
   <Warning message={data.error} />
   {#if browser}
     <div class="button">
-      <Button href={jiraLoginUrl()}>Try again&hellip;</Button>
+      <Button onclick={() => void jiraLogin()}>Try again&hellip;</Button>
     </div>
   {/if}
 {/if}

@@ -1,12 +1,17 @@
 <script lang="ts">
-  import { browser } from "$app/environment";
   import Button from "../../components/Button/Button.svelte";
-  import { jiraLoginUrl } from "../../platforms/jira-api";
+  import Spinner from "../../components/Spinner/Spinner.svelte";
+  import { jiraLogin } from "../../platforms/jira.svelte";
+
+  const authorizing = $state(false);
 </script>
 
 <div class="centered">
-  {#if browser}
-    <Button href={jiraLoginUrl()}>Authorize&hellip;</Button>
+  <Button disabled={authorizing} onclick={() => void jiraLogin()}>
+    Authorize&hellip;
+  </Button>
+  {#if authorizing}
+    <Spinner />
   {/if}
 </div>
 

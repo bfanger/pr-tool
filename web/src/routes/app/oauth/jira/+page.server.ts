@@ -3,14 +3,13 @@ import {
   PUBLIC_JIRA_CLIENT_ID,
   PUBLIC_JIRA_REDIRECT_URI,
 } from "$env/static/public";
-import { error } from "@sveltejs/kit";
 import { z } from "zod";
 
 export const prerender = false;
 export const load = async ({ url, cookies }) => {
   const state = url.searchParams.get("state");
   if (state && state !== cookies.get("jira_client_state")) {
-    error(400, "Invalid state");
+    return { error: "Invalid state" };
   }
 
   const code = url.searchParams.get("code");
