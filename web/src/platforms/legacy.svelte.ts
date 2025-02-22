@@ -111,7 +111,11 @@ export default function legacy(
         name: pullRequest.creator.name,
         getAvatar: (size) => loadAvatar(pullRequest.creator, size),
       },
-      getGroup: () => project.name,
+      getGroup: () => ({
+        id: `${config.type}\n${project.id}`,
+        title: project.name,
+        icon: "",
+      }),
       getCollaborators() {
         return pullRequest.reviewers.map((reviewer) => ({
           name: reviewer.profile.name,

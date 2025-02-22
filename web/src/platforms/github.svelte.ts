@@ -11,6 +11,7 @@ import type {
   Progress,
   Task,
 } from "./types";
+import githubIcon from "../assets/img/github.svg";
 
 export default function github({ auth }: GitHubConfig): Platform {
   let progress: Progress = $state("init");
@@ -65,7 +66,11 @@ export default function github({ auth }: GitHubConfig): Platform {
             }
             return collaborators;
           },
-          getGroup: () => pr.repository.name,
+          getGroup: () => ({
+            id: `github\n${pr.repository.name}`,
+            icon: githubIcon,
+            title: pr.repository.name,
+          }),
         });
       }
       progress = "idle";

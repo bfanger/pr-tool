@@ -13,6 +13,7 @@ import {
   PUBLIC_JIRA_CLIENT_ID,
   PUBLIC_JIRA_REDIRECT_URI,
 } from "$env/static/public";
+import jiraIcon from "../assets/img/jira.png";
 
 export default function jira(config: JiraConfig): Platform {
   const progress: Progress = $state("init");
@@ -61,7 +62,11 @@ export default function jira(config: JiraConfig): Platform {
           }
           return collaborators;
         },
-        getGroup: () => issue.fields.project.name,
+        getGroup: () => ({
+          id: `jira\n${issue.fields.project.id}`,
+          icon: jiraIcon,
+          title: issue.fields.project.name,
+        }),
         id: issue.key,
         timestamp: new Date(issue.fields.updated).getTime(),
         title: issue.fields.summary,

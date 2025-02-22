@@ -21,7 +21,7 @@
       }),
   );
   let groups = $derived(
-    Object.groupBy(allTasks, (task) => task.getGroup() ?? ""),
+    Object.groupBy(allTasks, (task) => task.getGroup().id ?? ""),
   );
   const dateFormatter = new Intl.DateTimeFormat("en-GB", { dateStyle: "long" });
   function formatTime(task: Task | undefined) {
@@ -42,11 +42,15 @@
   {/if}
 {:else}
   <div class="groups">
-    {#each Object.entries(groups) as [group, tasks]}
+    {#each Object.entries(groups) as [, tasks]}
       {#if tasks?.length}
+        {@const group = tasks![0]!.getGroup()}
         <div>
-          <h2 class="title">
-            <span>{group || "Untitled"}</span>
+          <h2 class="group">
+            {#if group.icon}
+              <img class="icon" src={group.icon} alt="" />
+            {/if}
+            <span class="title">{group.title || "Untitled"}</span>
             <span class="date">{formatTime(tasks[0])}</span>
           </h2>
           <TaskRows {tasks} />
@@ -64,10 +68,9 @@
     padding-top: 1.2rem;
   }
 
-  .title {
+  .group {
     display: flex;
     align-items: flex-end;
-    justify-content: space-between;
 
     margin-top: 0;
     margin-bottom: 1rem;
@@ -75,6 +78,17 @@
     font:
       600 1.4rem "SF Pro Display",
       var(--font);
+  }
+
+  .icon {
+    width: 1.6rem;
+    margin-right: 0.8rem;
+  }
+
+  .title {
+    overflow: hidden;
+    flex: 1;
+    text-overflow: ellipsis;
   }
 
   .date {

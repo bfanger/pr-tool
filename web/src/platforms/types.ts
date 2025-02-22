@@ -16,10 +16,14 @@ export type Task = {
   attentionNeeded: boolean;
   timestamp: number;
   author: Person;
-  getGroup(): string | undefined;
+  getGroup(): Group;
   getCollaborators: () => Collaborator[];
 };
-
+export type Group = {
+  id: string;
+  icon: string;
+  title: string;
+};
 export type Person = {
   name: string;
   getAvatar: (size: "medium" | "large") => string | undefined;

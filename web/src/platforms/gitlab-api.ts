@@ -5,6 +5,7 @@ import type { PathParams } from "../services/buildUrl";
 import buildUrl from "../services/buildUrl";
 import resilient from "../services/resilient";
 import type { Collaborator, Task } from "./types";
+import gitlabIcon from "../assets/img/gitlab.png";
 
 export type GitLabGetRequests = {
   "/user": GitLabUser;
@@ -168,7 +169,7 @@ export function gitlabMergeRequestToTask(
     getProjectName,
   }: {
     currentUserId: number;
-    getProjectName: (id: number) => string | undefined;
+    getProjectName: (id: number) => string;
   },
 ): Task {
   return {
@@ -183,7 +184,11 @@ export function gitlabMergeRequestToTask(
         return mr.author.avatar_url;
       },
     },
-    getGroup: () => getProjectName(mr.project_id),
+    getGroup: () => ({
+      id: `gitlab\n${currentUserId}\n${mr.project_id}`,
+      title: getProjectName(mr.project_id),
+      icon: gitlabIcon,
+    }),
     getCollaborators() {
       // @todo Trigger update?
       return [
