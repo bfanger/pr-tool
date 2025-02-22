@@ -1,6 +1,7 @@
 /**
  * https://developer.atlassian.com/cloud/jira/platform/rest/v3/
  */
+import { z } from "zod";
 import { jiraGet } from "./jira-api";
 import type {
   Collaborator,
@@ -9,25 +10,29 @@ import type {
   Progress,
   Task,
 } from "./types";
+import storage from "../services/storage.svelte";
+
+export const jiraTokensSchema = z
+  .object({ accessToken: z.string(), refreshToken: z.string() })
+  .catch({ accessToken: "", refreshToken: "" });
 
 export default function jira(config: JiraConfig): Platform {
   const progress: Progress = $state("init");
   const tasks: Task[] = $state([]);
+  const jiraTokens = storage("jira_tokens", jiraTokensSchema);
 
   let abortController = new AbortController();
 
   async function refresh() {
     abortController.abort();
     abortController = new AbortController();
-    const accessToken = localStorage.getItem(
-      `jira:accessToken:${config.cloudid}`,
-    );
-    if (typeof accessToken !== "string") {
-      throw new Error("No access token found");
-    }
 
+    if (!jiraTokens.value.accessToken) {
+      throw new Error("No access token");
+    }
     const apiConfig = {
-      auth: { cloudid: config.cloudid, accessToken },
+      cloudid: config.cloudid,
+      ...jiraTokens.value,
       signal: abortController.signal,
     };
     const results = await jiraGet(

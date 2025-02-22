@@ -2,7 +2,10 @@
  * https://developer.atlassian.com/cloud/jira/platform/rest/v3/
  */
 
-import { PUBLIC_JIRA_CLIENT_ID } from "$env/static/public";
+import {
+  PUBLIC_JIRA_CLIENT_ID,
+  PUBLIC_JIRA_REDIRECT_URI,
+} from "$env/static/public";
 import { z } from "zod";
 import type { PathParams } from "../services/buildUrl";
 import buildUrl from "../services/buildUrl";
@@ -21,24 +24,24 @@ type JiraGetRequests = {
 export function jiraLoginUrl(state?: string) {
   if (state === undefined) {
     state = Math.random().toString(36).slice(2);
-    sessionStorage.setItem("jira:oauth:state", state);
+    const expires = new Date(Date.now() + 3600 * 1000).toUTCString();
+    document.cookie = `jira_client_state=${state}; expires=${expires};`;
   }
   return `https://auth.atlassian.com/authorize?${new URLSearchParams({
     audience: "api.atlassian.com",
     client_id: PUBLIC_JIRA_CLIENT_ID,
     prompt: "consent",
-    redirect_uri: "https://pr.bfanger.nl/app/oauth/jira",
+    redirect_uri: PUBLIC_JIRA_REDIRECT_URI,
     response_type: "code",
-    scope: "read:jira-work",
+    scope: "read:jira-work offline_access",
     state,
   })}`;
 }
 
 type ApiConfig = {
-  auth: {
-    cloudid: string;
-    accessToken: string;
-  };
+  cloudid: string;
+  accessToken: string;
+  refreshToken: string;
   signal: AbortSignal;
   delay?: number;
   jitter?: number;
@@ -55,8 +58,8 @@ export async function jiraGet<T extends keyof JiraGetRequests>(
   //   const url = `${config.domain}${buildUrl(path, params ?? ({} as PathParams<T>), searchParams)}`;
   //   console.log({ url, config, path, request });
   init.headers = new Headers(init.headers);
-  const url = `https://api.atlassian.com/ex/jira/${config.auth.cloudid}${buildUrl(path, params ?? ({} as PathParams<T>), searchParams)}`;
-  init.headers.set("Authorization", `Bearer ${config.auth.accessToken}`);
+  const url = `https://api.atlassian.com/ex/jira/${config.cloudid}${buildUrl(path, params ?? ({} as PathParams<T>), searchParams)}`;
+  init.headers.set("Authorization", `Bearer ${config.accessToken}`);
   //
   // fetch(
   const response = await fetch(url, init);

@@ -1,9 +1,18 @@
-import { JIRA_CLIENT_SECRET, JIRA_REDIRECT_URI } from "$env/static/private";
-import { PUBLIC_JIRA_CLIENT_ID } from "$env/static/public";
+import { JIRA_CLIENT_SECRET } from "$env/static/private";
+import {
+  PUBLIC_JIRA_CLIENT_ID,
+  PUBLIC_JIRA_REDIRECT_URI,
+} from "$env/static/public";
+import { error } from "@sveltejs/kit";
 import { z } from "zod";
 
 export const prerender = false;
-export const load = async ({ url }) => {
+export const load = async ({ url, cookies }) => {
+  const state = url.searchParams.get("state");
+  if (state && state !== cookies.get("jira_client_state")) {
+    error(400, "Invalid state");
+  }
+
   const code = url.searchParams.get("code");
   if (code) {
     const response = await fetch("https://auth.atlassian.com/oauth/token", {
@@ -16,7 +25,7 @@ export const load = async ({ url }) => {
         client_id: PUBLIC_JIRA_CLIENT_ID,
         client_secret: JIRA_CLIENT_SECRET,
         code,
-        redirect_uri: JIRA_REDIRECT_URI,
+        redirect_uri: PUBLIC_JIRA_REDIRECT_URI,
       }),
     });
     let data;
@@ -33,13 +42,18 @@ export const load = async ({ url }) => {
           error: `[${result.data.error}] ${result.data.error_description}`,
         };
       }
-      return { accessToken: "", error: "Invalid code" };
+      return { error: "Invalid code" };
     } else {
-      const result = z.object({ access_token: z.string() }).parse(data);
+      const result = z
+        .object({ access_token: z.string(), refresh_token: z.string() })
+        .parse(data);
       if (result) {
-        return { accessToken: result.access_token, error: "" };
+        return {
+          accessToken: result.access_token,
+          refreshToken: result.refresh_token,
+        };
       }
     }
   }
-  return { accessToken: "", error: "Missing code" };
+  return { error: "Missing code" };
 };

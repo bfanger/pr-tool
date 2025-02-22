@@ -20,19 +20,19 @@ export class CompatProvider implements Provider {
   account(): Observable<Profile> {
     return of({ id: "0", name: "Anonymous" });
   }
-  avatar(profile: Profile, size: string): Observable<string> {
+  avatar(): Observable<string> {
     return EMPTY;
   }
   projects(): Observable<Project[]> {
     return of([]);
   }
-  pullRequestsFor(projectId: string | number): Observable<PullRequest[]> {
+  pullRequestsFor(): Observable<PullRequest[]> {
     throw new Error("Method not implemented.");
   }
-  pollFor(projectId: string | number): Observable<null> {
+  pollFor(): Observable<null> {
     throw new Error("Method not implemented.");
   }
-  pullRequestStatus(pullRequest: PullRequest, me: Profile): PullRequestStatus {
+  pullRequestStatus(): PullRequestStatus {
     throw new Error("Method not implemented.");
   }
 }

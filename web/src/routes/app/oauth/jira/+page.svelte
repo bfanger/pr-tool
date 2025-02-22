@@ -8,13 +8,15 @@
   import { configsSchema, type JiraConfig } from "../../../../platforms/types";
   import storage from "../../../../services/storage.svelte";
   import { goto } from "$app/navigation";
+  import { jiraTokensSchema } from "../../../../platforms/jira.svelte";
 
   const storedConfigs = storage("configs", configsSchema);
+  const jiraTokens = storage("jira_tokens", jiraTokensSchema);
 
   let { data } = $props();
 
   onMount(async () => {
-    if (data.accessToken) {
+    if (data.accessToken && data.refreshToken) {
       const response = await fetch(
         "https://api.atlassian.com/oauth/token/accessible-resources",
         { headers: { Authorization: `Bearer ${data.accessToken}` } },
@@ -29,11 +31,12 @@
         )
         .parse(await response.json());
 
+      jiraTokens.value = {
+        accessToken: data.accessToken,
+        refreshToken: data.refreshToken,
+      };
+
       for (const resource of resources) {
-        localStorage.setItem(
-          `jira:accessToken:${resource.id}`,
-          data.accessToken,
-        );
         const exists = storedConfigs.value.some(
           (config) => config?.type === "jira" && config.cloudid === resource.id,
         );

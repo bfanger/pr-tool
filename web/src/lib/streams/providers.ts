@@ -11,7 +11,6 @@ import BitbucketProvider from "../models/bitbucket/BitbucketProvider";
 import GitlabProvider from "../models/gitlab/GitlabProvider";
 import configsStore from "../store/configs";
 import { CompatProvider } from "$lib/services/CompatProvider";
-import type { Platform, PlatformConfig } from "../../platforms/types";
 
 type AzureDevopsProviderConfig = {
   type: "azure-devops";
