@@ -6,12 +6,7 @@ import {
 import { z } from "zod";
 
 export const prerender = false;
-export const load = async ({ url, cookies }) => {
-  const state = url.searchParams.get("state");
-  if (state && state !== cookies.get("jira_client_state")) {
-    return { error: "Invalid state" };
-  }
-
+export const load = async ({ url }) => {
   const code = url.searchParams.get("code");
   if (code) {
     const response = await fetch("https://auth.atlassian.com/oauth/token", {

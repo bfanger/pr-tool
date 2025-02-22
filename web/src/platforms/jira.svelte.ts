@@ -25,8 +25,8 @@ export default function jira(config: JiraConfig): Platform {
     abortController = new AbortController();
     const accessToken = localStorage.getItem("app_jira_accessToken");
     const refreshToken = localStorage.getItem("app_jira_refreshToken");
-    if (!accessToken) {
-      throw new Error("No access token");
+    if (!accessToken || !refreshToken) {
+      throw new Error("Missing tokens");
     }
     const apiConfig = {
       cloudid: config.cloudid,
@@ -88,28 +88,16 @@ export default function jira(config: JiraConfig): Platform {
  * https://developer.atlassian.com/cloud/jira/platform/oauth-2-3lo-apps/
  * https://developer.atlassian.com/console/myapps/
  */
-export function jiraLogin(state?: string) {
-  if (state === undefined) {
-    state = Math.random().toString(36).slice(2);
-
-    const url = `https://auth.atlassian.com/authorize?${new URLSearchParams({
-      audience: "api.atlassian.com",
-      client_id: PUBLIC_JIRA_CLIENT_ID,
-      prompt: "consent",
-      redirect_uri: PUBLIC_JIRA_REDIRECT_URI,
-      response_type: "code",
-      scope: "read:jira-work offline_access",
-      state,
-    })}`;
-
-    (window as any).cookieStore.set("jira_client_state", state, {
-      path: "/",
-      sameSite: "strict",
-    });
-
-    setTimeout(() => {
-      location.href = url;
-    }, 100);
-  }
-  return;
+export function jiraLogin() {
+  const state = Math.random().toString(36).slice(2);
+  const url = `https://auth.atlassian.com/authorize?${new URLSearchParams({
+    audience: "api.atlassian.com",
+    client_id: PUBLIC_JIRA_CLIENT_ID,
+    prompt: "consent",
+    redirect_uri: PUBLIC_JIRA_REDIRECT_URI,
+    response_type: "code",
+    scope: "read:jira-work offline_access",
+    state,
+  })}`;
+  location.href = url;
 }
