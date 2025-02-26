@@ -2,6 +2,7 @@
   import { onMount } from "svelte";
   import type { Platform } from "../../platforms/types";
   import Button from "../../components/Button/Button.svelte";
+  import poll from "../../services/poll";
 
   type Props = {
     platforms: Platform[];
@@ -35,11 +36,14 @@
 
   onMount(() => {
     refreshAll();
+    const abortController = new AbortController();
+    poll(refreshAll, { gap: 3600, signal: abortController.signal });
     window.navigator.connection?.addEventListener(
       "change",
       handleNetworkChange,
     );
     return () => {
+      abortController.abort();
       window.navigator.connection?.removeEventListener(
         "change",
         handleNetworkChange,
