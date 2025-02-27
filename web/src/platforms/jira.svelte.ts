@@ -17,7 +17,7 @@ import jiraIcon from "../assets/img/jira.png";
 
 export default function jira(config: JiraConfig): Platform {
   const progress: Progress = $state("init");
-  const tasks: Task[] = $state([]);
+  let tasks: Task[] = $state([]);
 
   let abortController = new AbortController();
 
@@ -38,35 +38,32 @@ export default function jira(config: JiraConfig): Platform {
       },
       apiConfig,
     );
-    tasks.length = 0;
-    for (const issue of results.issues) {
-      tasks.push({
-        attentionNeeded: false,
-        author: {
-          getAvatar: () => issue.fields.creator.avatarUrls["48x48"],
-          name: issue.fields.creator.displayName,
-        },
-        getCollaborators: () => {
-          const collaborators: Collaborator[] = [];
-          if (issue.fields.assignee) {
-            collaborators.push({
-              getAvatar: () => issue.fields.assignee.avatarUrls["48x48"],
-              name: issue.fields.assignee.displayName,
-            });
-          }
-          return collaborators;
-        },
-        getGroup: () => ({
-          id: `jira\n${issue.fields.project.id}`,
-          icon: jiraIcon,
-          title: issue.fields.project.name,
-        }),
-        id: issue.key,
-        timestamp: new Date(issue.fields.updated).getTime(),
-        title: issue.fields.summary,
-        url: `${config.domain}/browse/${issue.key}`,
-      });
-    }
+    tasks = results.issues.map((issue) => ({
+      attentionNeeded: false,
+      author: {
+        getAvatar: () => issue.fields.creator.avatarUrls["48x48"],
+        name: issue.fields.creator.displayName,
+      },
+      getCollaborators: () => {
+        const collaborators: Collaborator[] = [];
+        if (issue.fields.assignee) {
+          collaborators.push({
+            getAvatar: () => issue.fields.assignee.avatarUrls["48x48"],
+            name: issue.fields.assignee.displayName,
+          });
+        }
+        return collaborators;
+      },
+      getGroup: () => ({
+        id: `jira\n${issue.fields.project.id}`,
+        icon: jiraIcon,
+        title: issue.fields.project.name,
+      }),
+      id: issue.key,
+      timestamp: new Date(issue.fields.updated).getTime(),
+      title: issue.fields.summary,
+      url: `${config.domain}/browse/${issue.key}`,
+    }));
   }
 
   return {

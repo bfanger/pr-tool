@@ -32,6 +32,10 @@ export async function jiraGet<T extends keyof JiraGetRequests>(
   if (!accessToken) {
     throw new Error("Missing accessToken");
   }
+  if (isJwtExpired(accessToken) && !config.refreshed) {
+    await refreshTokens();
+    return await jiraGet(path, request, { ...config, refreshed: true });
+  }
   const url = `https://api.atlassian.com/ex/jira/${config.cloudid}${buildUrl(path, params ?? ({} as PathParams<T>), searchParams)}`;
   init.headers.set("Authorization", `Bearer ${accessToken}`);
   const response = await fetch(url, init);
@@ -88,6 +92,17 @@ async function refreshTokens() {
   return refreshPromise;
 }
 
+function isJwtExpired(jwt: string) {
+  try {
+    const [, payload] = jwt.split(".");
+    const decoded = JSON.parse(atob(payload ?? "")) as { exp: number };
+    const now = Date.now() / 1000;
+    return decoded.exp < now;
+  } catch (err: unknown) {
+    console.warn(err);
+    return true;
+  }
+}
 type SearchResultDto = {
   expand: string;
   startAt: number;
