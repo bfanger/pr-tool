@@ -3,15 +3,13 @@
  */
 
 import poll from "../services/poll";
-import { githubGraphql, githubQuery, type GithubQuery } from "./github-api";
-import type {
-  Collaborator,
-  GitHubConfig,
-  Platform,
-  Progress,
-  Task,
-} from "./types";
-import githubIcon from "../assets/img/github.svg";
+import {
+  githubGraphql,
+  githubPullRequestToTask,
+  githubQuery,
+  type GithubQuery,
+} from "./github-api";
+import type { GitHubConfig, Platform, Progress, Task } from "./types";
 
 export default function github({ auth }: GitHubConfig): Platform {
   let progress: Progress = $state("init");
@@ -40,38 +38,7 @@ export default function github({ auth }: GitHubConfig): Platform {
         if (updateAt.getTime() < minimumDate.getTime()) {
           continue;
         }
-        tasks.push({
-          id: pr.id,
-          title: pr.title,
-          url: pr.url,
-          attentionNeeded: false,
-          timestamp: updateAt.getTime(),
-          author: {
-            getAvatar: () => data.user.avatarUrl,
-            name: data.user.name,
-          },
-          getCollaborators() {
-            const collaborators: Collaborator[] = [];
-            for (const assignee of pr.assignees.nodes) {
-              collaborators.push({
-                getAvatar: () => assignee.avatarUrl,
-                name: assignee.login,
-              });
-            }
-            for (const review of pr.latestReviews.nodes) {
-              collaborators.push({
-                getAvatar: () => review.author.avatarUrl,
-                name: review.author.login,
-              });
-            }
-            return collaborators;
-          },
-          getGroup: () => ({
-            id: `github\n${pr.repository.name}`,
-            icon: githubIcon,
-            title: pr.repository.name,
-          }),
-        });
+        tasks.push(githubPullRequestToTask(pr, data.user));
       }
       progress = "idle";
     } catch (err) {

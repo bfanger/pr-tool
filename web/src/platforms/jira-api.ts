@@ -5,6 +5,9 @@
 import { z } from "zod";
 import type { PathParams } from "../services/buildUrl";
 import buildUrl from "../services/buildUrl";
+import jiraIcon from "../assets/img/jira.png";
+import type { Collaborator, Task } from "./types";
+
 type JiraGetRequests = {
   "/rest/api/3/myself": unknown;
   "/rest/api/3/issue/{issueIdOrKey}": unknown;
@@ -90,6 +93,40 @@ async function refreshTokens() {
     });
   }
   return refreshPromise;
+}
+export function jiraIssueToTask(issue: IssueDto, domain: string): Task {
+  const task: Task = {
+    id: issue.key,
+    title: issue.fields.summary,
+    code: issue.key,
+    timestamp: new Date(issue.fields.updated).getTime(),
+    url: `${domain}/browse/${issue.key}`,
+    attentionNeeded: false,
+    owners: [],
+    getCollaborators: () => {
+      const collaborators: Collaborator[] = [];
+      if (issue.fields.creator.accountId !== issue.fields.assignee?.accountId) {
+        collaborators.push({
+          getAvatar: () => issue.fields.creator.avatarUrls["48x48"],
+          name: issue.fields.creator.displayName,
+        });
+      }
+      return collaborators;
+    },
+    getGroup: () => ({
+      id: `jira\n${issue.fields.project.id}`,
+      icon: jiraIcon,
+      title: issue.fields.project.name,
+    }),
+  };
+  if (issue.fields.assignee) {
+    task.owners.push({
+      getAvatar: () => issue.fields.assignee.avatarUrls["48x48"],
+      name: issue.fields.assignee.displayName,
+    });
+  }
+
+  return task;
 }
 
 function isJwtExpired(jwt: string) {

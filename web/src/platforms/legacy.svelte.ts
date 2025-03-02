@@ -105,12 +105,15 @@ export default function legacy(
       id: `${pullRequest.id}`,
       url: pullRequest.url,
       title: pullRequest.title,
+      code: "",
       attentionNeeded: false,
       timestamp: pullRequest.timestamp,
-      author: {
-        name: pullRequest.creator.name,
-        getAvatar: (size) => loadAvatar(pullRequest.creator, size),
-      },
+      owners: [
+        {
+          name: pullRequest.creator.name,
+          getAvatar: (size) => loadAvatar(pullRequest.creator, size),
+        },
+      ],
       getGroup: () => ({
         id: `${config.type}\n${project.id}`,
         title: project.name,

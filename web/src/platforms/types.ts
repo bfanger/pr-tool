@@ -12,10 +12,11 @@ export type Platform = {
 export type Task = {
   id: string;
   url: string;
+  code: string;
   title: string;
   attentionNeeded: boolean;
   timestamp: number;
-  author: Person;
+  owners: Person[];
   getGroup(): Group;
   getCollaborators: () => Collaborator[];
 };

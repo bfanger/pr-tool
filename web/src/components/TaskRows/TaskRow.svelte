@@ -8,7 +8,7 @@
     task: Task;
   };
   let { task }: Props = $props();
-  let { url, title, author } = $derived(task);
+  let { url, code, title, owners } = $derived(task);
   let collaborators = $derived(task.getCollaborators());
 </script>
 
@@ -30,8 +30,11 @@
       </div>
     {/if}
   </div>
-  <div class="avatar">
-    <Avatar src={author.getAvatar("large")} title={author.name} size="medium" />
+  {#if code}<span class="code">{code}</span>{/if}
+  <div class="avatars">
+    {#each owners as owner}
+      <Avatar src={owner.getAvatar("large")} title={owner.name} size="medium" />
+    {/each}
   </div>
   <div class="chevron">
     <ChevronRight />
@@ -99,6 +102,13 @@
     background: light-dark(#3378f6, #3a82f7);
   }
 
+  .code {
+    margin-right: 0.8rem;
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: #767676;
+  }
+
   .title {
     font-size: 1.4rem;
   }
@@ -109,9 +119,12 @@
     gap: 1.2rem;
   }
 
-  .avatar {
+  .avatars {
+    display: flex;
     flex-shrink: 0;
+    gap: 0.4rem;
     align-self: center;
+
     margin-right: 0.4rem;
   }
 

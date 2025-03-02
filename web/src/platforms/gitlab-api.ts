@@ -175,27 +175,31 @@ export function gitlabMergeRequestToTask(
   return {
     id: `${mr.id}`,
     title: mr.title,
+    code: `MR-${mr.iid}`,
     url: mr.web_url,
     attentionNeeded: isAttentionNeeded(mr, currentUserId),
     timestamp: new Date(mr.updated_at).getTime(),
-    author: {
-      name: mr.author.name,
-      getAvatar() {
-        return mr.author.avatar_url;
+    owners: [
+      {
+        name: mr.author.name,
+        getAvatar() {
+          return mr.author.avatar_url;
+        },
       },
-    },
+      ...mr.assignees
+        .filter((user) => user.id !== mr.author.id)
+        .map((user) => gitlabUserToCollaborator(user)),
+    ],
     getGroup: () => ({
       id: `gitlab\n${currentUserId}\n${mr.project_id}`,
       title: getProjectName(mr.project_id),
       icon: gitlabIcon,
     }),
     getCollaborators() {
-      // @todo Trigger update?
       return [
         ...mr.reviewers.map((reviewer) =>
           gitlabUserToCollaborator(reviewer, mr.approvals),
         ),
-        ...mr.assignees.map((user) => gitlabUserToCollaborator(user)),
       ];
     },
   };
