@@ -49,6 +49,8 @@
           <h2 class="group">
             {#if group.icon}
               <img class="icon" src={group.icon} alt="" />
+            {:else}
+              <div class="icon"></div>
             {/if}
             <span class="title">{group.title || "Untitled"}</span>
             <span class="date">{formatTime(tasks[0])}</span>
@@ -82,7 +84,8 @@
 
   .icon {
     width: 1.6rem;
-    margin-right: 0.8rem;
+    margin-right: 0.6rem;
+    margin-left: 0.2rem;
   }
 
   .title {
@@ -92,6 +95,7 @@
   }
 
   .date {
+    margin-right: 0.8rem;
     font:
       500 1.2rem "SF Pro Display",
       var(--font);

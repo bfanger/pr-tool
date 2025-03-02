@@ -102,13 +102,6 @@
     background: light-dark(#3378f6, #3a82f7);
   }
 
-  .code {
-    margin-right: 0.8rem;
-    font-size: 1.2rem;
-    font-weight: 500;
-    color: #767676;
-  }
-
   .title {
     font-size: 1.4rem;
   }
@@ -117,6 +110,13 @@
     display: flex;
     flex-wrap: wrap;
     gap: 1.2rem;
+  }
+
+  .code {
+    margin-right: 0.4rem;
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: light-dark(#767676, #9f9f9f);
   }
 
   .avatars {
