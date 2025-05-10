@@ -10,6 +10,7 @@ import {
   type GithubQuery,
 } from "./github-api";
 import type { GitHubConfig, Platform, Progress, Task } from "./types";
+import githubIcon from "../assets/img/github.svg";
 
 export default function github({ auth }: GitHubConfig): Platform {
   let progress: Progress = $state("init");
@@ -60,6 +61,7 @@ export default function github({ auth }: GitHubConfig): Platform {
   }
 
   return {
+    icon: githubIcon,
     get progress() {
       return progress;
     },

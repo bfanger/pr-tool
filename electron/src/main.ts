@@ -4,6 +4,7 @@ import {
   BrowserWindow,
   ipcMain,
   type IpcMainEvent,
+  Menu,
   nativeTheme,
   screen,
   Tray,
@@ -73,8 +74,25 @@ function iconFilename(icon: string) {
   return path.join(currentDir, `../assets/tray-${icon}Template.png`);
 }
 function createTray() {
+  const contextMenu = Menu.buildFromTemplate([
+    {
+      label: "Restart",
+      // type: "normal",
+      click: async () => {
+        await load();
+        showWindow();
+      },
+    },
+    {
+      label: "Quit",
+      // type: "normal",
+      click: () => app.exit(0),
+    },
+  ]);
   tray = new Tray(iconFilename(currentIcon));
-  tray.on("right-click", toggleWindow);
+  tray.on("right-click", (e) => {
+    contextMenu.popup();
+  });
   tray.on("double-click", toggleWindow);
   tray.on("click", (event) => {
     toggleWindow();
@@ -90,13 +108,21 @@ nativeTheme.on("updated", () => {
 
 let loaded = false;
 async function load() {
-  await window.loadURL(
-    process.env.NODE_ENV === "development"
-      ? "http://localhost:5173/v3"
-      : "https://pr.bfanger.nl/v3"
-  );
-  loaded = true;
+  try {
+    currentIcon = "busy";
+    tray.setImage(iconFilename(currentIcon));
+    await window.loadURL(
+      process.env.NODE_ENV === "development"
+        ? "http://localhost:5173/v3"
+        : "https://pr.bfanger.nl/v3"
+    );
+    loaded = true;
+  } catch (err) {
+    tray.setImage(iconFilename("error"));
+    currentIcon = "error";
+  }
 }
+
 function createWindow() {
   window = new BrowserWindow({
     width: windowWidth,

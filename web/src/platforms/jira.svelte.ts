@@ -7,9 +7,10 @@ import {
   PUBLIC_JIRA_CLIENT_ID,
   PUBLIC_JIRA_REDIRECT_URI,
 } from "$env/static/public";
+import jiraIcon from "../assets/img/jira.png";
 
 export default function jira(config: JiraConfig): Platform {
-  const progress: Progress = $state("init");
+  let progress: Progress = $state("init");
   let tasks: Task[] = $state([]);
 
   let abortController = new AbortController();
@@ -22,21 +23,29 @@ export default function jira(config: JiraConfig): Platform {
       cloudid: config.cloudid,
       signal: abortController.signal,
     };
-    const results = await jiraGet(
-      "/rest/api/3/search",
-      {
-        searchParams: {
-          jql: "assignee=currentuser() AND resolution=unresolved AND sprint in openSprints()",
+    try {
+      progress = "refreshing";
+      const results = await jiraGet(
+        "/rest/api/3/search",
+        {
+          searchParams: {
+            jql: "assignee=currentuser() AND resolution=unresolved AND sprint in openSprints()",
+          },
         },
-      },
-      apiConfig,
-    );
-    tasks = results.issues.map((issue) =>
-      jiraIssueToTask(issue, config.domain),
-    );
+        apiConfig,
+      );
+      tasks = results.issues.map((issue) =>
+        jiraIssueToTask(issue, config.domain),
+      );
+      progress = "idle";
+    } catch (err) {
+      console.warn(err);
+      progress = "error";
+    }
   }
 
   return {
+    icon: jiraIcon,
     get tasks() {
       return tasks;
     },

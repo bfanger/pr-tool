@@ -14,6 +14,7 @@ import {
   gitLabMergeRequestWithApprovals,
 } from "./gitlab-api";
 import type { GitLabConfig, Platform, Progress } from "./types";
+import gitlabIcon from "../assets/img/gitlab.png";
 
 export default function gitlab({ auth }: GitLabConfig): Platform {
   let progress: Progress = $state("init");
@@ -212,6 +213,7 @@ export default function gitlab({ auth }: GitLabConfig): Platform {
   }
 
   return {
+    icon: gitlabIcon,
     get progress() {
       return progress;
     },

@@ -131,6 +131,7 @@ export default function legacy(
   }
 
   return {
+    icon: "",
     get progress() {
       return progress;
     },

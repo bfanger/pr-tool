@@ -79,8 +79,25 @@
 
 {#each platforms as platform}
   {#if platform.progress === "error"}
-    <div>
-      Failed <Button onclick={() => platform.refresh()}>Retry</Button>
+    <div class="error-row">
+      {#if platform.icon}
+        <img class="icon" src={platform.icon} alt="" />
+      {/if}
+      <span>Failed</span>
+      <Button onclick={() => platform.refresh()}>Retry</Button>
     </div>
   {/if}
 {/each}
+
+<style>
+  .error-row {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    margin-block: 4px;
+  }
+
+  .icon {
+    width: 1.6rem;
+  }
+</style>

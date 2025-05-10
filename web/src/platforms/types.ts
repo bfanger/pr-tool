@@ -3,6 +3,7 @@ import { z } from "zod";
 export type Progress = "init" | "error" | "refreshing" | "updating" | "idle";
 
 export type Platform = {
+  icon: string;
   progress: Progress;
   refresh: () => Promise<void>;
   abort: () => void;
