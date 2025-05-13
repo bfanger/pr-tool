@@ -114,6 +114,9 @@ export default function gitlab({ auth }: GitLabConfig): Platform {
           }),
       );
     } catch (err) {
+      if (signal.aborted) {
+        return;
+      }
       progress = "error";
       throw err;
     }
@@ -206,9 +209,12 @@ export default function gitlab({ auth }: GitLabConfig): Platform {
 
       await projectPromise;
       progress = "idle";
-    } catch (error) {
+    } catch (err) {
+      if (signal.aborted) {
+        return;
+      }
       progress = "error";
-      throw error;
+      throw err;
     }
   }
 

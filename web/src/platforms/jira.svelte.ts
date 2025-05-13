@@ -18,10 +18,11 @@ export default function jira(config: JiraConfig): Platform {
   async function refresh() {
     abortController.abort();
     abortController = new AbortController();
+    const signal = abortController.signal;
 
     const apiConfig = {
       cloudid: config.cloudid,
-      signal: abortController.signal,
+      signal,
     };
     try {
       progress = "refreshing";
@@ -39,8 +40,11 @@ export default function jira(config: JiraConfig): Platform {
       );
       progress = "idle";
     } catch (err) {
-      console.warn(err);
+      if (signal.aborted) {
+        return;
+      }
       progress = "error";
+      throw err;
     }
   }
 

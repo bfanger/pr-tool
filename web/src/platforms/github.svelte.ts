@@ -43,6 +43,9 @@ export default function github({ auth }: GitHubConfig): Platform {
       }
       progress = "idle";
     } catch (err) {
+      if (signal.aborted) {
+        return;
+      }
       progress = "error";
       throw err;
     }
