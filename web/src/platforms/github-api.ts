@@ -15,7 +15,7 @@ export type GithubQuery = {
         title: string;
         updatedAt: string;
         url: string;
-        repository: { name: string };
+        repository: { name: string; isArchived: boolean };
         assignees: { nodes: { login: string; avatarUrl: string }[] };
         reviewRequests: {
           nodes: {
@@ -55,6 +55,7 @@ export const githubQuery = gql`
           updatedAt
           repository {
             name
+            isArchived
           }
           assignees(first: 5) {
             nodes {

@@ -3,9 +3,18 @@
   import TaskRows from "../../components/TaskRows/TaskRows.svelte";
   import { getContext } from "svelte";
   import type { Platform, Task } from "../../platforms/types";
+  import storage from "../../services/storage.svelte";
+  import { z } from "zod";
+  import Button from "../../components/Button/Button.svelte";
+  import ArchiveButton from "./ArchiveButton.svelte";
 
   const ctx = getContext<{ platforms: Platform[] }>("platforms");
   let platforms = $derived(ctx.platforms);
+  let wantToArchive = $state<string>();
+  const archived = storage(
+    "archived",
+    z.record(z.string(), z.number()).catch({}),
+  );
 
   let allTasks = $derived(
     platforms
@@ -30,6 +39,14 @@
     }
     return dateFormatter.format(task.timestamp);
   }
+
+  function archive(groupId: string, timestamp: number | undefined) {
+    archived.value = {
+      ...archived.value,
+      [groupId]: z.number().parse(timestamp),
+    };
+    wantToArchive = groupId;
+  }
 </script>
 
 {#if allTasks.length === 0}
@@ -45,18 +62,38 @@
     {#each Object.entries(groups) as [, tasks]}
       {#if tasks?.length}
         {@const group = tasks![0]!.getGroup()}
-        <div>
-          <h2 class="group">
-            {#if group.icon}
-              <img class="icon" src={group.icon} alt="" />
+        {#if archived.value[group.id] !== tasks[0]!.timestamp}
+          <div>
+            <h2 class="group">
+              {#if group.icon}
+                <img class="icon" src={group.icon} alt="" />
+              {:else}
+                <div class="icon"></div>
+              {/if}
+              <span class="title">{group.title || "Untitled"}</span>
+              <span class="date">{formatTime(tasks[0])}</span>
+              <ArchiveButton
+                onclick={() => {
+                  wantToArchive = group.id;
+                }}
+              />
+            </h2>
+            {#if wantToArchive === group.id}
+              <div class="archive-confirm">
+                <Button onclick={() => archive(group.id, tasks[0]?.timestamp)}>
+                  Archive
+                </Button>
+                <Button
+                  onclick={() => {
+                    wantToArchive = undefined;
+                  }}>Cancel</Button
+                >
+              </div>
             {:else}
-              <div class="icon"></div>
+              <TaskRows {tasks} />
             {/if}
-            <span class="title">{group.title || "Untitled"}</span>
-            <span class="date">{formatTime(tasks[0])}</span>
-          </h2>
-          <TaskRows {tasks} />
-        </div>
+          </div>
+        {/if}
       {/if}
     {/each}
   </div>
@@ -95,10 +132,21 @@
   }
 
   .date {
-    margin-right: 0.8rem;
     font:
       500 1.2rem "SF Pro Display",
       var(--font);
     color: light-dark(#747474, #9f9f9f);
+  }
+
+  .archive-confirm {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+
+    padding: 1rem;
+    border: var(--hairline) solid light-dark(#dadada, #4b4b4b);
+    border-radius: 0.6rem;
+
+    background: light-dark(#e7e7e7, #2b2a2a);
   }
 </style>

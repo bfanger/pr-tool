@@ -29,14 +29,10 @@ export default function github({ auth }: GitHubConfig): Platform {
         { login: auth.login },
         { auth, signal },
       );
-
       tasks = [];
-      const minimumDate = new Date();
-      minimumDate.setMonth(minimumDate.getMonth() - 18);
 
       for (const pr of data.user.pullRequests.nodes) {
-        const updateAt = new Date(pr.updatedAt);
-        if (updateAt.getTime() < minimumDate.getTime()) {
+        if (pr.repository.isArchived) {
           continue;
         }
         tasks.push(githubPullRequestToTask(pr, data.user));
