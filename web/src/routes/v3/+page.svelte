@@ -3,22 +3,18 @@
   import TaskRows from "../../components/TaskRows/TaskRows.svelte";
   import { getContext } from "svelte";
   import type { Platform, Task } from "../../platforms/types";
-  import storage from "../../services/storage.svelte";
-  import { z } from "zod";
   import Button from "../../components/Button/Button.svelte";
   import ArchiveButton from "./ArchiveButton.svelte";
+  import archived from "../../platforms/archived";
 
   const ctx = getContext<{ platforms: Platform[] }>("platforms");
   let platforms = $derived(ctx.platforms);
   let wantToArchive = $state<string>();
-  const archived = storage(
-    "archived",
-    z.record(z.string(), z.number()).catch({}),
-  );
 
   let allTasks = $derived(
     platforms
       .flatMap((platform) => platform.tasks)
+      .filter((task) => archived.isActive(task))
       .toSorted((a, b) => {
         if (a.attentionNeeded && !b.attentionNeeded) {
           return -1;
@@ -39,14 +35,6 @@
     }
     return dateFormatter.format(task.timestamp);
   }
-
-  function archive(groupId: string, timestamp: number | undefined) {
-    archived.value = {
-      ...archived.value,
-      [groupId]: z.number().parse(timestamp),
-    };
-    wantToArchive = groupId;
-  }
 </script>
 
 {#if allTasks.length === 0}
@@ -62,38 +50,39 @@
     {#each Object.entries(groups) as [, tasks]}
       {#if tasks?.length}
         {@const group = tasks![0]!.getGroup()}
-        {#if archived.value[group.id] !== tasks[0]!.timestamp}
-          <div>
-            <h2 class="group">
-              {#if group.icon}
-                <img class="icon" src={group.icon} alt="" />
-              {:else}
-                <div class="icon"></div>
-              {/if}
-              <span class="title">{group.title || "Untitled"}</span>
-              <span class="date">{formatTime(tasks[0])}</span>
-              <ArchiveButton
-                onclick={() => {
-                  wantToArchive = group.id;
-                }}
-              />
-            </h2>
-            {#if wantToArchive === group.id}
-              <div class="archive-confirm">
-                <Button onclick={() => archive(group.id, tasks[0]?.timestamp)}>
-                  Archive
-                </Button>
-                <Button
-                  onclick={() => {
-                    wantToArchive = undefined;
-                  }}>Cancel</Button
-                >
-              </div>
+
+        <div>
+          <h2 class="group">
+            {#if group.icon}
+              <img class="icon" src={group.icon} alt="" />
             {:else}
-              <TaskRows {tasks} />
+              <div class="icon"></div>
             {/if}
-          </div>
-        {/if}
+            <span class="title">{group.title || "Untitled"}</span>
+            <span class="date">{formatTime(tasks[0])}</span>
+            <ArchiveButton
+              onclick={() => {
+                wantToArchive = group.id;
+              }}
+            />
+          </h2>
+          {#if wantToArchive === group.id}
+            <div class="archive-confirm">
+              <Button
+                onclick={() => archived.archive(group, tasks[0]!.timestamp)}
+              >
+                Archive
+              </Button>
+              <Button
+                onclick={() => {
+                  wantToArchive = undefined;
+                }}>Cancel</Button
+              >
+            </div>
+          {:else}
+            <TaskRows {tasks} />
+          {/if}
+        </div>
       {/if}
     {/each}
   </div>
@@ -141,7 +130,7 @@
   .archive-confirm {
     display: flex;
     gap: 1rem;
-    justify-content: center;
+    justify-content: end;
 
     padding: 1rem;
     border: var(--hairline) solid light-dark(#dadada, #4b4b4b);

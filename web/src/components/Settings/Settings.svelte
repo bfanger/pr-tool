@@ -1,18 +1,12 @@
 <script lang="ts">
   import { lastValueFrom } from "rxjs";
-  import { z } from "zod";
   import AddConfig from "$lib/components/AddConfig.svelte";
   import BackButton from "$lib/components/BackButton.svelte";
   import Button from "$lib/components/Button.svelte";
   import rpc from "$lib/services/rpc";
   import configs from "$lib/store/configs";
   import { providersWithConfig$ } from "$lib/streams/providers";
-  import storage from "../../services/storage.svelte";
-
-  const archived = storage(
-    "archived",
-    z.record(z.string(), z.number()).catch({}),
-  );
+  import archived from "../../platforms/archived";
 </script>
 
 <br />
@@ -34,14 +28,8 @@
   </div>
 {/each}
 <div class="buttons">
-  {#if Object.keys(archived.value).length > 0}
-    <Button
-      on:click={() => {
-        archived.value = {};
-      }}
-    >
-      Unarchive all
-    </Button>
+  {#if archived.hasItems}
+    <Button on:click={archived.reset}>Unarchive all</Button>
   {/if}
   <Button
     on:click={() => {
