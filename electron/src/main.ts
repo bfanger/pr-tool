@@ -44,6 +44,9 @@ function getWindowPosition() {
 }
 function showWindow() {
   const position = getWindowPosition();
+  if (!window.isVisibleOnAllWorkspaces()) {
+    window.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: false });
+  }
   window.setPosition(position.x, position.y, false);
   window.show();
   window.focus();
@@ -55,15 +58,14 @@ function toggleWindow() {
   }
   if (window.isVisible()) {
     window.hide();
+    app.dock?.hide();
   } else {
     showWindow();
   }
 }
 
-if (process.env.NODE_ENV !== "development") {
-  // Don't show the app in the doc
-  app.dock?.hide();
-}
+// Don't show the app in the dock
+app.dock?.hide();
 
 // Quit the app when the window is closed
 app.on("window-all-closed", () => {
@@ -137,7 +139,6 @@ function createWindow() {
       preload: path.join(currentDir, "preload.cjs"),
     },
   });
-  window.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: false });
   load();
 
   window.webContents.setWindowOpenHandler(({ url }) => {
@@ -147,6 +148,7 @@ function createWindow() {
 
   // Hide the window when it loses focus
   window.on("blur", () => {
+    app.dock?.hide();
     if (!window.webContents.isDevToolsOpened()) {
       window.hide();
     }
