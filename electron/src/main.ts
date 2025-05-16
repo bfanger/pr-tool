@@ -77,7 +77,6 @@ function createTray() {
   const contextMenu = Menu.buildFromTemplate([
     {
       label: "Restart",
-      // type: "normal",
       click: async () => {
         await load();
         showWindow();
@@ -85,7 +84,6 @@ function createTray() {
     },
     {
       label: "Quit",
-      // type: "normal",
       click: () => app.exit(0),
     },
   ]);
@@ -139,6 +137,7 @@ function createWindow() {
       preload: path.join(currentDir, "preload.cjs"),
     },
   });
+  window.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: false });
   load();
 
   window.webContents.setWindowOpenHandler(({ url }) => {
