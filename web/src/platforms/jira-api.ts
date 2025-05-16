@@ -87,10 +87,13 @@ async function refreshTokens() {
       localStorage.setItem("app_jira_accessToken", accessToken);
       localStorage.setItem("app_jira_refreshToken", refreshToken);
     })();
-    refreshPromise.catch((err) => {
-      refreshPromise = undefined;
-      throw err;
-    });
+    refreshPromise
+      .catch((err) => {
+        throw err;
+      })
+      .finally(() => {
+        refreshPromise = undefined;
+      });
   }
   return refreshPromise;
 }
