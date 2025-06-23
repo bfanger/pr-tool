@@ -1,6 +1,6 @@
 import { JIRA_CLIENT_SECRET } from "$env/static/private";
 import { PUBLIC_JIRA_CLIENT_ID } from "$env/static/public";
-import { error, json } from "@sveltejs/kit";
+import { json } from "@sveltejs/kit";
 import { z } from "zod";
 
 export async function POST({ request }) {
@@ -29,5 +29,13 @@ export async function POST({ request }) {
       refreshToken: result.refresh_token,
     });
   }
-  return error(503);
+
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers: {
+      "Content-Type":
+        response.headers.get("Content-Type") ?? "application/json",
+    },
+  });
 }

@@ -41,6 +41,6 @@
     personal access token
   </a>
   with the
-  <strong>api</strong>
+  <strong>read_api</strong>
   scope.
 </TextInput>
