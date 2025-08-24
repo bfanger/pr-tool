@@ -3,43 +3,21 @@
   "productName": "PR notifications",
   "version": "2.0.0",
   "private": true,
-  "type": "module",
-  "main": "build/main.js",
+  "type": "commonjs",
+  "main": ".vite/build/main.js",
   "scripts": {
-    "dev": "concurrently --kill-others \"npm:dev:*\"",
-    "build": "npm run build:main && npm run build:preload && npm run build:electron",
-    "dev:main": "npm run build:main -- --watch",
-    "dev:preload": "npm run build:preload -- --watch",
-    "dev:trayicon": "NODE_ENV=development nodemon -w build/main.cjs -w build/preload.cjs --exec electron-forge start",
-    "build:main": "esbuild src/main.ts --platform=node --outfile=build/main.js",
-    "build:preload": "esbuild src/preload.ts --platform=node --bundle --external:electron --format=cjs --outfile=build/preload.cjs",
-    "build:electron": "electron-forge package",
+    "dev": "NODE_ENV=development electron-forge start",
+    "build": "electron-forge package",
     "preinstall": "npx -y only-allow npm",
     "lint": "prettier --check . && tsc --noEmit",
     "format": "prettier --write ."
   },
-  "config": {
-    "forge": {
-      "packagerConfig": {
-        "icon": "icon.icns"
-      },
-      "makers": [
-        {
-          "name": "@electron-forge/maker-zip"
-        }
-      ]
-    }
-  },
   "devDependencies": {
-    "@electron-forge/cli": "^7.5.0",
-    "@electron-forge/maker-zip": "^7.5.0",
-    "concurrently": "^9.0.1",
-    "electron": "^36.2.0",
-    "esbuild": "^0.25.0",
-    "nodemon": "^3.1.9",
-    "prettier": "^3.4.2",
-    "rxjs": "^7.8.1",
-    "typescript": "^5.7.3"
+    "@electron-forge/cli": "^7.8.3",
+    "@electron-forge/plugin-vite": "^7.8.3",
+    "electron": "37.3.1",
+    "typescript": "~4.5.4",
+    "vite": "^5.4.19"
   },
   "dependencies": {
     "axios": "^1.7.7",
