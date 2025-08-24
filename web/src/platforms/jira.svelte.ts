@@ -27,7 +27,7 @@ export default function jira(config: JiraConfig): Platform {
     try {
       progress = "refreshing";
       const results = await jiraGet(
-        "/rest/api/3/search",
+        "/rest/api/3/search/jql?fields=key,summary,updated,project,assignee,creator",
         {
           searchParams: {
             jql: "assignee=currentuser() AND resolution=unresolved AND sprint in openSprints()",
@@ -69,6 +69,7 @@ export default function jira(config: JiraConfig): Platform {
  */
 export function jiraLogin() {
   const state = Math.random().toString(36).slice(2);
+  // eslint-disable-next-line svelte/prefer-svelte-reactivity
   const url = `https://auth.atlassian.com/authorize?${new URLSearchParams({
     audience: "api.atlassian.com",
     client_id: PUBLIC_JIRA_CLIENT_ID,

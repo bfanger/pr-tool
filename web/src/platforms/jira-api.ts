@@ -11,7 +11,7 @@ import type { Collaborator, Task } from "./types";
 type JiraGetRequests = {
   "/rest/api/3/myself": unknown;
   "/rest/api/3/issue/{issueIdOrKey}": unknown;
-  "/rest/api/3/search": SearchResultDto;
+  "/rest/api/3/search/jql?fields=key,summary,updated,project,assignee,creator": SearchResultDto;
 };
 
 type ApiConfig = {
@@ -144,10 +144,7 @@ function isJwtExpired(jwt: string) {
   }
 }
 type SearchResultDto = {
-  expand: string;
-  startAt: number;
-  maxResults: number;
-  total: number;
+  isLast: boolean;
   issues: IssueDto[];
 };
 
@@ -157,52 +154,8 @@ type IssueDto = {
   self: string;
   key: string;
   fields: {
-    statuscategorychangedate: string;
-    fixVersions: {
-      self: string;
-      id: string;
-      description: string;
-      name: string;
-      archived: boolean;
-      released: boolean;
-      releaseDate: Date;
-    }[];
-    resolution: PriorityDto | null;
-    lastViewed: null | string;
-    priority: PriorityDto;
-    labels: any[];
-    aggregatetimeoriginalestimate: number | null;
-    timeestimate: number | null;
-    versions: any[];
-    issuelinks: {
-      id: string;
-      self: string;
-      type: {
-        id: string;
-        name: string;
-        inward: string;
-        outward: string;
-        self: string;
-      };
-      outwardIssue?: ParentDto;
-      inwardIssue?: ParentDto;
-    }[];
     assignee: UserDto;
-    status: StatusDto;
-    components: any[];
-    aggregatetimeestimate: number | null;
     creator: UserDto;
-    subtasks: any[];
-    reporter: UserDto;
-    aggregateprogress: ProgressDto;
-    progress: ProgressDto;
-    votes: {
-      self: string;
-      votes: number;
-      hasVoted: boolean;
-    };
-    issuetype: IssueTypeDto;
-    timespent: number | null;
     project: {
       self: string;
       id: string;
@@ -211,63 +164,10 @@ type IssueDto = {
       projectTypeKey: string;
       simplified: boolean;
       avatarUrls: AvatarsDto;
-      projectCategory: PriorityDto;
     };
-    aggregatetimespent: number | null;
-    resolutiondate: null | string;
-    workratio: number;
-    watches: {
-      self: string;
-      watchCount: number;
-      isWatching: boolean;
-    };
-    created: string;
     updated: string;
-    timeoriginalestimate: number | null;
-    description: {
-      type: string;
-      version: number;
-      content: {
-        type: string;
-        content: {
-          type: string;
-          text?: string;
-          marks?: MarkDto[];
-          content?: {
-            type: string;
-            content: {
-              type: string;
-              text: string;
-              marks?: MarkDto[];
-            }[];
-          }[];
-          attrs?: {
-            type?: string;
-            id?: string;
-            collection?: string;
-            height?: number;
-            width?: number;
-            url?: string;
-          };
-        }[];
-        attrs?: {
-          language?: string;
-          layout?: string;
-        };
-      }[];
-    } | null;
-    security: null;
     summary: string;
-    environment: null;
-    duedate: null;
-    parent?: ParentDto;
   };
-};
-
-type ProgressDto = {
-  progress: number;
-  total: number;
-  percent?: number;
 };
 
 type UserDto = {
@@ -286,55 +186,4 @@ type AvatarsDto = {
   "24x24": string;
   "16x16": string;
   "32x32": string;
-};
-
-type MarkDto = {
-  type: string;
-};
-
-type ParentDto = {
-  id: string;
-  key: string;
-  self: string;
-  fields: {
-    summary: string;
-    status: StatusDto;
-    priority: PriorityDto;
-    issuetype: IssueTypeDto;
-  };
-};
-
-type IssueTypeDto = {
-  self: string;
-  id: string;
-  description: string;
-  iconUrl: string;
-  name: "Bug" | "Epic" | "Story" | "Taak";
-  subtask: boolean;
-  avatarId: number;
-  entityId: string;
-  hierarchyLevel: number;
-};
-
-type PriorityDto = {
-  self: string;
-  iconUrl?: string;
-  name: string;
-  id: string;
-  description?: string;
-};
-
-type StatusDto = {
-  self: string;
-  description: string;
-  iconUrl: string;
-  name: string;
-  id: string;
-  statusCategory: {
-    self: string;
-    id: number;
-    key: string;
-    colorName: string;
-    name: string;
-  };
 };
