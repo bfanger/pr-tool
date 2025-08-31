@@ -88,12 +88,17 @@ export async function gitlabGet<T extends keyof GitLabGetRequests>(
   const response = await resilient(
     {
       delay,
-      retries: 3,
+      retries: 2,
       timeout: 20_000,
       signal: config.signal,
       jitter: config.jitter,
     },
-    () => fetch(`https://${auth.domain}/api/v4${url}`, { ...init, headers }),
+    (signal) =>
+      fetch(`https://${auth.domain}/api/v4${url}`, {
+        ...init,
+        headers,
+        signal,
+      }),
   );
   if (!response.ok) {
     throw new Error(response.statusText);

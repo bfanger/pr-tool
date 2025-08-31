@@ -13,7 +13,7 @@ type Options = {
  */
 export default async function resilient<T>(
   options: Options,
-  fn: () => Promise<T>,
+  fn: (timeoutSignal: AbortSignal) => Promise<T>,
 ): Promise<T> {
   const { signal, retries, timeout, delay = 0, jitter = 0.1 } = options;
   if (delay) {
@@ -21,7 +21,9 @@ export default async function resilient<T>(
   }
   const timeoutController = new AbortController();
   const timer = setTimeout(
-    () => timeoutController.abort("timed out"),
+    () => {
+      timeoutController.abort(new Error("Timed out"));
+    },
     applyJitter(timeout, jitter),
   );
   function abortTrigger() {
@@ -30,7 +32,7 @@ export default async function resilient<T>(
   signal.addEventListener("abort", abortTrigger);
 
   try {
-    return fn();
+    return await fn(timeoutController.signal);
   } catch (err) {
     if (
       !navigator.onLine ||
