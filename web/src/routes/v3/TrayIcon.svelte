@@ -19,16 +19,23 @@
     }
     return count === 0 ? "" : `${count} PRs`;
   });
+  type Icon = "default" | "busy" | "error";
+  let previous: Icon = "busy";
 
-  let icon: "default" | "busy" | "error" = $derived.by(() => {
+  let icon: Icon = $derived.by(() => {
     for (const platform of platforms) {
       if (platform.progress === "error") {
+        previous = "error";
         return "error";
       }
-      if (platform.progress === "init") {
+      if (
+        platform.progress === "init" ||
+        (platform.progress === "refreshing" && previous !== "default")
+      ) {
         return "busy";
       }
     }
+    previous = "default";
     return "default";
   });
 

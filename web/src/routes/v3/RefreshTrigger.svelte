@@ -9,14 +9,14 @@
   };
   let { platforms }: Props = $props();
   let promise = $state<Promise<any>>();
-  let aborts: (() => void)[] = [];
+  let aborts: ((reason: string) => void)[] = [];
 
-  function refreshAll() {
+  function refreshAll(reason: string) {
     aborts = [];
     promise = Promise.allSettled(
       platforms.map((platform) => {
         aborts.push(platform.abort);
-        return platform.refresh();
+        return platform.refresh(reason);
       }),
     ).then((results) => {
       for (const result of results) {
@@ -30,40 +30,43 @@
   }
 
   function handleNetworkChange() {
-    console.info("Network change detected");
-    refreshAll();
+    refreshAll("Refresh, network change detected");
   }
 
   onMount(() => {
-    refreshAll();
+    refreshAll("RefreshTrigger is mounted");
     const abortController = new AbortController();
-    poll(refreshAll, { gap: 3600, signal: abortController.signal });
+    poll(() => refreshAll("Polling..."), {
+      gap: 3600,
+      signal: abortController.signal,
+    });
     window.navigator.connection?.addEventListener(
       "change",
       handleNetworkChange,
     );
     return () => {
-      abortController.abort();
+      const reason = "RefreshTrigger was destroyed";
+      abortController.abort(new DOMException(reason, "AbortError"));
       window.navigator.connection?.removeEventListener(
         "change",
         handleNetworkChange,
       );
       for (const abort of aborts) {
-        abort();
+        abort(reason);
       }
     };
   });
 
   function handleVisibilityChange() {
     if (!document.hidden) {
-      refreshAll();
+      refreshAll("Refreshing, window was opened");
     }
   }
 
   function handleFocus() {
     for (const platform of platforms) {
       if (platform.progress === "error" || platform.progress === "idle") {
-        platform.refresh();
+        platform.refresh("Retry, window regained focus");
       }
     }
   }
@@ -72,7 +75,7 @@
 <svelte:document onvisibilitychange={handleVisibilityChange} />
 <svelte:window onfocus={handleFocus} />
 
-<Button onclick={refreshAll}>Refresh</Button>
+<Button onclick={() => refreshAll("Manual refresh")}>Refresh</Button>
 {#await promise}
   Refreshing...
 {/await}
@@ -84,7 +87,7 @@
         <img class="icon" src={platform.icon} alt="" />
       {/if}
       <span>Failed</span>
-      <Button onclick={() => platform.refresh()}>Retry</Button>
+      <Button onclick={() => platform.refresh("Manual Retry")}>Retry</Button>
     </div>
   {/if}
 {/each}

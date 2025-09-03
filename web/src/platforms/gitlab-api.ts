@@ -87,6 +87,7 @@ export async function gitlabGet<T extends keyof GitLabGetRequests>(
   const url = buildUrl(path, params ?? ({} as PathParams<T>), searchParams);
   const response = await resilient(
     {
+      task: `GitLab ${url}`,
       delay,
       retries: 2,
       timeout: 20_000,

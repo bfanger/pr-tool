@@ -1,3 +1,4 @@
+/* eslint-disable svelte/prefer-svelte-reactivity */
 /**
  * https://docs.gitlab.com/ee/api/rest/
  */
@@ -128,8 +129,8 @@ export default function gitlab({ auth }: GitLabConfig): Platform {
     }
   }
 
-  async function refresh() {
-    refreshController.abort();
+  async function refresh(reason: string) {
+    refreshController.abort(new DOMException(reason, "AbortError"));
     refreshController = new AbortController();
     const signal = refreshController.signal;
 
@@ -227,8 +228,8 @@ export default function gitlab({ auth }: GitLabConfig): Platform {
       return tasks;
     },
     refresh,
-    abort: () => {
-      refreshController.abort();
+    abort: (reason) => {
+      refreshController.abort(new DOMException(reason, "AbortError"));
     },
   } satisfies Platform;
 }

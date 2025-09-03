@@ -15,8 +15,8 @@ export default function jira(config: JiraConfig): Platform {
 
   let abortController = new AbortController();
 
-  async function refresh() {
-    abortController.abort();
+  async function refresh(reason: string) {
+    abortController.abort(new DOMException(reason, "AbortError"));
     abortController = new AbortController();
     const signal = abortController.signal;
 
@@ -57,7 +57,8 @@ export default function jira(config: JiraConfig): Platform {
       return progress;
     },
     refresh,
-    abort: () => abortController.abort(),
+    abort: (reason) =>
+      abortController.abort(new DOMException(reason, "AbortError")),
   };
 }
 

@@ -47,11 +47,11 @@ export default function github({ auth }: GitHubConfig): Platform {
     }
   }
 
-  async function refresh() {
+  async function refresh(reason: string) {
     if (progress !== "init") {
       progress = "refreshing";
     }
-    refreshController.abort();
+    refreshController.abort(new DOMException(reason, "AbortError"));
     refreshController = new AbortController();
     const signal = refreshController.signal;
     await update(signal);
@@ -68,8 +68,8 @@ export default function github({ auth }: GitHubConfig): Platform {
       return tasks;
     },
     refresh,
-    abort: () => {
-      refreshController.abort();
+    abort: (reason) => {
+      refreshController.abort(new DOMException(reason, "AbortError"));
     },
   } satisfies Platform;
 }

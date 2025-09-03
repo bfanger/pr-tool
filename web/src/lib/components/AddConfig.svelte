@@ -146,8 +146,8 @@
 
   .fields {
     display: grid;
-    grid-gap: 1rem;
     grid-template-columns: 1fr 100fr;
+    gap: 1rem;
   }
 
   .providers {

@@ -5,8 +5,8 @@ export type Progress = "init" | "error" | "refreshing" | "updating" | "idle";
 export type Platform = {
   icon: string;
   progress: Progress;
-  refresh: () => Promise<void>;
-  abort: () => void;
+  refresh: (reason: string) => Promise<void>;
+  abort: (reason: string) => void;
   tasks: Task[];
 };
 

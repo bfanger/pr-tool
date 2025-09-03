@@ -1,6 +1,7 @@
 import sleep from "./sleep";
 
 type Options = {
+  task: string;
   signal: AbortSignal;
   retries: number;
   timeout: number;
@@ -22,12 +23,14 @@ export default async function resilient<T>(
   const timeoutController = new AbortController();
   const timer = setTimeout(
     () => {
-      timeoutController.abort(new Error("Timed out"));
+      timeoutController.abort(
+        new DOMException(`Timed out after ~${timeout}ms`, "AbortError"),
+      );
     },
     applyJitter(timeout, jitter),
   );
   function abortTrigger() {
-    timeoutController.abort();
+    timeoutController.abort(signal.reason);
   }
   signal.addEventListener("abort", abortTrigger);
 
@@ -40,9 +43,11 @@ export default async function resilient<T>(
       signal.aborted ||
       !timeoutController.signal.aborted
     ) {
-      throw err;
+      throw new Error(`Task "${options.task}" failed`, { cause: err });
     }
-    console.warn(err);
+    console.warn(
+      new Error(`Task "${options.task}" failed, retrying...`, { cause: err }),
+    );
 
     return resilient(
       {

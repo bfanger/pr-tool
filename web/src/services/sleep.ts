@@ -5,18 +5,23 @@ export default function sleep(
   let timer: ReturnType<typeof setTimeout>;
   return new Promise<void>((resolve, reject) => {
     if (signal?.aborted) {
-      reject(new Error("aborted"));
+      reject(
+        signal.reason ?? new DOMException("sleep was aborted", "AbortError"),
+      );
       return;
     }
-    function abortTrigger() {
+    function listener() {
       clearTimeout(timer);
-      reject(new DOMException("aborted", "AbortError"));
+      signal?.removeEventListener("abort", listener);
+      reject(
+        signal?.reason ?? new DOMException("sleep was aborted", "AbortError"),
+      );
     }
     timer = setTimeout(() => {
       resolve();
-      signal?.removeEventListener("abort", abortTrigger);
+      signal?.removeEventListener("abort", listener);
     }, ms);
 
-    signal?.addEventListener("abort", abortTrigger);
+    signal?.addEventListener("abort", listener);
   });
 }
