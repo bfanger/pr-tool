@@ -4,6 +4,7 @@ import { VitePlugin } from "@electron-forge/plugin-vite";
 const config: ForgeConfig = {
   packagerConfig: {
     icon: "icon.icns",
+    extraResource: ["./public"],
   },
   plugins: [
     new VitePlugin({
