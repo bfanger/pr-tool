@@ -140,7 +140,7 @@ function createWindow() {
       nodeIntegration: false,
       contextIsolation: true,
       backgroundThrottling: false,
-      preload: path.join(currentDir, "preload.cjs"),
+      preload: path.join(currentDir, "preload.js"),
     },
   });
   load();
