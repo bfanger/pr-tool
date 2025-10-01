@@ -139,6 +139,7 @@ export async function gitlabGetAll<T extends keyof GitLabGetRequests>(
     10,
   );
   const streamPromise = Promise.all(
+    // eslint-disable-next-line @typescript-eslint/await-thenable
     stream ? (page1 as any[]).map((item: any) => stream(item)) : [],
   );
   if (Number.isNaN(pageCount) || pageCount === 1) {
@@ -255,7 +256,7 @@ function isAttentionNeeded(
       return true; // Merge Conflicts
     }
     if (mr.user_notes_count > 0) {
-      return true; // Has comments (TODO: check resolved)
+      return true; // Has comments (TODO: check resolved, and exclude own comments)
     }
     if (mr.reviewers.length === 0) {
       return true; // No reviewers assigned

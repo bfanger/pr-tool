@@ -12,6 +12,7 @@
   let collaborators = $derived(task.getCollaborators());
 </script>
 
+<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
 <a class="task" href={url} target="_blank" rel="noreferrer">
   <div class="indicator-spacer">
     {#if task.attentionNeeded}

@@ -8,6 +8,7 @@
   export let pullRequest: PullRequest;
 </script>
 
+<!-- eslint-disable svelte/no-navigation-without-resolve -->
 <a class="pull-request" href={pullRequest.url} target="_blank" rel="noreferrer">
   <div class="title-row">
     <span class="avatar" title={pullRequest.creator.name}>

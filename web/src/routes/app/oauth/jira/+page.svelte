@@ -8,6 +8,7 @@
   import storage from "../../../../services/storage.svelte";
   import { goto } from "$app/navigation";
   import { jiraLogin } from "../../../../platforms/jira.svelte";
+  import { resolve } from "$app/paths";
 
   const storedConfigs = storage("configs", configsSchema);
 
@@ -46,7 +47,7 @@
         }
       }
       storedConfigs.value = storedConfigs.value;
-      await goto("/app");
+      await goto(resolve("/app"));
     }
   });
 </script>

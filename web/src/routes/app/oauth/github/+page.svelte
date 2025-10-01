@@ -6,6 +6,7 @@
   import Warning from "$lib/components/Warning.svelte";
   import githubApi from "$lib/services/githubApi.js";
   import configs from "$lib/store/configs";
+  import { resolve } from "$app/paths";
 
   export let data;
 
@@ -18,7 +19,7 @@
         type: "github",
         auth: { login: me.login, accessToken: data.accessToken },
       });
-      goto("/app");
+      await goto(resolve("/app"));
     }
   });
 </script>

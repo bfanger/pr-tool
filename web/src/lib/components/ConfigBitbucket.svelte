@@ -43,6 +43,7 @@
 >
   <div>
     Create a
+    <!-- eslint-disable svelte/no-navigation-without-resolve -->
     <a
       href={auth.domain
         ? `https://${auth.domain}/plugins/servlet/access-tokens/manage`
