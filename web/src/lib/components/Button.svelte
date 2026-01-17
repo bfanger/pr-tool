@@ -5,6 +5,7 @@
 </script>
 
 {#if href && !disabled}
+  <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
   <a class="button" class:small {href} on:click><slot /></a>
 {:else}
   <button class="button" class:small {disabled} on:click><slot /></button>

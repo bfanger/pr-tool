@@ -3,7 +3,7 @@ import tailwindcss from "@tailwindcss/vite";
 import { configDefaults, defineConfig } from "vitest/config";
 import { config } from "dotenv";
 
-config();
+config({ quiet: true });
 
 export default defineConfig({
   plugins: [sveltekit(), tailwindcss()],

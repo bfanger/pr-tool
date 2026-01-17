@@ -11,6 +11,7 @@
 </script>
 
 {#if href && !disabled}
+  <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
   <a class="button" {href} {onclick}>{@render children()}</a>
 {:else}
   <button class="button" {disabled} {onclick}>{@render children()}</button>
