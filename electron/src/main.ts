@@ -28,7 +28,7 @@ function getWindowPosition() {
 
   // Center window horizontally below the tray icon
   let x = Math.round(
-    trayBounds.x + trayBounds.width / 2 - windowBounds.width / 2
+    trayBounds.x + trayBounds.width / 2 - windowBounds.width / 2,
   );
   const { width } = screen.getPrimaryDisplay().workAreaSize;
   if (trayBounds.x > 0 && trayBounds.x < width) {
@@ -76,7 +76,7 @@ function iconFilename(icon: string) {
   return path.join(
     currentDir,
     process.env.NODE_ENV === "development" ? "./" : "../",
-    `../../public/tray-${icon}Template.png`
+    `../../public/tray-${icon}Template.png`,
   );
 }
 function createTray() {
@@ -118,7 +118,7 @@ async function load() {
     await window.loadURL(
       process.env.NODE_ENV === "development"
         ? "http://localhost:5173/v3"
-        : "https://pr.bfanger.nl/v3"
+        : "https://pr.bfanger.nl/v3",
     );
     loaded = true;
   } catch (err) {
