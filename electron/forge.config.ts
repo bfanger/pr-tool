@@ -3,7 +3,7 @@ import { VitePlugin } from "@electron-forge/plugin-vite";
 
 const config: ForgeConfig = {
   packagerConfig: {
-    icon: "icon.icns",
+    icon: process.platform === "darwin" ? "icon.icns" : "icon.ico",
     extraResource: ["./public"],
   },
   plugins: [

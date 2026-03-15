@@ -10,11 +10,8 @@ import {
   Tray,
 } from "electron";
 import open from "open";
-import path from "path";
-import { dirname } from "path";
-import { fileURLToPath } from "url";
+import path from "node:path";
 
-const currentDir = dirname(fileURLToPath(import.meta.url));
 
 let tray: Tray;
 let window: BrowserWindow;
@@ -74,7 +71,7 @@ app.on("window-all-closed", () => {
 const icons = ["default", "error", "busy"];
 function iconFilename(icon: string) {
   return path.join(
-    currentDir,
+    __dirname,
     process.env.NODE_ENV === "development" ? "./" : "../",
     `../../public/tray-${icon}Template.png`,
   );
@@ -140,7 +137,7 @@ function createWindow() {
       nodeIntegration: false,
       contextIsolation: true,
       backgroundThrottling: false,
-      preload: path.join(currentDir, "preload.js"),
+      preload: path.join(__dirname, "preload.js"),
     },
   });
   load();
