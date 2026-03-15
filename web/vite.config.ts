@@ -8,7 +8,7 @@ config({ quiet: true });
 
 export default defineConfig({
   plugins: [
-    varlockVitePlugin({ ssrInjectMode: "auto-load" }),
+    varlockVitePlugin({ ssrInjectMode: "resolved-env" }),
     sveltekit(),
     tailwindcss(),
   ],
