@@ -12,7 +12,6 @@ import {
 import open from "open";
 import path from "node:path";
 
-
 let tray: Tray;
 let window: BrowserWindow;
 let currentIcon = "busy";
@@ -70,12 +69,21 @@ app.on("window-all-closed", () => {
 });
 const icons = ["default", "error", "busy"];
 function iconFilename(icon: string) {
-  return path.join(
+  let folder = path.join(
     __dirname,
     process.env.NODE_ENV === "development" ? "./" : "../",
-    `../../public/tray-${icon}Template.png`,
+    "../../public/",
   );
+  if (process.platform === "win32") {
+    return path.resolve(
+      folder,
+      `win32-${nativeTheme.shouldUseDarkColors ? "dark" : "light"}/tray-${icon}@3x.png`,
+    );
+  }
+
+  return path.resolve(folder, `tray-${icon}Template.png`);
 }
+
 function createTray() {
   const contextMenu = Menu.buildFromTemplate([
     {
