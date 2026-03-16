@@ -15,6 +15,7 @@ import path from "node:path";
 let tray: Tray;
 let window: BrowserWindow;
 let currentIcon = "busy";
+let attentionNeeded = 0;
 const windowWidth = 550;
 const windowHeight = 500;
 
@@ -75,9 +76,12 @@ function iconFilename(icon: string) {
     "../../public/",
   );
   if (process.platform === "win32") {
+    if (icon === "default" && attentionNeeded !== 0) {
+      icon = "attention-required";
+    }
     return path.resolve(
       folder,
-      `win32-${nativeTheme.shouldUseDarkColors ? "dark" : "light"}/tray-${icon}@3x.png`,
+      `win32-${nativeTheme.shouldUseDarkColors ? "dark" : "light"}/tray-${icon}.png`,
     );
   }
 
@@ -164,6 +168,9 @@ function createWindow() {
   });
 }
 
+ipcMain.on("attentionNeeded", (event, count) => {
+  attentionNeeded = count;
+});
 ipcMain.on("title", (event, title) => {
   tray.setTitle(title);
   tray.setToolTip(title);

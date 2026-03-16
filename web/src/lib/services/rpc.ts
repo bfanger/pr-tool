@@ -1,6 +1,7 @@
 export const channelWithResponse = {
   title: false,
   icon: false,
+  attentionNeeded: false,
   quit: false,
   axios: true,
 };
@@ -14,6 +15,7 @@ type AxiosResponse = {
 type Responses = {
   title: void;
   icon: void;
+  attentionNeeded: void;
   quit: void;
   axios: AxiosResponse;
 };

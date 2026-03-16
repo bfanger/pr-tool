@@ -8,7 +8,7 @@
   };
   let { platforms }: Props = $props();
 
-  let title = $derived.by(() => {
+  let attentionNeeded = $derived.by(() => {
     let count = 0;
     for (const platform of platforms) {
       for (const task of platform.tasks) {
@@ -17,8 +17,11 @@
         }
       }
     }
-    return count === 0 ? "" : `${count} PRs`;
+    return count;
   });
+
+  let title = $derived(attentionNeeded === 0 ? "" : `${attentionNeeded} PRs`);
+
   type Icon = "default" | "busy" | "error";
   let previous: Icon = "busy";
 
@@ -38,10 +41,13 @@
     previous = "default";
     return "default";
   });
-
+  $effect(() => {
+    rpc.send("attentionNeeded", attentionNeeded);
+  });
   $effect(() => {
     rpc.send("title", title);
   });
+
   $effect(() => {
     rpc.send("icon", icon);
   });
