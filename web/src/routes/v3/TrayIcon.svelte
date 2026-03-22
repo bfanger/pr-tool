@@ -1,16 +1,13 @@
 <script lang="ts">
   import rpc from "$lib/services/rpc";
   import archived from "../../platforms/archived";
-  import type { Platform } from "../../platforms/types";
+  import { getPlatformsContext } from "../../services/platformContext-fns";
 
-  type Props = {
-    platforms: Platform[];
-  };
-  let { platforms }: Props = $props();
+  const platforms = getPlatformsContext();
 
   let attentionNeeded = $derived.by(() => {
     let count = 0;
-    for (const platform of platforms) {
+    for (const platform of platforms.current) {
       for (const task of platform.tasks) {
         if (task.attentionNeeded && archived.isActive(task)) {
           count++;
@@ -26,7 +23,7 @@
   let previous: Icon = "busy";
 
   let icon: Icon = $derived.by(() => {
-    for (const platform of platforms) {
+    for (const platform of platforms.current) {
       if (platform.progress === "error") {
         previous = "error";
         return "error";

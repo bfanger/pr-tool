@@ -1,18 +1,17 @@
 <script lang="ts">
-  import Spinner from "../../components/Spinner/Spinner.svelte";
-  import TaskRows from "../../components/TaskRows/TaskRows.svelte";
-  import { getContext } from "svelte";
-  import type { Platform, Task } from "../../platforms/types";
-  import Button from "../../components/Button/Button.svelte";
-  import ArchiveButton from "./ArchiveButton.svelte";
-  import archived from "../../platforms/archived";
+  import Spinner from "../../../components/Spinner/Spinner.svelte";
+  import TaskRows from "../../../components/TaskRows/TaskRows.svelte";
+  import type { Task } from "../../../platforms/types";
+  import Button from "../../../components/Button/Button.svelte";
+  import ArchiveButton from "../ArchiveButton.svelte";
+  import archived from "../../../platforms/archived";
+  import { getPlatformsContext } from "../../../services/platformContext-fns";
 
-  const ctx = getContext<{ platforms: Platform[] }>("platforms");
-  let platforms = $derived(ctx.platforms);
+  const platforms = getPlatformsContext();
   let wantToArchive = $state<string>();
 
   let allTasks = $derived(
-    platforms
+    platforms.current
       .flatMap((platform) => platform.tasks)
       .filter((task) => archived.isActive(task))
       .toSorted((a, b) => {
@@ -38,9 +37,9 @@
 </script>
 
 {#if allTasks.length === 0}
-  {#if platforms.some((platform) => platform.progress === "updating" || platform.progress === "refreshing")}
+  {#if platforms.current.some((platform) => platform.progress === "init" || platform.progress === "updating" || platform.progress === "refreshing")}
     <Spinner />
-  {:else if platforms.some((platform) => platform.progress === "error")}
+  {:else if platforms.current.some((platform) => platform.progress === "error")}
     <div>Failed to load items</div>
   {:else}
     <div>No items</div>
@@ -50,7 +49,6 @@
     {#each Object.entries(groups) as [, tasks]}
       {#if tasks?.length}
         {@const group = tasks[0]!.getGroup()}
-
         <div>
           <h2 class="group">
             {#if group.icon}

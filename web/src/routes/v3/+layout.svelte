@@ -1,17 +1,21 @@
 <script lang="ts">
+  import { onMount, type Snippet } from "svelte";
   import { configsSchema } from "../../platforms/types";
   import storage from "../../services/storage.svelte";
   import gitlab from "../../platforms/gitlab.svelte";
   import legacy from "../../platforms/legacy.svelte";
-  import { setContext } from "svelte";
-  import TrayIcon from "./TrayIcon.svelte";
-  import RefreshTrigger from "./RefreshTrigger.svelte";
-  import Onboarding from "../../components/Onboarding/Onboarding.svelte";
-  import Button from "../../components/Button/Button.svelte";
   import github from "../../platforms/github.svelte";
   import jira from "../../platforms/jira.svelte";
+  import TrayIcon from "./TrayIcon.svelte";
+  import { setPlatformsContext } from "../../services/platformContext-fns";
+  import poll from "../../services/poll";
+  type Props = {
+    children: Snippet;
+  };
+  let { children }: Props = $props();
 
-  let { children } = $props();
+  let promise = $state(new Promise<void>(() => undefined));
+  let aborts: ((reason: string) => void)[] = [];
 
   const storedConfigs = storage("configs", configsSchema);
   let platforms = $derived(
@@ -29,38 +33,90 @@
     }),
   );
 
-  setContext("platforms", {
-    get platforms() {
+  function refreshAll(reason: string) {
+    aborts = [];
+    promise = Promise.allSettled(
+      platforms.map((platform) => {
+        aborts.push(platform.abort);
+        return platform.refresh(reason);
+      }),
+    ).then((results) => {
+      for (const result of results) {
+        if (result.status === "rejected") {
+          console.warn(result.reason);
+        }
+      }
+      return undefined;
+    });
+    return promise;
+  }
+
+  setPlatformsContext({
+    get current() {
       return platforms;
     },
+    get promise() {
+      return promise;
+    },
+    refreshAll,
+  });
+
+  function handleNetworkChange() {
+    refreshAll("Refresh, network change detected");
+  }
+
+  function handleVisibilityChange() {
+    if (!document.hidden) {
+      refreshAll("Refreshing, window was opened");
+    }
+  }
+
+  function handleFocus() {
+    for (const platform of platforms) {
+      if (platform.progress === "error" || platform.progress === "idle") {
+        platform.refresh("Retry, window regained focus");
+      }
+    }
+  }
+
+  onMount(() => {
+    refreshAll("RefreshTrigger is mounted");
+    const abortController = new AbortController();
+    poll(() => refreshAll("Polling..."), {
+      gap: 3600,
+      signal: abortController.signal,
+    });
+    window.navigator.connection?.addEventListener(
+      "change",
+      handleNetworkChange,
+    );
+    return () => {
+      const reason = "RefreshTrigger was destroyed";
+      abortController.abort(new DOMException(reason, "AbortError"));
+      window.navigator.connection?.removeEventListener(
+        "change",
+        handleNetworkChange,
+      );
+      for (const abort of aborts) {
+        abort(reason);
+      }
+    };
   });
 </script>
 
-{#if platforms.length > 0}
-  <TrayIcon {platforms} />
-  <div class="layout">
-    {#key platforms}
-      <header class="header">
-        <div>
-          <RefreshTrigger {platforms} />
-        </div>
-        <div>
-          <Button href="/v3/settings">Settings</Button>
-        </div>
-      </header>
-    {/key}
-    <main class="content">
-      {@render children()}
-    </main>
-  </div>
-{:else}
-  <div class="layout">
-    <Onboarding />
-  </div>
-{/if}
+<svelte:document onvisibilitychange={handleVisibilityChange} />
+<svelte:window onfocus={handleFocus} />
+
+<div class="page-layout">
+  {#if platforms.length > 0}
+    <TrayIcon />
+  {/if}
+
+  {@render children()}
+</div>
 
 <style>
-  .layout {
+  .page-layout {
     box-sizing: border-box;
     max-width: 100rem;
     min-height: 100%;
@@ -73,20 +129,5 @@
     letter-spacing: 0.1px;
 
     background: light-dark(#ebebeb, #282727);
-  }
-
-  .header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-
-    padding: 0.8rem;
-    border-bottom: 1px solid light-dark(#c9c9c9, #000);
-
-    background: light-dark(#dfdedf, #4c4b4b);
-  }
-
-  .content {
-    padding: 0.8rem;
   }
 </style>
