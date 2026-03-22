@@ -6,9 +6,13 @@
   import legacy from "../../platforms/legacy.svelte";
   import github from "../../platforms/github.svelte";
   import jira from "../../platforms/jira.svelte";
+  import azueDevopsIcon from "../../assets/img/azure-devops.png";
+  import bitbucketIcon from "../../assets/img/azure-devops.png";
   import TrayIcon from "./TrayIcon.svelte";
   import { setPlatformsContext } from "../../services/platformContext-fns";
   import poll from "../../services/poll";
+  import type { ProviderConfig } from "$lib/streams/providers";
+
   type Props = {
     children: Snippet;
   };
@@ -16,6 +20,11 @@
 
   let promise = $state(new Promise<void>(() => undefined));
   let aborts: ((reason: string) => void)[] = [];
+
+  const icons = {
+    "azure-devops": azueDevopsIcon,
+    bitbucket: bitbucketIcon,
+  } as Record<ProviderConfig["type"], string | undefined>;
 
   const storedConfigs = storage("configs", configsSchema);
   let platforms = $derived(
@@ -27,7 +36,7 @@
       } else if (config?.type === "jira") {
         return jira(config);
       } else if (config) {
-        return legacy(config);
+        return legacy(config, icons[config.type] ?? "");
       }
       throw new Error(`Unsupported platform: ${(config as any)?.type}`);
     }),

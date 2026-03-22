@@ -7,7 +7,7 @@
     "preview": "vite preview",
     "lint": "node ./src/varlockSync.js && concurrently -c \"#c596c7\",\"#676778\",\"#4b32c3\",\"#fafafa\" --kill-others-on-fail \"npm:lint:*\"",
     "lint:prettier": "prettier --check .",
-    "lint:svelte-check": "svelte-check --fail-on-warnings",
+    "lint:svelte-check": "svelte-check --fail-on-warnings --tsgo",
     "lint:eslint": "eslint --max-warnings=0",
     "lint:stylelint": "stylelint --max-warnings=0 \"src/**/*.{css,svelte}\"",
     "format": "eslint --fix && stylelint --fix \"src/**/*.{css,svelte}\" && prettier --write .",

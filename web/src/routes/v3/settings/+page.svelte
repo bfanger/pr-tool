@@ -5,7 +5,16 @@
 </script>
 
 <Header>
-  <Button href="/v2/">Switch to version 2</Button>
   <Button href="/app">Back</Button>
 </Header>
 <Settings />
+<footer>
+  <Button href="/v2/">Downgrade to version 2</Button>
+</footer>
+
+<style>
+  footer {
+    margin-top: 8rem;
+    text-align: center;
+  }
+</style>

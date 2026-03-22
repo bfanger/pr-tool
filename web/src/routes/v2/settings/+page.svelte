@@ -4,14 +4,15 @@
   import Settings from "../../../components/Settings/Settings.svelte";
 </script>
 
-<div class="upgrade">
-  <Button href="/v3/">Switch to version 3</Button>
-</div>
 <Settings />
 <BackButton />
+<div class="upgrade">
+  <Button href="/v3/">Upgrade to version 3</Button>
+</div>
 
 <style>
   .upgrade {
-    padding: 0.8rem;
+    margin-top: 2rem;
+    text-align: center;
   }
 </style>

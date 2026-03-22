@@ -15,6 +15,7 @@ import type { Profile } from "$lib/models/Profile";
 
 export default function legacy(
   config: GitHubConfig | GitLabConfig | AzureDevOpsConfig | BitbucketConfig,
+  icon: string,
 ): Platform {
   const provider = providerFromConfig(config);
   const progress$ = new BehaviorSubject(0);
@@ -117,7 +118,7 @@ export default function legacy(
       getGroup: () => ({
         id: `${config.type}\n${project.id}`,
         title: project.name,
-        icon: "",
+        icon,
       }),
       getCollaborators() {
         return pullRequest.reviewers.map((reviewer) => ({
@@ -131,7 +132,7 @@ export default function legacy(
   }
 
   return {
-    icon: "",
+    icon,
     get progress() {
       return progress;
     },
