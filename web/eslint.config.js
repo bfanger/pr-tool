@@ -1,28 +1,42 @@
+// @ts-check
 import "eslint-plugin-only-warn";
 import js from "@eslint/js";
 import ts from "typescript-eslint";
 import prettier from "eslint-config-prettier";
 import svelte from "eslint-plugin-svelte";
 import globals from "globals";
+import { defineConfig } from "eslint/config";
 
-export default ts.config(
-  js.configs.recommended,
-  ...ts.configs.recommendedTypeChecked,
-  ...svelte.configs["flat/recommended"],
-  prettier,
-  ...svelte.configs["flat/prettier"],
+export default defineConfig(
+  {
+    ignores: [
+      ".svelte-kit",
+      ".vercel",
+      "build",
+      "node_modules",
+      "dist",
+      "vite.config.ts.timestamp-*.mjs",
+    ],
+  },
   {
     languageOptions: {
       ecmaVersion: "latest",
       sourceType: "module",
-      globals: { ...globals.node, ...globals.browser },
+      globals: globals.browser,
       parserOptions: {
         parser: ts.parser,
         extraFileExtensions: [".svelte"],
-        project: `tsconfig.eslint.json`,
+        project: "tsconfig.eslint.json",
       },
     },
   },
+  js.configs.recommended,
+  ts.configs.eslintRecommended,
+  ...ts.configs.recommendedTypeChecked,
+  ...ts.configs.stylisticTypeChecked,
+  ...svelte.configs["flat/recommended"],
+  prettier,
+  ...svelte.configs["flat/prettier"],
   {
     rules: {
       "@typescript-eslint/no-floating-promises": 0,
@@ -32,6 +46,8 @@ export default ts.config(
       "@typescript-eslint/no-unsafe-call": 0,
       "@typescript-eslint/no-unsafe-return": 0,
       "@typescript-eslint/prefer-promise-reject-errors": 0,
+
+      "@typescript-eslint/consistent-type-definitions": ["warn", "type"],
       "@typescript-eslint/ban-ts-comment": "off",
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-shadow": "warn",
@@ -70,13 +86,7 @@ export default ts.config(
     },
   },
   {
-    ignores: [
-      ".svelte-kit",
-      ".vercel",
-      "build",
-      "node_modules",
-      "package",
-      "vite.config.ts.timestamp-*.mjs",
-    ],
+    files: ["**/*.cjs", "**/*.js", "**/*.server.ts"],
+    languageOptions: { globals: globals.node },
   },
 );

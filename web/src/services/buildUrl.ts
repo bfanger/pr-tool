@@ -85,7 +85,7 @@ function parseParam(parameter: string, value: string | number): string {
     return value;
   }
   const numeric = value.toString();
-  if (!numeric.match(/^[0-9]+$/)) {
+  if (!/^[0-9]+$/.exec(numeric)) {
     throw new Error(`Only integer are allowed. ${parameter} was: ${numeric}`);
   }
   return numeric;

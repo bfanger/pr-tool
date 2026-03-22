@@ -27,7 +27,7 @@ const rpc = {
     channel: T,
     ...args: any[]
   ): Promise<R> {
-    if (win.rpc && win.rpc.call) {
+    if (win.rpc?.call) {
       return await win.rpc.call(channel, ...args);
     }
     // not available in web

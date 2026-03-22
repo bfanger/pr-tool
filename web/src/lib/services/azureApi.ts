@@ -12,10 +12,10 @@ import type { TeamResponse } from "./azure-api-types/team-response";
 import type { UsersResponse } from "./azure-api-types/users-response";
 import buildUrl from "./buildUrl";
 
-interface Config extends Partial<AjaxRequest> {
+type Config = Partial<AjaxRequest> & {
   token: string; // Personal Authentication Token
   params?: Record<string, unknown>;
-}
+};
 type ResponseMapGet = {
   "https://vssps.dev.azure.com/[organization]/_apis/profile/profiles/[id]": ProfileResponse;
   "https://vssps.dev.azure.com/[organization]/_apis/graph/users": UsersResponse;

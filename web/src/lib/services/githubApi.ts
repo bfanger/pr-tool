@@ -9,10 +9,10 @@ import type { ReviewsResponse } from "./github-api-types/reviews-response";
 import type { UserResponse } from "./github-api-types/user-response";
 import buildUrl from "./buildUrl";
 
-interface Config extends Partial<AjaxRequest> {
+type Config = Partial<AjaxRequest> & {
   accessToken: string;
   params?: Record<string, unknown>;
-}
+};
 type ResponseMapGet = {
   user: UserResponse;
   "user/repos": RepositoriesResponse;

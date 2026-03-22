@@ -52,9 +52,7 @@
     },
   ];
 
-  $: activeProvider = providers.find(
-    (p) => p.type === type,
-  ) as (typeof providers)[number];
+  $: activeProvider = providers.find((p) => p.type === type)!;
 
   const config$ = new BehaviorSubject<ProviderConfig | undefined>(undefined);
 

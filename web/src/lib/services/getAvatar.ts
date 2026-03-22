@@ -19,15 +19,13 @@ export default function getAvatar(
   size?: string,
 ) {
   const key = `${descriptor}_${size}`;
-  if (!cache[key]) {
-    cache[key] = azure.avatar(organization, token, descriptor, size).pipe(
-      map((response) => {
-        const blob = base64toBlob(response.value, "image/png");
-        const url = URL.createObjectURL(blob);
-        return url;
-      }),
-      shareReplay(1),
-    );
-  }
+  cache[key] ??= azure.avatar(organization, token, descriptor, size).pipe(
+    map((response) => {
+      const blob = base64toBlob(response.value, "image/png");
+      const url = URL.createObjectURL(blob);
+      return url;
+    }),
+    shareReplay(1),
+  );
   return cache[key];
 }

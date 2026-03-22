@@ -1,9 +1,9 @@
 import { pluck } from "rxjs/operators";
 import api from "./azureApi";
 
-interface WithUrl {
+type WithUrl = {
   url: string;
-}
+};
 
 export default {
   profile(organization: string, token: string, id = "me") {
@@ -85,7 +85,7 @@ export default {
       console.warn(object);
       throw new Error(`Unable to extract organization`);
     }
-    const match = object.url.match(/https:\/\/dev\.azure\.com\/([^/]+)/);
+    const match = /https:\/\/dev\.azure\.com\/([^/]+)/.exec(object.url);
     if (match === null) {
       throw new Error(`Unable to extract organization from url: ${object.url}`);
     }

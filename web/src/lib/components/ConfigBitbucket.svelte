@@ -5,7 +5,7 @@
   import TextInput from "./TextInput.svelte";
 
   const dispatch = createEventDispatcher();
-  const proxyAvailable = !!window.rpc;
+  const proxyAvailable = !!(window as any).rpc;
   const auth: BitbucketProviderAuth = {
     domain: "",
     personalAccessToken: "",

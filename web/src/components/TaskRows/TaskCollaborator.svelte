@@ -13,7 +13,7 @@
     completed: completedSvg,
   };
   let avatar = $derived(collaborator.getAvatar("medium"));
-  let icon = $derived(icons[collaborator.icon as Status]);
+  let icon = $derived(icons[collaborator.icon!]);
 </script>
 
 <div class="collaborator">

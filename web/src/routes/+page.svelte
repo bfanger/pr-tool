@@ -3,7 +3,7 @@
 
   if (
     typeof navigator !== "undefined" &&
-    navigator.userAgent.match(/ Electron\//)
+    / Electron\//.exec(navigator.userAgent)
   ) {
     window.location.href = "/app";
   }

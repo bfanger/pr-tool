@@ -19,9 +19,7 @@ const statusMap: Record<number, string> = {
   "-10": "Rejected",
 };
 function transformPullRequest(pr: ApiPullRequest): PullRequest {
-  const match = pr.repository.url.match(
-    /^(https:\/\/dev\.azure\.com\/[^/]+\/)/,
-  );
+  const match = /^(https:\/\/dev\.azure\.com\/[^/]+\/)/.exec(pr.repository.url);
   const encodedProject = encodeURIComponent(pr.repository.project.name);
   const encodedRepo = encodeURIComponent(pr.repository.name);
   return {
@@ -116,7 +114,7 @@ export default class AzureDevopsProvider implements Provider {
     return this.users().pipe(
       switchMap((users) => {
         const user = users[profile.id];
-        if (!user || !user.descriptor) {
+        if (!user?.descriptor) {
           return never();
         }
         return getAvatar(
@@ -163,23 +161,21 @@ export default class AzureDevopsProvider implements Provider {
   }
 
   users() {
-    if (!this.users$) {
-      this.users$ = azure
-        .users(this.auth.organization, this.auth.personalAccessToken)
-        .pipe(
-          map((response) => {
-            const users: Record<string, AzureDevopsProfile> = {};
-            response.value.forEach((user) => {
-              users[user.principalName] = {
-                id: user.principalName,
-                name: user.displayName,
-                descriptor: user.descriptor,
-              };
-            });
-            return users;
-          }),
-        );
-    }
+    this.users$ ??= azure
+      .users(this.auth.organization, this.auth.personalAccessToken)
+      .pipe(
+        map((response) => {
+          const users: Record<string, AzureDevopsProfile> = {};
+          response.value.forEach((user) => {
+            users[user.principalName] = {
+              id: user.principalName,
+              name: user.displayName,
+              descriptor: user.descriptor,
+            };
+          });
+          return users;
+        }),
+      );
     return this.users$;
   }
 

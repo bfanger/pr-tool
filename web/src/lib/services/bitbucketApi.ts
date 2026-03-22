@@ -9,11 +9,11 @@ import type { UserResponse } from "./bitbucket-api-types/user-response";
 import buildUrl from "./buildUrl";
 import proxy from "./proxy";
 
-interface Config extends Partial<AjaxRequest> {
+type Config = Partial<AjaxRequest> & {
   token: string; // Personal Access Token
   proxy: boolean;
   params: { domain: string } & Record<string, string | number>;
-}
+};
 type ResponseMapGet = {
   "https://[domain]/rest/api/1.0/users/[username]": UserResponse;
   "https://[domain]/rest/api/1.0/projects": ProjectsResponse;

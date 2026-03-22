@@ -20,7 +20,7 @@ export type GitLabUser = {
   id: number;
   name: string;
   avatar_url: string;
-} & { [key: string]: unknown };
+} & Record<string, unknown>;
 
 export type GitLabMergeRequest = {
   id: number;
@@ -34,7 +34,7 @@ export type GitLabMergeRequest = {
   web_url: string;
   user_notes_count: number;
   updated_at: string;
-} & { [key: string]: unknown };
+} & Record<string, unknown>;
 
 export type GitLabApprovals = {
   approved_by: { user: GitLabUser }[];
@@ -43,7 +43,7 @@ export type GitLabApprovals = {
 export type GitLabProject = {
   id: number;
   name: string;
-} & { [key: string]: unknown };
+} & Record<string, unknown>;
 
 export const gitlabEventsTypes = [
   "accepted",
@@ -61,7 +61,7 @@ export type GitLabEvent = {
   project_id: number;
   target_type: "MergeRequest" | null;
   target_id: number;
-} & { [key: string]: unknown };
+} & Record<string, unknown>;
 
 const responses = new WeakMap<any, Response>();
 
@@ -134,10 +134,7 @@ export async function gitlabGetAll<T extends keyof GitLabGetRequests>(
   if (!response) {
     return page1;
   }
-  const pageCount = parseInt(
-    response.headers.get("x-total-pages") as string,
-    10,
-  );
+  const pageCount = parseInt(response.headers.get("x-total-pages")!, 10);
   const streamPromise = Promise.all(
     // eslint-disable-next-line @typescript-eslint/await-thenable
     stream ? (page1 as any[]).map((item: any) => stream(item)) : [],

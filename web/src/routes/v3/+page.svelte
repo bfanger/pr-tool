@@ -49,7 +49,7 @@
   <div class="groups">
     {#each Object.entries(groups) as [, tasks]}
       {#if tasks?.length}
-        {@const group = tasks![0]!.getGroup()}
+        {@const group = tasks[0]!.getGroup()}
 
         <div>
           <h2 class="group">

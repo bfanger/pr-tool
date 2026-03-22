@@ -14,9 +14,9 @@ export type BitbucketProviderAuth = {
   personalAccessToken: string;
   proxy: boolean;
 };
-export interface BitbucketProfile extends Profile {
+export type BitbucketProfile = Profile & {
   email: string;
-}
+};
 
 export default class BitbucketProvider implements Provider {
   name: string;
@@ -147,7 +147,7 @@ export default class BitbucketProvider implements Provider {
             title: pr.title,
             fase: "READY",
             timestamp: pr.updatedDate * 1000,
-            url: pr.links!.self[0]!.href,
+            url: pr.links.self[0]!.href,
             reviewers: pr.reviewers.map((author) => {
               const reviewer: Reviewer = {
                 icon: author.approved ? "APPROVED" : "",

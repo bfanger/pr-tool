@@ -58,7 +58,7 @@ export const pullRequestsWithStatus$ = combineLatest([
       if (account) {
         withStatus.push({
           ...pr,
-          status: pr.provider.pullRequestStatus(pr.pullRequest!, account),
+          status: pr.provider.pullRequestStatus(pr.pullRequest, account),
         });
       }
     });
@@ -75,7 +75,7 @@ type Grouped = {
 export function groupByProject(prs: Result[]): Grouped[] {
   const grouped: Record<string, Grouped> = {};
   for (const { project, provider, pullRequest } of prs) {
-    const group = grouped[project.id] || {
+    const group = grouped[project.id] ?? {
       project,
       provider,
       pullRequests: [],

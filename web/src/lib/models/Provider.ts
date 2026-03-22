@@ -7,7 +7,7 @@ export type PullRequestWithProject = {
   pullRequest: PullRequest;
   project: Project;
 };
-export interface Provider {
+export type Provider = {
   name: string;
   auth: Record<string, unknown>;
   valid(): Observable<Error | boolean>;
@@ -17,4 +17,4 @@ export interface Provider {
   pullRequestsFor(projectId: string | number): Observable<PullRequest[]>;
   pollFor(projectId: string | number): Observable<null>;
   pullRequestStatus(pullRequest: PullRequest, me: Profile): PullRequestStatus;
-}
+};

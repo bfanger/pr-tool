@@ -12,10 +12,10 @@ import type { ProjectsResponse } from "./gitlab-api-types/projects-response";
 import type { UserResponse } from "./gitlab-api-types/user-response";
 import buildUrl from "./buildUrl";
 
-interface Config extends Partial<AjaxRequest> {
+type Config = Partial<AjaxRequest> & {
   token: string; // Private Token
   params?: Record<string, string | number>;
-}
+};
 type ResponseMapGet = {
   "https://[domain]/api/v4/user": UserResponse;
   "https://[domain]/api/v4/projects": ProjectsResponse;

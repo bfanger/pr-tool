@@ -4,11 +4,11 @@ import type {
 } from "../../services/azure-api-types/pull-requests-response";
 import type { Profile } from "../Profile";
 
-export interface AzureDevopsProfile extends Profile {
+export type AzureDevopsProfile = Profile & {
   id: string; // uniqueName / email
   name: string;
   descriptor?: string;
-}
+};
 
 export function fromCreatedBy(createdBy: CreatedBy): AzureDevopsProfile {
   return {
@@ -18,7 +18,7 @@ export function fromCreatedBy(createdBy: CreatedBy): AzureDevopsProfile {
   };
 }
 export function fromReviewer(reviewer: Reviewer): AzureDevopsProfile {
-  const match = reviewer._links.avatar.href.match(/MemberAvatars\/([^/]+)/);
+  const match = /MemberAvatars\/([^/]+)/.exec(reviewer._links.avatar.href);
   return {
     id: reviewer.uniqueName.toLowerCase(),
     name: reviewer.displayName,

@@ -29,7 +29,7 @@ export default function legacy(
   } = $state({ medium: {}, large: {} });
 
   function loadAvatar(profile: Profile, size: "medium" | "large") {
-    let url = avatars[size][profile.id] ?? avatars[size]["large"];
+    let url = avatars[size][profile.id] ?? avatars[size].large;
     if (!url) {
       const subscription = provider.avatar(profile, size).subscribe((value) => {
         url = value;
@@ -139,7 +139,7 @@ export default function legacy(
       retry$.next();
       return Promise.resolve();
     },
-    abort() {},
+    abort: () => undefined,
     get tasks() {
       return tasks;
     },

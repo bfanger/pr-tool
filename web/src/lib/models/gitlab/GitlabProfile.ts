@@ -1,11 +1,11 @@
 import type { ApiUser } from "../../services/gitlab-api-types/api-user";
 import type { Profile } from "../Profile";
 
-export interface GitlabProfile extends Profile {
+export type GitlabProfile = Profile & {
   id: number;
   name: string;
   avatar?: string;
-}
+};
 export function userToProfile(user: ApiUser): GitlabProfile {
   return {
     id: user.id,

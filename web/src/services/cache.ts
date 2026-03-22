@@ -21,7 +21,7 @@ const log = debug
   ? function (message: string, key: unknown) {
       console.info(`[cache] ${message}:`, key);
     }
-  : () => {};
+  : () => undefined;
 
 /**
  * An in-memory caching helper
