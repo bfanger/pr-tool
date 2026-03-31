@@ -1,7 +1,7 @@
 import { varlockVitePlugin } from "@varlock/vite-integration";
 import { sveltekit } from "@sveltejs/kit/vite";
 import tailwindcss from "@tailwindcss/vite";
-import { configDefaults, defineConfig } from "vitest/config";
+import { defineConfig } from "vite";
 import { config } from "dotenv";
 
 config({ quiet: true });
@@ -13,13 +13,9 @@ export default defineConfig({
     tailwindcss(),
   ],
   css: { devSourcemap: true },
-  test: {
-    environment: "happy-dom",
-    exclude: [...configDefaults.exclude, "package", "playwright"],
-  },
-  ...(process.env.PUBLIC_PROXY_DOMAIN
-    ? {
-        server: {
+  server: {
+    ...(process.env.PUBLIC_PROXY_DOMAIN
+      ? {
           proxy: {
             "/proxy": {
               target: process.env.PUBLIC_PROXY_DOMAIN,
@@ -27,7 +23,7 @@ export default defineConfig({
               rewrite: (path) => path.replace(/^\/proxy/, ""),
             },
           },
-        },
-      }
-    : {}),
+        }
+      : {}),
+  },
 });

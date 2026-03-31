@@ -1,8 +1,7 @@
 /**
- * The proxy immitates the api of ajax from 'rxjs/ajax' but uses axios inside nodejs.
+ * The proxy imitates the api of ajax from 'rxjs/ajax' but uses axios inside nodejs.
  * This allows the app to make requests that are not allowed with CORS
  */
-import type { AxiosRequestConfig } from "axios";
 import type { Observable } from "rxjs";
 import type { AjaxRequest, AjaxResponse } from "rxjs/ajax";
 import { defer, from } from "rxjs";
@@ -13,22 +12,23 @@ export type ProxyResponse = Pick<
   AjaxResponse<any>,
   "status" | "response" | "xhr"
 >;
-export default function proxy(request: AjaxRequest): Observable<ProxyResponse> {
-  const options: AxiosRequestConfig = {
+export default function ajaxRpc(
+  request: AjaxRequest,
+): Observable<ProxyResponse> {
+  const options: { url: string } & RequestInit = {
     url: request.url,
     method: request.method,
     headers: request.headers,
   };
   return defer(() =>
-    from(rpc.send("axios", options)).pipe(
+    from(rpc.send("fetch", options)).pipe(
       map((res) => {
+        const headers = new Headers(res.headers);
         const response: ProxyResponse = {
           status: res.status,
           response: res.body,
           xhr: {
-            getResponseHeader(header: string) {
-              return res.headers[header];
-            },
+            getResponseHeader: (name) => headers.get(name),
           } as XMLHttpRequest,
         };
         return response;

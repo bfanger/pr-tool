@@ -1,4 +1,3 @@
-import Axios from "axios";
 import {
   app,
   BrowserWindow,
@@ -188,19 +187,19 @@ ipcMain.on("quit", () => {
   app.exit(0);
 });
 
-ipcMain.on("axios", (event, options) => {
+ipcMain.on("fetch", async (event, options) => {
   const reply = createAsyncResponse(event);
-  Axios(options)
-    .then((res) => {
-      reply(null, {
-        status: res.status,
-        headers: res.headers,
-        body: res.data,
-      });
-    })
-    .catch((err) => {
-      reply(err);
+  try {
+    const { url, ...init } = options;
+    const response = await fetch(url, init);
+    reply(null, {
+      status: response.status,
+      headers: Object.fromEntries(response.headers.entries()),
+      body: await response.json(),
     });
+  } catch (err) {
+    reply(err as Error);
+  }
 });
 app.on("ready", () => {
   createTray();

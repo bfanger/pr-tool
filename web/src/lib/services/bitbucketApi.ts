@@ -7,7 +7,7 @@ import type { ProjectsResponse } from "./bitbucket-api-types/projects-response";
 import type { PullRequestsResponse } from "./bitbucket-api-types/pull-requests-response";
 import type { UserResponse } from "./bitbucket-api-types/user-response";
 import buildUrl from "./buildUrl";
-import proxy from "./proxy";
+import ajaxRpc from "./ajaxRpc";
 
 type Config = Partial<AjaxRequest> & {
   token: string; // Personal Access Token
@@ -40,15 +40,12 @@ function applyParams(path: string, config: Config): AjaxRequest {
   }
   return request;
 }
-function fetch<Response>(
+function rxFetch<Response>(
   method: "GET",
   path: string,
   config: Config,
 ): Observable<Response> {
-  let client: typeof proxy = ajax;
-  if (config.proxy) {
-    client = proxy;
-  }
+  const client: typeof ajaxRpc = config.proxy ? ajaxRpc : ajax;
   return client(applyParams(path, { ...config, method })).pipe(
     map(({ response, xhr }) => {
       const username = xhr.getResponseHeader("x-ausername");
@@ -62,7 +59,7 @@ function fetch<Response>(
 }
 const bitbucketApi = {
   get<P extends keyof ResponseMapGet>(path: P, options: Config) {
-    return fetch<ResponseMapGet[P]>("GET", path, options);
+    return rxFetch<ResponseMapGet[P]>("GET", path, options);
   },
 };
 export default bitbucketApi;

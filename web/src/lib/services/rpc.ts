@@ -3,21 +3,21 @@ export const channelWithResponse = {
   icon: false,
   attentionNeeded: false,
   quit: false,
-  axios: true,
+  fetch: true,
 };
 export const channels = Object.keys(channelWithResponse);
 export type Channel = keyof typeof channelWithResponse;
-type AxiosResponse = {
+export type FetchProxyResponse = {
   status: number;
-  body: string;
   headers: Record<string, string>;
+  body: unknown;
 };
 type Responses = {
   title: void;
   icon: void;
   attentionNeeded: void;
   quit: void;
-  axios: AxiosResponse;
+  fetch: FetchProxyResponse;
 };
 
 const win = globalThis as any;

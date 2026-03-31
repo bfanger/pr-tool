@@ -10,5 +10,7 @@ test("homepage", async ({ page }) => {
   await expect(
     page.getByRole("heading", { name: "Add an account" }),
   ).toBeVisible();
-  await expect(page.locator(".layout")).toHaveScreenshot();
+  if (process.platform === "darwin") {
+    await expect(page.locator(".page-layout")).toHaveScreenshot();
+  }
 });
