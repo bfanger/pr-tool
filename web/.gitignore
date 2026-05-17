@@ -1,0 +1,7 @@
+.pnpm-store
+.svelte-kit
+.vercel
+build
+node_modules
+pnpm-lock.yaml
+test-results

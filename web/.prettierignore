@@ -3,5 +3,6 @@
 /build
 /package
 /node_modules
+/.pnpm-store
 /pnpm-lock.yaml
 /test-results
