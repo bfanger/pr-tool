@@ -1,3 +1,7 @@
+setup:
+	pnpm --prefix ./web install
+	npm --prefix ./electron install
+
 dev:
 	yarn --cwd ./web concurrently --kill-others 'yarn dev' 'yarn --cwd ../electron dev'
 	
