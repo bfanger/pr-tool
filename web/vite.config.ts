@@ -1,3 +1,4 @@
+import { existsSync } from "node:fs";
 import { varlockVitePlugin } from "@varlock/vite-integration";
 import { sveltekit } from "@sveltejs/kit/vite";
 import tailwindcss from "@tailwindcss/vite";
@@ -5,6 +6,8 @@ import { defineConfig } from "vite";
 import { config } from "dotenv";
 
 config({ quiet: true });
+
+const inDocker = existsSync("/.dockerenv");
 
 export default defineConfig({
   plugins: [
@@ -14,6 +17,9 @@ export default defineConfig({
   ],
   css: { devSourcemap: true },
   server: {
+    ...(inDocker
+      ? { host: true, watch: { usePolling: true, interval: 1000 } }
+      : {}),
     ...(process.env.PUBLIC_PROXY_DOMAIN
       ? {
           proxy: {

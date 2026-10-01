@@ -3,14 +3,14 @@ setup:
 	npm --prefix ./electron install
 
 dev:
-	yarn --cwd ./web concurrently --kill-others 'yarn dev' 'yarn --cwd ../electron dev'
+	pnpm --prefix ./web concurrently --kill-others 'pnpm dev' 'pnpm --prefix ../electron dev'
 	
 build:
-	yarn --cwd ./web build
-	yarn --cwd ./electron build
+	pnpm --prefix ./web build
+	pnpm --prefix ./electron build
 
 lint:
-	yarn --cwd ./web concurrently --kill-others 'yarn lint' 'yarn --cwd ../electron lint'
+	pnpm --prefix ./web concurrently --kill-others 'pnpm lint' 'pnpm --prefix ../electron lint'
 
 format:
-	yarn --cwd ./web concurrently --kill-others 'yarn format' 'yarn --cwd ../electron format'
+	pnpm --prefix ./web concurrently --kill-others 'pnpm format' 'pnpm --prefix ../electron format'

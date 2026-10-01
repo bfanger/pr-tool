@@ -3,25 +3,25 @@
   "productName": "PR notifications",
   "version": "2.0.0",
   "private": true,
-  "type": "commonjs",
-  "main": ".vite/build/main.js",
+  "type": "module",
+  "main": ".vite/build/main.cjs",
   "scripts": {
     "dev": "cross-env NODE_ENV=development electron-forge start",
     "build": "electron-forge package",
-    "preinstall": "npx -y only-allow npm",
+    "preinstall": "npx -y only-allow pnpm",
     "lint": "prettier --check . && tsc --noEmit",
     "format": "prettier --write ."
   },
   "devDependencies": {
-    "@electron-forge/cli": "^7.11.1",
-    "@electron-forge/plugin-vite": "^7.11.1",
+    "@electron-forge/cli": "^8.0.1",
+    "@electron-forge/plugin-vite": "^8.0.1",
     "cross-env": "^10.1.0",
-    "electron": "^42.3.2",
-    "prettier": "^3.8.1",
-    "typescript": "^6.0.3",
-    "vite": "^8.0.0"
+    "electron": "^44.5.1",
+    "prettier": "^3.9.9",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.1"
   },
   "dependencies": {
-    "open": "^11.0.0"
+    "open": "^11.0.4"
   }
 }
